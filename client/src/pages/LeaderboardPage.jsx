@@ -99,7 +99,27 @@ export default function LeaderboardPage() {
                 <span style={{ ...styles.col, width: '60px' }} className="mono">
                   <RankBadge rank={row.rank} />
                 </span>
-                <span style={{ ...styles.col, flex: 1 }}>{row.name}</span>
+                <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {row.cfHandle && (
+                    <a
+                      href={`https://codeforces.com/profile/${row.cfHandle}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      style={styles.cfIconLink}
+                      title={`Open ${row.cfHandle} on Codeforces`}
+                    >
+                      <CfIcon />
+                    </a>
+                  )}
+                  <span
+                    className="mono"
+                    style={styles.nameLink}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/profile/${row.userId}`); }}
+                  >
+                    {row.cfHandle || row.name}
+                  </span>
+                </span>
                 <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="mono">
                   {row.points}
                 </span>
@@ -121,6 +141,16 @@ function RankBadge({ rank }) {
     return <span>{MEDALS[rank]} <span style={{ color: 'var(--text-dim)', fontSize: '11px' }}>#{rank}</span></span>;
   }
   return <span style={{ color: 'var(--text-dim)', fontWeight: 600 }}>#{rank}</span>;
+}
+
+function CfIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="6" width="4" height="9" rx="1.2" fill="#FF7F00" />
+      <rect x="6" y="3" width="4" height="12" rx="1.2" fill="#3776AB" />
+      <rect x="11.5" y="0.5" width="4" height="14.5" rx="1.2" fill="#1FA83B" />
+    </svg>
+  );
 }
 
 const styles = {
@@ -216,5 +246,7 @@ const styles = {
     cursor: 'pointer'
   },
   queueRowSelf: { background: 'var(--accent-green-dim)' },
+  cfIconLink: { display: 'flex', alignItems: 'center', flexShrink: 0 },
+  nameLink: { cursor: 'pointer' },
   empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: '13px' }
 };
