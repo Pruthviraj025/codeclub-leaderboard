@@ -9,6 +9,10 @@ export default function ProfilePage() {
   const [cfHandle, setCfHandle] = useState('');
   const [verifyInfo, setVerifyInfo] = useState(null);
   const [verifyMsg, setVerifyMsg] = useState('');
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [emailMsg, setEmailMsg] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
   const sessionUser = getSessionUser();
   const navigate = useNavigate();
 
@@ -50,6 +54,22 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleUpdateEmail(e) {
+    e.preventDefault();
+    setEmailMsg('');
+    setSavingEmail(true);
+    try {
+      await api.updateEmail(newEmail);
+      setEmailMsg('Email updated');
+      setEditingEmail(false);
+      await load();
+    } catch (err) {
+      setEmailMsg(err.message);
+    } finally {
+      setSavingEmail(false);
+    }
+  }
+
   if (!sessionUser) return null;
   if (error) return <div style={styles.pageCenter}><div style={styles.error}>{error}</div></div>;
   if (!profile) return <div style={styles.pageCenter}><div style={styles.dim}>Loading…</div></div>;
@@ -80,7 +100,40 @@ export default function ProfilePage() {
           {isOwner && profile.usn && (
             <div style={styles.privateBlock}>
               <div style={styles.privateLine}><span style={styles.dim}>USN</span> {profile.usn}</div>
-              <div style={styles.privateLine}><span style={styles.dim}>Email</span> {profile.email}</div>
+
+              {!editingEmail ? (
+                <div style={styles.privateLine}>
+                  <span style={styles.dim}>Email</span> {profile.email}{' '}
+                  <button
+                    type="button"
+                    style={styles.editLink}
+                    onClick={() => { setEditingEmail(true); setNewEmail(profile.email); setEmailMsg(''); }}
+                  >
+                    edit
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleUpdateEmail} style={styles.cfForm}>
+                  <input
+                    style={styles.input}
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    required
+                  />
+                  <button style={styles.smallBtn} type="submit" disabled={savingEmail}>
+                    {savingEmail ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    style={styles.editLink}
+                    onClick={() => { setEditingEmail(false); setEmailMsg(''); }}
+                  >
+                    cancel
+                  </button>
+                </form>
+              )}
+              {emailMsg && <div style={styles.verifyMsg}>{emailMsg}</div>}
             </div>
           )}
 
@@ -164,6 +217,10 @@ const styles = {
   privateBlock: { marginTop: 'var(--space-4)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border)' },
   privateLine: { fontFamily: 'var(--font-mono)', fontSize: '13px', marginBottom: '4px' },
   dim: { color: 'var(--text-dim)' },
+  editLink: {
+    background: 'transparent', border: 'none', color: 'var(--accent-green)',
+    fontFamily: 'var(--font-mono)', fontSize: '11px', textDecoration: 'underline', padding: 0
+  },
   cfConnect: { marginTop: 'var(--space-4)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border)' },
   eyebrow: { fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent-green)', letterSpacing: '2px', marginBottom: 'var(--space-2)' },
   cfForm: { display: 'flex', gap: 'var(--space-2)' },
