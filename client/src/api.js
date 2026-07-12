@@ -25,6 +25,7 @@ export const api = {
   currentLeaderboard: () => request('/leaderboard/current'),
   refresh: () => request('/leaderboard/refresh', { method: 'POST' }),
   profile: (userId) => request(`/profile/${userId}`),
+  updateEmail: (email) => request('/profile/me/email', { method: 'PATCH', body: JSON.stringify({ email }) }),
   startCfVerification: (cfHandle) => request('/cf/start-verification', { method: 'POST', body: JSON.stringify({ cfHandle }) }),
   checkCfVerification: () => request('/cf/verify', { method: 'POST' }),
 
@@ -52,4 +53,9 @@ export function getSessionUser() {
 export function clearSession() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+}
+
+// Fire-and-forget ping to wake a sleeping Render backend before the user submits a form
+export function warmUpServer() {
+  fetch(`${BASE_URL}/health`).catch(() => {});
 }
