@@ -30,15 +30,19 @@ router.get('/current', requireAuth, async (req, res) => {
     ]);
 
     const userIds = totals.map(t => t._id);
-    const users = await User.find({ _id: { $in: userIds } }, 'name usn');
-    const nameMap = new Map(users.map(u => [u._id.toString(), u.name]));
+    const users = await User.find({ _id: { $in: userIds } }, 'name cfHandle');
+    const userMap = new Map(users.map(u => [u._id.toString(), u]));
 
-    const leaderboard = totals.map((t, i) => ({
-      rank: i + 1,
-      userId: t._id,
-      name: nameMap.get(t._id.toString()),
-      points: t.points
-    }));
+    const leaderboard = totals.map((t, i) => {
+      const u = userMap.get(t._id.toString());
+      return {
+        rank: i + 1,
+        userId: t._id,
+        name: u?.name || 'unknown',
+        cfHandle: u?.cfHandle || null,
+        points: t.points
+      };
+    });
 
     res.json({ weekNumber: week.weekNumber, leaderboard });
   } catch (err) {
