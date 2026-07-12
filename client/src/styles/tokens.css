@@ -1,0 +1,112 @@
+/* ============================================================
+   CodeClub Leaderboard — Design Tokens
+   "Judge Console" aesthetic — borrows from online-judge verdict
+   language (AC/WA badges) since that's the actual visual world
+   this product lives in. Green/red stars map directly onto it.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Color */
+  --bg: #10141C;
+  --surface: #171B24;
+  --surface-raised: #1E2430;
+  --border: #2A3140;
+  --border-hover: #3A4356;
+  --text: #E7E9EE;
+  --text-dim: #8B94A7;
+  --accent-green: #4CAF6D;
+  --accent-green-dim: #4CAF6D22;
+  --accent-red: #E5534B;
+  --accent-red-dim: #E5534B22;
+  --accent-gold: #D4A657;
+  --accent-gold-dim: #D4A65722;
+
+  /* Type */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+
+  --radius: 8px;
+  --radius-sm: 4px;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 0%, #1A2030 0%, var(--bg) 55%),
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 39px,
+      #ffffff05 39px, #ffffff05 40px
+    );
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Focus visibility — accessibility floor, never remove */
+:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+button {
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+button:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+button:active:not(:disabled) { transform: translateY(0); }
+button:disabled { opacity: 0.6; cursor: default; }
+
+input { transition: border-color 0.15s var(--ease); }
+input:focus { border-color: var(--accent-green) !important; }
+
+.mono { font-family: var(--font-mono); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.fade-up { animation: fadeUp 0.5s var(--ease) both; }
+.cursor-blink { animation: blink 1s step-end infinite; }
+.scale-in { animation: scaleIn 0.3s var(--ease) both; }
+
+.row-hover {
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.row-hover:hover {
+  background: var(--surface-raised) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
