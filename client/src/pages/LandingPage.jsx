@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, saveSession } from '../api';
+import { api, saveSession, warmUpServer } from '../api';
 
 const BOOT_LINE = '> initializing maximum productivity';
 
@@ -12,7 +12,12 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [bootText, setBootText] = useState('');
   const [bootDone, setBootDone] = useState(false);
+  const [slowHint, setSlowHint] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    warmUpServer(); // wake a sleeping Render backend before the user even submits
+  }, []);
 
   useEffect(() => {
     let i = 0;
@@ -31,6 +36,8 @@ export default function LandingPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setSlowHint(false);
+    const slowTimer = setTimeout(() => setSlowHint(true), 4000);
     try {
       const data = mode === 'join'
         ? await api.signup(form)
@@ -40,7 +47,9 @@ export default function LandingPage() {
     } catch (err) {
       setError(err.message);
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setSlowHint(false);
     }
   }
 
@@ -134,6 +143,9 @@ export default function LandingPage() {
                 />
 
                 {error && <div style={styles.error}>✕ {error}</div>}
+                {loading && slowHint && (
+                  <div style={styles.hint}>Server was asleep — waking it up, this can take ~30s…</div>
+                )}
 
                 <button style={styles.submitBtn} type="submit" disabled={loading}>
                   {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
@@ -259,6 +271,11 @@ const styles = {
   error: {
     color: 'var(--accent-red)',
     fontSize: '13px',
+    fontFamily: 'var(--font-mono)'
+  },
+  hint: {
+    color: 'var(--accent-gold)',
+    fontSize: '12px',
     fontFamily: 'var(--font-mono)'
   }
 };
