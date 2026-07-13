@@ -21,8 +21,8 @@ export default function AdminPage() {
         <div style={styles.headerTitle} className="mono">ADMIN CONSOLE</div>
       </header>
 
-      <main style={styles.main}>
-        <div style={styles.tabRow}>
+      <main style={styles.main} className="page-main">
+        <div style={styles.tabRow} className="admin-tab-row">
           <TabButton active={tab === 'users'} onClick={() => setTab('users')}>Users</TabButton>
           <TabButton active={tab === 'review'} onClick={() => setTab('review')}>Review Queue</TabButton>
           <TabButton active={tab === 'audit'} onClick={() => setTab('audit')}>Audit Log</TabButton>
@@ -111,7 +111,8 @@ function UsersTab() {
       {error && <div style={styles.error}>{error}</div>}
       {msg && <div style={styles.infoMsg}>{msg}</div>}
 
-      <div style={styles.table}>
+      <div style={styles.table} className="admin-table-scroll">
+        <div className="admin-table-inner">
         <div style={styles.tableHeader}>
           <span style={{ ...styles.col, flex: 2 }}>NAME / USN</span>
           <span style={{ ...styles.col, flex: 1 }}>CF HANDLE</span>
@@ -160,6 +161,7 @@ function UsersTab() {
             </span>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
@@ -209,7 +211,8 @@ function ReviewTab() {
       {submissions.length === 0 ? (
         <div style={styles.empty}>Queue is empty — nothing pending review.</div>
       ) : (
-        <div style={styles.table}>
+        <div style={styles.table} className="admin-table-scroll">
+          <div className="admin-table-inner">
           <div style={styles.tableHeader}>
             <span style={{ ...styles.col, flex: 1 }}>USER</span>
             <span style={{ ...styles.col, flex: 1 }}>PROBLEM</span>
@@ -233,6 +236,7 @@ function ReviewTab() {
               </span>
             </div>
           ))}
+          </div>
         </div>
       )}
     </div>
@@ -252,7 +256,8 @@ function AuditTab() {
   return (
     <div>
       {error && <div style={styles.error}>{error}</div>}
-      <div style={styles.table}>
+      <div style={styles.table} className="admin-table-scroll">
+        <div className="admin-table-inner">
         <div style={styles.tableHeader}>
           <span style={{ ...styles.col, width: '120px' }}>ACTION</span>
           <span style={{ ...styles.col, flex: 1 }}>TARGET</span>
@@ -267,6 +272,7 @@ function AuditTab() {
             <span style={{ width: '160px' }} className="mono">{new Date(a.createdAt).toLocaleString()}</span>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
