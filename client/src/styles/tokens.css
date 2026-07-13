@@ -110,3 +110,58 @@ input:focus { border-color: var(--accent-green) !important; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   Mobile breakpoints
+   Inline styles win over plain CSS, so these use !important
+   to override layout-critical properties only (never colors/
+   type — those stay inline and are already responsive-safe).
+   ============================================================ */
+@media (max-width: 640px) {
+  .site-header {
+    flex-wrap: wrap !important;
+    gap: var(--space-2) !important;
+    padding: var(--space-3) var(--space-3) !important;
+  }
+  .site-header .header-right {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+  .page-main {
+    padding: var(--space-4) var(--space-3) !important;
+  }
+  .title-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-3) !important;
+  }
+  .title-row .refresh-btn {
+    width: 100% !important;
+  }
+  .queue-col-points {
+    width: 64px !important;
+  }
+  .cf-form {
+    flex-wrap: wrap !important;
+  }
+  .cf-form input {
+    width: 100% !important;
+  }
+  .cf-form button {
+    width: 100% !important;
+  }
+  .admin-tab-row {
+    flex-wrap: wrap !important;
+  }
+  .admin-tab-row button {
+    flex: 1 1 auto !important;
+  }
+  .admin-table-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .admin-table-inner {
+    min-width: 640px !important;
+  }
+}
