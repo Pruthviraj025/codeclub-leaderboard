@@ -2,6 +2,8 @@ const cron = require('node-cron');
 const Week = require('../models/Week');
 const { finalizeWeek } = require('../services/weeklyFinalizeService');
 
+const TIMEZONE = 'Asia/Kolkata'; // Monday 00:00 IST
+
 /**
  * Ensures exactly one 'open' Week document exists. Call once at server startup.
  * If no week exists at all (first-ever run), creates Week #1 starting now.
@@ -26,14 +28,37 @@ async function ensureOpenWeekExists() {
 }
 
 /**
- * Schedules automatic weekly finalization.
- * Runs every Monday at 00:00 server time — change the cron expression if you
- * want a different reset day/time. finalizeWeek() itself creates the next
- * open week, so this job only needs to find and close the current one.
+ * Free-tier hosts (Render, etc.) sleep after inactivity, so an in-process
+ * cron job can silently miss its exact firing time — nobody's online at
+ * midnight to keep the process alive. This self-heals: on every server
+ * boot (which happens on cold-start wake-up), it finalizes any week(s)
+ * whose endsAt has already passed, looping in case multiple weeks were
+ * missed (e.g. the server was asleep across more than one Monday).
+ */
+async function catchUpMissedResets() {
+  let guard = 0;
+  while (guard++ < 52) { // safety cap: never loop more than a year's worth
+    const openWeek = await Week.findOne({ status: 'open' });
+    if (!openWeek) {
+      await ensureOpenWeekExists();
+      return;
+    }
+    if (openWeek.endsAt > new Date()) return; // current week isn't overdue, nothing to do
+
+    console.log(`Week #${openWeek.weekNumber} was overdue (missed while asleep) — finalizing now.`);
+    const { week, nextWeek } = await finalizeWeek(openWeek._id);
+    console.log(`Week #${week.weekNumber} finalized. Week #${nextWeek.weekNumber} is now open.`);
+  }
+}
+
+/**
+ * Schedules automatic weekly finalization for whenever the server happens
+ * to be awake at the right moment (best-effort — catchUpMissedResets is
+ * what guarantees correctness on a host that sleeps).
  */
 function startWeeklyCron() {
   // Cron format: minute hour day-of-month month day-of-week
-  // '0 0 * * 1' = 00:00 every Monday
+  // '0 0 * * 1' = 00:00 every Monday, in the timezone below
   cron.schedule('0 0 * * 1', async () => {
     try {
       const openWeek = await Week.findOne({ status: 'open' });
@@ -51,9 +76,9 @@ function startWeeklyCron() {
       // NOTE: in production, alert an admin here (email/Slack) — a failed
       // finalization means the leaderboard silently doesn't reset on time.
     }
-  });
+  }, { timezone: TIMEZONE });
 
-  console.log('Weekly finalize cron scheduled (every Monday 00:00).');
+  console.log(`Weekly finalize cron scheduled (every Monday 00:00 ${TIMEZONE}).`);
 }
 
-module.exports = { startWeeklyCron, ensureOpenWeekExists };
+module.exports = { startWeeklyCron, ensureOpenWeekExists, catchUpMissedResets };
