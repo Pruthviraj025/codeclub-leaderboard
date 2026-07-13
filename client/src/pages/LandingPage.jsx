@@ -78,6 +78,7 @@ export default function LandingPage() {
             <div style={styles.logoBlock} className="fade-up">
               <div style={styles.logoText}>{'<CODECLUB/>'}</div>
               <div style={styles.logoRule} />
+              <div style={styles.logoSubtitle}>LEADERBOARD</div>
             </div>
 
             {!showForm ? (
@@ -213,6 +214,15 @@ const styles = {
     background: 'linear-gradient(90deg, transparent, var(--accent-green), transparent)',
     margin: '18px auto 0',
     opacity: 0.7
+  },
+  logoSubtitle: {
+    fontFamily: 'var(--font-mono)',
+    fontSize: '11px',
+    fontWeight: 500,
+    letterSpacing: '4px',
+    color: 'var(--accent-green)',
+    opacity: 0.65,
+    marginTop: '12px'
   },
   joinBtn: {
     background: 'var(--accent-green)',
