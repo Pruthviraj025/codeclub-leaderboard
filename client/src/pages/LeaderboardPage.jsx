@@ -57,6 +57,7 @@ export default function LeaderboardPage() {
       <header style={styles.header} className="site-header">
         <div style={styles.logoMark}>{'<CODECLUB/>'}</div>
         <div style={styles.headerRight} className="header-right">
+          <button style={styles.historyBtn} onClick={() => navigate('/history')}>History</button>
           {user.role === 'admin' && (
             <button style={styles.adminBtn} onClick={() => navigate('/admin')}>Admin</button>
           )}
@@ -174,6 +175,14 @@ const styles = {
     letterSpacing: '1px'
   },
   headerRight: { display: 'flex', gap: 'var(--space-2)' },
+  historyBtn: {
+    background: 'var(--surface-raised)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text-dim)',
+    padding: '8px 16px',
+    fontSize: '13px'
+  },
   adminBtn: {
     background: 'var(--accent-gold-dim)',
     border: '1px solid var(--accent-gold)',
