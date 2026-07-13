@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, saveSession, warmUpServer } from '../api';
+import { api, saveSession } from '../api';
 
 const BOOT_LINE = '> initializing maximum productivity';
 
@@ -12,12 +12,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [bootText, setBootText] = useState('');
   const [bootDone, setBootDone] = useState(false);
-  const [slowHint, setSlowHint] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    warmUpServer(); // wake a sleeping Render backend before the user even submits
-  }, []);
 
   useEffect(() => {
     let i = 0;
@@ -36,8 +31,6 @@ export default function LandingPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    setSlowHint(false);
-    const slowTimer = setTimeout(() => setSlowHint(true), 4000);
     try {
       const data = mode === 'join'
         ? await api.signup(form)
@@ -47,9 +40,7 @@ export default function LandingPage() {
     } catch (err) {
       setError(err.message);
     } finally {
-      clearTimeout(slowTimer);
       setLoading(false);
-      setSlowHint(false);
     }
   }
 
@@ -78,7 +69,6 @@ export default function LandingPage() {
             <div style={styles.logoBlock} className="fade-up">
               <div style={styles.logoText}>{'<CODECLUB/>'}</div>
               <div style={styles.logoRule} />
-              <div style={styles.logoSubtitle}>LEADERBOARD</div>
             </div>
 
             {!showForm ? (
@@ -144,9 +134,6 @@ export default function LandingPage() {
                 />
 
                 {error && <div style={styles.error}>✕ {error}</div>}
-                {loading && slowHint && (
-                  <div style={styles.hint}>Server was asleep — waking it up, this can take ~30s…</div>
-                )}
 
                 <button style={styles.submitBtn} type="submit" disabled={loading}>
                   {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
@@ -203,8 +190,8 @@ const styles = {
   logoText: {
     fontFamily: 'var(--font-mono)',
     fontWeight: 700,
-    fontSize: '38px',
-    letterSpacing: '2px',
+    fontSize: 'clamp(26px, 8vw, 38px)',
+    letterSpacing: '1px',
     color: 'var(--text)',
     textShadow: '0 0 30px #ffffff22'
   },
@@ -214,15 +201,6 @@ const styles = {
     background: 'linear-gradient(90deg, transparent, var(--accent-green), transparent)',
     margin: '18px auto 0',
     opacity: 0.7
-  },
-  logoSubtitle: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '11px',
-    fontWeight: 500,
-    letterSpacing: '4px',
-    color: 'var(--accent-green)',
-    opacity: 0.65,
-    marginTop: '12px'
   },
   joinBtn: {
     background: 'var(--accent-green)',
@@ -239,7 +217,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-3)',
-    width: '320px',
+    width: '100%',
+    maxWidth: '320px',
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
@@ -281,11 +260,6 @@ const styles = {
   error: {
     color: 'var(--accent-red)',
     fontSize: '13px',
-    fontFamily: 'var(--font-mono)'
-  },
-  hint: {
-    color: 'var(--accent-gold)',
-    fontSize: '12px',
     fontFamily: 'var(--font-mono)'
   }
 };
