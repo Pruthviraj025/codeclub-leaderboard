@@ -203,7 +203,7 @@ const styles = {
   logoText: {
     fontFamily: 'var(--font-mono)',
     fontWeight: 700,
-    fontSize: '38px',
+    fontSize: 'clamp(26px, 8vw, 38px)',
     letterSpacing: '2px',
     color: 'var(--text)',
     textShadow: '0 0 30px #ffffff22'
@@ -239,7 +239,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-3)',
-    width: '320px',
+    width: 'min(320px, 100%)',
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
