@@ -14,6 +14,16 @@ async function request(path, options = {}) {
       ...options.headers
     }
   });
+
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      res.ok
+        ? 'Server returned an unexpected response. Please try again.'
+        : `Server error (${res.status}). The backend may still be deploying — try again in a minute.`
+    );
+  }
+
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
@@ -23,6 +33,7 @@ export const api = {
   signup: (body) => request('/auth/signup', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   currentLeaderboard: () => request('/leaderboard/current'),
+  leaderboardHistory: () => request('/leaderboard/history'),
   refresh: () => request('/leaderboard/refresh', { method: 'POST' }),
   profile: (userId) => request(`/profile/${userId}`),
   updateEmail: (email) => request('/profile/me/email', { method: 'PATCH', body: JSON.stringify({ email }) }),
