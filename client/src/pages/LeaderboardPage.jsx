@@ -4,6 +4,7 @@ import { api, getSessionUser, clearSession } from '../api';
 
 export default function LeaderboardPage() {
   const [data, setData] = useState(null);
+  const [loadingBoard, setLoadingBoard] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState('');
@@ -21,6 +22,8 @@ export default function LeaderboardPage() {
       setData(res);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoadingBoard(false);
     }
   }
 
@@ -51,9 +54,9 @@ export default function LeaderboardPage() {
 
   return (
     <div style={styles.page}>
-      <header style={styles.header}>
+      <header style={styles.header} className="site-header">
         <div style={styles.logoMark}>{'<CODECLUB/>'}</div>
-        <div style={styles.headerRight}>
+        <div style={styles.headerRight} className="header-right">
           {user.role === 'admin' && (
             <button style={styles.adminBtn} onClick={() => navigate('/admin')}>Admin</button>
           )}
@@ -64,13 +67,13 @@ export default function LeaderboardPage() {
         </div>
       </header>
 
-      <main style={styles.main}>
-        <div style={styles.titleRow}>
+      <main style={styles.main} className="page-main">
+        <div style={styles.titleRow} className="title-row">
           <div>
             <div style={styles.eyebrow}>WEEK {data?.weekNumber ?? '—'} · LIVE STANDINGS</div>
             <h1 style={styles.title}>Leaderboard</h1>
           </div>
-          <button style={styles.refreshBtn} onClick={handleRefresh} disabled={refreshing}>
+          <button style={styles.refreshBtn} className="refresh-btn" onClick={handleRefresh} disabled={refreshing}>
             {refreshing ? 'Checking CF…' : '↻ Refresh my solves'}
           </button>
         </div>
@@ -82,9 +85,11 @@ export default function LeaderboardPage() {
           <div style={styles.queueHeader}>
             <span style={{ ...styles.col, width: '60px' }}>RANK</span>
             <span style={{ ...styles.col, flex: 1 }}>HANDLE</span>
-            <span style={{ ...styles.col, width: '100px', textAlign: 'right' }}>POINTS</span>
+            <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="queue-col-points">POINTS</span>
           </div>
-          {data?.leaderboard?.length ? (
+          {loadingBoard ? (
+            <div style={styles.empty} className="fade-up">Loading standings…</div>
+          ) : data?.leaderboard?.length ? (
             data.leaderboard.map((row, idx) => (
               <div
                 key={row.userId}
@@ -99,7 +104,7 @@ export default function LeaderboardPage() {
                 <span style={{ ...styles.col, width: '60px' }} className="mono">
                   <RankBadge rank={row.rank} />
                 </span>
-                <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   {row.cfHandle && (
                     <a
                       href={`https://codeforces.com/profile/${row.cfHandle}`}
@@ -120,7 +125,7 @@ export default function LeaderboardPage() {
                     {row.cfHandle || row.name}
                   </span>
                 </span>
-                <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="mono">
+                <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="mono queue-col-points">
                   {row.points}
                 </span>
               </div>
@@ -247,6 +252,6 @@ const styles = {
   },
   queueRowSelf: { background: 'var(--accent-green-dim)' },
   cfIconLink: { display: 'flex', alignItems: 'center', flexShrink: 0 },
-  nameLink: { cursor: 'pointer' },
+  nameLink: { cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: '13px' }
 };
