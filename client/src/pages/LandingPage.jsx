@@ -68,7 +68,7 @@ export default function LandingPage() {
 
       {bootDone && (
         <div style={styles.quote} className="mono fade-up">
-          {'// "Productive days are the days where you do what you want to do" — PTVRJ'}
+          {'// "Productive days are the days where you do what you want to do"'}
         </div>
       )}
 
