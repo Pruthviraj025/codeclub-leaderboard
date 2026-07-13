@@ -84,7 +84,7 @@ export default function ProfilePage() {
         <button style={styles.backBtn} onClick={() => navigate('/leaderboard')}>← Leaderboard</button>
       </header>
 
-      <main style={styles.main}>
+      <main style={styles.main} className="page-main">
         <div style={styles.card} className="fade-up">
           <div style={styles.nameRow}>
             <h1 style={styles.name}>{profile.name}</h1>
@@ -113,7 +113,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleUpdateEmail} style={styles.cfForm}>
+                <form onSubmit={handleUpdateEmail} style={styles.cfForm} className="cf-form">
                   <input
                     style={styles.input}
                     type="email"
@@ -141,7 +141,7 @@ export default function ProfilePage() {
             <div style={styles.cfConnect}>
               <div style={styles.eyebrow}>CONNECT CODEFORCES</div>
               {!verifyInfo ? (
-                <form onSubmit={handleStartVerification} style={styles.cfForm}>
+                <form onSubmit={handleStartVerification} style={styles.cfForm} className="cf-form">
                   <input
                     style={styles.input}
                     placeholder="Your CF handle"
