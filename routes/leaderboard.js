@@ -50,11 +50,40 @@ router.get('/current', requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/leaderboard/history — finalized past weeks
+// GET /api/leaderboard/history — finalized past weeks, with user names/handles populated
 router.get('/history', requireAuth, async (req, res) => {
   try {
-    const weeks = await Week.find({ status: 'finalized' }).sort({ weekNumber: -1 }).limit(10);
-    res.json(weeks);
+    const weeks = await Week.find({ status: 'finalized' })
+      .sort({ weekNumber: -1 })
+      .limit(20)
+      .lean();
+
+    const allUserIds = [...new Set(weeks.flatMap(w => w.results.map(r => r.userId.toString())))];
+    const users = await User.find({ _id: { $in: allUserIds } }, 'name cfHandle');
+    const userMap = new Map(users.map(u => [u._id.toString(), u]));
+
+    const populated = weeks.map(w => ({
+      _id: w._id,
+      weekNumber: w.weekNumber,
+      startsAt: w.startsAt,
+      endsAt: w.endsAt,
+      finalizedAt: w.finalizedAt,
+      results: w.results
+        .sort((a, b) => a.rank - b.rank)
+        .map(r => {
+          const u = userMap.get(r.userId.toString());
+          return {
+            userId: r.userId,
+            name: u?.name || 'unknown',
+            cfHandle: u?.cfHandle || null,
+            points: r.points,
+            rank: r.rank,
+            outcome: r.outcome
+          };
+        })
+    }));
+
+    res.json(populated);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
