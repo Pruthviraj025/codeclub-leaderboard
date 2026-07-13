@@ -8,6 +8,7 @@ export default function LeaderboardPage() {
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState('');
+  const [showInfo, setShowInfo] = useState(false);
   const user = getSessionUser();
   const navigate = useNavigate();
 
@@ -72,7 +73,17 @@ export default function LeaderboardPage() {
         <div style={styles.titleRow} className="title-row">
           <div>
             <div style={styles.eyebrow}>WEEK {data?.weekNumber ?? '—'} · LIVE STANDINGS</div>
-            <h1 style={styles.title}>Leaderboard</h1>
+            <div style={styles.titleWithInfo}>
+              <h1 style={styles.title}>Leaderboard</h1>
+              <button
+                style={styles.infoBtn}
+                onClick={() => setShowInfo(true)}
+                aria-label="How scoring works"
+                title="How scoring works"
+              >
+                i
+              </button>
+            </div>
           </div>
           <button style={styles.refreshBtn} className="refresh-btn" onClick={handleRefresh} disabled={refreshing}>
             {refreshing ? 'Checking CF…' : '↻ Refresh my solves'}
@@ -136,6 +147,8 @@ export default function LeaderboardPage() {
           )}
         </div>
       </main>
+
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
     </div>
   );
 }
@@ -156,6 +169,65 @@ function CfIcon() {
       <rect x="6" y="3" width="4" height="12" rx="1.2" fill="#3776AB" />
       <rect x="11.5" y="0.5" width="4" height="14.5" rx="1.2" fill="#1FA83B" />
     </svg>
+  );
+}
+
+// Mirrors utils/ratingMap.js on the backend — keep in sync if that ever changes.
+const RATING_MAP = [
+  [800, 100], [900, 200], [1000, 500], [1100, 600], [1200, 900],
+  [1300, 1000], [1400, 1300], [1500, 1400], [1600, 1700], [1700, 1800],
+  [1800, 2100], [1900, 2200], [2000, 2500], [2100, 2600], [2200, 2900],
+  [2300, 3000], [2400, 3300], [2500, 3400], [2600, 3700], [2700, 3800],
+  [2800, 4100], [2900, 4200], [3000, 4500], [3100, 4600], [3200, 4900],
+  [3300, 5000], [3400, 5300], [3500, 5400]
+];
+
+function InfoModal({ onClose }) {
+  return (
+    <div style={styles.overlay} onClick={onClose}>
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()} className="scale-in">
+        <div style={styles.modalHeader}>
+          <h2 style={styles.modalTitle}>How this works</h2>
+          <button style={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+        </div>
+
+        <div style={styles.modalBody}>
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>Counting a solve</div>
+            <ul style={styles.list}>
+              <li>Connect your Codeforces handle on your Profile page first — only submissions made <em>after</em> connecting are counted.</li>
+              <li>Only <strong>Accepted (AC)</strong> submissions count. Wrong answers, TLEs, etc. don't score anything.</li>
+              <li>Each problem counts once — resubmitting an already-solved problem doesn't add points again.</li>
+              <li>Unrated problems (no CF rating) don't count at all.</li>
+              <li>Nothing updates automatically — hit <strong>"↻ Refresh my solves"</strong> on this page to pull your latest submissions from Codeforces. There's a short cooldown between refreshes.</li>
+            </ul>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>Points by problem rating</div>
+            <div style={styles.ratingGrid}>
+              {RATING_MAP.map(([rating, points]) => (
+                <div key={rating} style={styles.ratingCell}>
+                  <span className="mono" style={styles.ratingNum}>{rating}</span>
+                  <span className="mono" style={styles.ratingPts}>{points}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>Weekly stars (at Monday reset)</div>
+            <ul style={styles.list}>
+              <li><span style={{ color: 'var(--accent-green)' }}>●</span> <strong>7 or more solvers</strong> that week → top 3 by points get a green star, bottom 3 get a red star, everyone else gets nothing.</li>
+              <li><span style={{ color: 'var(--accent-green)' }}>●</span> <strong>6 or fewer solvers</strong> that week → top half get a green star, bottom half get a red star (the exact middle gets nothing if the count is odd).</li>
+              <li>Earning a green star clears your oldest un-cleared red star, if you have one.</li>
+              <li>A red star does not get cleared by anything except a later green star.</li>
+              <li>Only people who solved at least one problem that week appear in the ranking — solving nothing means you simply don't appear, not a red star.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -217,6 +289,91 @@ const styles = {
     marginBottom: 'var(--space-1)'
   },
   title: { fontSize: '28px', margin: 0, fontWeight: 700 },
+  titleWithInfo: { display: 'flex', alignItems: 'center', gap: '10px' },
+  infoBtn: {
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    border: '1px solid var(--border)',
+    background: 'var(--surface-raised)',
+    color: 'var(--text-dim)',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    fontStyle: 'italic',
+    lineHeight: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer'
+  },
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.6)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 'var(--space-4)',
+    zIndex: 100
+  },
+  modal: {
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius)',
+    maxWidth: '540px',
+    width: '100%',
+    maxHeight: '85vh',
+    overflowY: 'auto',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+  },
+  modalHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 'var(--space-4)',
+    borderBottom: '1px solid var(--border)',
+    position: 'sticky',
+    top: 0,
+    background: 'var(--surface)'
+  },
+  modalTitle: { margin: 0, fontSize: '18px' },
+  closeBtn: { background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '16px', cursor: 'pointer' },
+  modalBody: { padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' },
+  section: {},
+  sectionTitle: {
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    letterSpacing: '1.5px',
+    color: 'var(--accent-green)',
+    marginBottom: 'var(--space-2)'
+  },
+  list: {
+    margin: 0,
+    paddingLeft: '18px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    fontSize: '13px',
+    color: 'var(--text)',
+    lineHeight: 1.5
+  },
+  ratingGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+    gap: '6px'
+  },
+  ratingCell: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '2px',
+    padding: '6px 4px',
+    background: 'var(--surface-raised)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)'
+  },
+  ratingNum: { fontSize: '11px', color: 'var(--text-dim)' },
+  ratingPts: { fontSize: '13px', color: 'var(--accent-green)', fontWeight: 700 },
   refreshBtn: {
     background: 'var(--surface-raised)',
     border: '1px solid var(--accent-green)',
