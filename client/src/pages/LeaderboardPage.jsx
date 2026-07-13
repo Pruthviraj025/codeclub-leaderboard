@@ -220,8 +220,8 @@ function InfoModal({ onClose }) {
             <ul style={styles.list}>
               <li><span style={{ color: 'var(--accent-green)' }}>●</span> <strong>7 or more solvers</strong> that week → top 3 by points get a green star, bottom 3 get a red star, everyone else gets nothing.</li>
               <li><span style={{ color: 'var(--accent-green)' }}>●</span> <strong>6 or fewer solvers</strong> that week → top half get a green star, bottom half get a red star (the exact middle gets nothing if the count is odd).</li>
-              <li>Earning a green star clears your oldest un-cleared red star, if you have one.</li>
-              <li>A red star does not get cleared by anything except a later green star.</li>
+              <li>Earning a green star or a no star clears your oldest un-cleared red star, if you have one.</li>
+              <li>A red star does not get cleared by anything except a later green star or no star and red stars can over lap.</li>
               <li>Only people who solved at least one problem that week appear in the ranking — solving nothing means you simply don't appear, not a red star.</li>
             </ul>
           </section>
