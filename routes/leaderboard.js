@@ -30,19 +30,22 @@ router.get('/current', requireAuth, async (req, res) => {
     ]);
 
     const userIds = totals.map(t => t._id);
-    const users = await User.find({ _id: { $in: userIds } }, 'name cfHandle');
+    // Only active users — admin soft-remove must actually hide them from the live board
+    const users = await User.find({ _id: { $in: userIds }, isActive: true }, 'name cfHandle');
     const userMap = new Map(users.map(u => [u._id.toString(), u]));
 
-    const leaderboard = totals.map((t, i) => {
-      const u = userMap.get(t._id.toString());
-      return {
-        rank: i + 1,
-        userId: t._id,
-        name: u?.name || 'unknown',
-        cfHandle: u?.cfHandle || null,
-        points: t.points
-      };
-    });
+    const leaderboard = totals
+      .filter(t => userMap.has(t._id.toString()))
+      .map((t, i) => {
+        const u = userMap.get(t._id.toString());
+        return {
+          rank: i + 1,
+          userId: t._id,
+          name: u.name,
+          cfHandle: u.cfHandle || null,
+          points: t.points
+        };
+      });
 
     res.json({ weekNumber: week.weekNumber, leaderboard });
   } catch (err) {
