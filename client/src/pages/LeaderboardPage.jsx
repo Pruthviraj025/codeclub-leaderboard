@@ -71,7 +71,7 @@ export default function LeaderboardPage() {
       <main style={styles.main} className="page-main">
         <div style={styles.titleRow} className="title-row">
           <div>
-            <div style={styles.eyebrow}>TRAILING 7 DAYS · LIVE STANDINGS</div>
+            <div style={styles.eyebrow}>Recent 7 DAYS · LIVE STANDINGS</div>
             <div style={styles.titleWithInfo}>
               <h1 style={styles.title}>Leaderboard</h1>
               <button
