@@ -7,7 +7,7 @@ const ScoredSubmissionSchema = new mongoose.Schema({
 
   // Codeforces problem identity: contestId + index (e.g. "1234A") uniquely identifies a problem
   problemId: { type: String, required: true }, // e.g. "1234A"
-  problemRating: { type: Number, required: true }, // 800-3500, used to resolve points via the mapping table
+  problemRating: { type: Number, default: null }, // 800-3500, or null for unrated (unrated now scores a flat UNRATED_POINTS)
   points: { type: Number, required: true }, // resolved value at time of scoring (table is fixed, but store it — never recompute silently)
 
   cfSubmissionId: { type: Number, required: true }, // raw CF submission id, for audit/debug
