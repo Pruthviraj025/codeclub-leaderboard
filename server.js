@@ -8,7 +8,6 @@ const cfRoutes = require('./routes/cf');
 const leaderboardRoutes = require('./routes/leaderboard');
 const profileRoutes = require('./routes/profile');
 const adminRoutes = require('./routes/admin');
-const { startWeeklyCron, ensureOpenWeekExists, catchUpMissedResets } = require('./jobs/weeklyCron');
 
 const app = express();
 app.use(cors());
@@ -27,9 +26,6 @@ const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('MongoDB connected');
-    await ensureOpenWeekExists(); // creates Week #1 if this is the very first run
-    await catchUpMissedResets(); // finalize any week(s) missed while the server was asleep
-    startWeeklyCron();
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => {
