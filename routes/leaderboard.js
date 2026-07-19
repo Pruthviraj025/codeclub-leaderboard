@@ -1,11 +1,12 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const { refreshUserScore } = require('../services/scoringService');
-const Week = require('../models/Week');
 const ScoredSubmission = require('../models/ScoredSubmission');
 const User = require('../models/User');
 
 const router = express.Router();
+
+const WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // rolling 7 days
 
 // POST /api/leaderboard/refresh — the refresh button
 router.post('/refresh', requireAuth, async (req, res) => {
@@ -17,14 +18,13 @@ router.post('/refresh', requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/leaderboard/current — live standings for the open week
+// GET /api/leaderboard/current — live standings: solves accepted in the trailing 7 days
 router.get('/current', requireAuth, async (req, res) => {
   try {
-    const week = await Week.findOne({ status: 'open' });
-    if (!week) return res.status(404).json({ error: 'No open week' });
+    const windowStart = new Date(Date.now() - WINDOW_MS);
 
     const totals = await ScoredSubmission.aggregate([
-      { $match: { weekId: week._id } },
+      { $match: { solvedAt: { $gte: windowStart } } },
       { $group: { _id: '$userId', points: { $sum: '$points' } } },
       { $sort: { points: -1 } }
     ]);
@@ -47,46 +47,7 @@ router.get('/current', requireAuth, async (req, res) => {
         };
       });
 
-    res.json({ weekNumber: week.weekNumber, leaderboard });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/leaderboard/history — finalized past weeks, with user names/handles populated
-router.get('/history', requireAuth, async (req, res) => {
-  try {
-    const weeks = await Week.find({ status: 'finalized' })
-      .sort({ weekNumber: -1 })
-      .limit(20)
-      .lean();
-
-    const allUserIds = [...new Set(weeks.flatMap(w => w.results.map(r => r.userId.toString())))];
-    const users = await User.find({ _id: { $in: allUserIds } }, 'name cfHandle');
-    const userMap = new Map(users.map(u => [u._id.toString(), u]));
-
-    const populated = weeks.map(w => ({
-      _id: w._id,
-      weekNumber: w.weekNumber,
-      startsAt: w.startsAt,
-      endsAt: w.endsAt,
-      finalizedAt: w.finalizedAt,
-      results: w.results
-        .sort((a, b) => a.rank - b.rank)
-        .map(r => {
-          const u = userMap.get(r.userId.toString());
-          return {
-            userId: r.userId,
-            name: u?.name || 'unknown',
-            cfHandle: u?.cfHandle || null,
-            points: r.points,
-            rank: r.rank,
-            outcome: r.outcome
-          };
-        })
-    }));
-
-    res.json(populated);
+    res.json({ windowStart, leaderboard });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
