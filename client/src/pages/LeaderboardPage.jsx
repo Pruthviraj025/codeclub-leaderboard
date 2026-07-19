@@ -71,7 +71,7 @@ export default function LeaderboardPage() {
       <main style={styles.main} className="page-main">
         <div style={styles.titleRow} className="title-row">
           <div>
-            <div style={styles.eyebrow}>Recent 7 DAYS · LIVE STANDINGS</div>
+            <div style={styles.eyebrow}>TRAILING 7 DAYS · LIVE STANDINGS</div>
             <div style={styles.titleWithInfo}>
               <h1 style={styles.title}>Leaderboard</h1>
               <button
@@ -173,13 +173,14 @@ function CfIcon() {
 
 // Mirrors utils/ratingMap.js on the backend — keep in sync if that ever changes.
 const RATING_MAP = [
-  [800, 100], [900, 200], [1000, 500], [1100, 600], [1200, 900],
-  [1300, 1000], [1400, 1300], [1500, 1400], [1600, 1700], [1700, 1800],
-  [1800, 2100], [1900, 2200], [2000, 2500], [2100, 2600], [2200, 2900],
-  [2300, 3000], [2400, 3300], [2500, 3400], [2600, 3700], [2700, 3800],
-  [2800, 4100], [2900, 4200], [3000, 4500], [3100, 4600], [3200, 4900],
-  [3300, 5000], [3400, 5300], [3500, 5400]
+  [800, 200], [900, 300], [1000, 600], [1100, 700], [1200, 1000],
+  [1300, 1100], [1400, 1400], [1500, 1500], [1600, 1800], [1700, 1900],
+  [1800, 2200], [1900, 2300], [2000, 2600], [2100, 2700], [2200, 3000],
+  [2300, 3100], [2400, 3400], [2500, 3500], [2600, 3800], [2700, 3900],
+  [2800, 4200], [2900, 4300], [3000, 4600], [3100, 4700], [3200, 5000],
+  [3300, 5100], [3400, 5400], [3500, 5500]
 ];
+const UNRATED_POINTS = 100;
 
 function InfoModal({ onClose }) {
   return (
@@ -197,7 +198,7 @@ function InfoModal({ onClose }) {
               <li>Connect your Codeforces handle on your Profile page first — only submissions made <em>after</em> connecting are counted.</li>
               <li>Only <strong>Accepted (AC)</strong> submissions count. Wrong answers, TLEs, etc. don't score anything.</li>
               <li>Each problem counts once — resubmitting an already-solved problem doesn't add points again.</li>
-              <li>Unrated problems (no CF rating) don't count at all.</li>
+              <li>Unrated problems (no CF rating) count too — flat {UNRATED_POINTS} points each.</li>
               <li>Nothing updates automatically — hit <strong>"↻ Refresh my solves"</strong> on this page to pull your latest submissions from Codeforces. There's a short cooldown between refreshes.</li>
             </ul>
           </section>
@@ -205,6 +206,10 @@ function InfoModal({ onClose }) {
           <section style={styles.section}>
             <div style={styles.sectionTitle}>Points by problem rating</div>
             <div style={styles.ratingGrid}>
+              <div style={styles.ratingCell}>
+                <span className="mono" style={styles.ratingNum}>unrated</span>
+                <span className="mono" style={styles.ratingPts}>{UNRATED_POINTS}</span>
+              </div>
               {RATING_MAP.map(([rating, points]) => (
                 <div key={rating} style={styles.ratingCell}>
                   <span className="mono" style={styles.ratingNum}>{rating}</span>
