@@ -1,14 +1,5 @@
 const mongoose = require('mongoose');
 
-const StarSchema = new mongoose.Schema({
-  type: { type: String, enum: ['green', 'red'], required: true },
-  weekId: { type: mongoose.Schema.Types.ObjectId, ref: 'Week', required: true },
-  rank: { type: Number }, // only meaningful for green stars (1, 2, 3, or position for %-split weeks)
-  awardedAt: { type: Date, default: Date.now },
-  clearedAt: { type: Date, default: null }, // for red stars only — when it was cleared
-  clearedByWeekId: { type: mongoose.Schema.Types.ObjectId, ref: 'Week', default: null }
-}, { _id: true });
-
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   usn: { type: String, required: true, unique: true, trim: true, uppercase: true },
@@ -33,20 +24,7 @@ const UserSchema = new mongoose.Schema({
   // --- Refresh cooldown ---
   lastRefreshAt: { type: Date, default: null },
 
-  // --- Stars (append-only, see StarSchema) ---
-  stars: { type: [StarSchema], default: [] },
-
   createdAt: { type: Date, default: Date.now }
 });
-
-// Virtuals for convenience
-UserSchema.virtual('greenStarCount').get(function () {
-  return (this.stars || []).filter(s => s.type === 'green').length;
-});
-UserSchema.virtual('activeRedStarCount').get(function () {
-  return (this.stars || []).filter(s => s.type === 'red' && !s.clearedAt).length;
-});
-
-UserSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('User', UserSchema);
