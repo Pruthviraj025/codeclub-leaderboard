@@ -58,7 +58,6 @@ export default function LeaderboardPage() {
       <header style={styles.header} className="site-header">
         <div style={styles.logoMark}>{'<CODECLUB/>'}</div>
         <div style={styles.headerRight} className="header-right">
-          <button style={styles.historyBtn} onClick={() => navigate('/history')}>History</button>
           {user.role === 'admin' && (
             <button style={styles.adminBtn} onClick={() => navigate('/admin')}>Admin</button>
           )}
@@ -72,7 +71,7 @@ export default function LeaderboardPage() {
       <main style={styles.main} className="page-main">
         <div style={styles.titleRow} className="title-row">
           <div>
-            <div style={styles.eyebrow}>WEEK {data?.weekNumber ?? '—'} · LIVE STANDINGS</div>
+            <div style={styles.eyebrow}>TRAILING 7 DAYS · LIVE STANDINGS</div>
             <div style={styles.titleWithInfo}>
               <h1 style={styles.title}>Leaderboard</h1>
               <button
@@ -143,7 +142,7 @@ export default function LeaderboardPage() {
               </div>
             ))
           ) : (
-            <div style={styles.empty}>No solves recorded yet this week. Be the first.</div>
+            <div style={styles.empty}>No solves recorded in the last 7 days. Be the first.</div>
           )}
         </div>
       </main>
@@ -216,13 +215,11 @@ function InfoModal({ onClose }) {
           </section>
 
           <section style={styles.section}>
-            <div style={styles.sectionTitle}>Weekly stars (at Monday reset)</div>
+            <div style={styles.sectionTitle}>The 7-day window</div>
             <ul style={styles.list}>
-              <li><span style={{ color: 'var(--accent-green)' }}>●</span> <strong>7 or more solvers</strong> that week → top 3 by points get a green star, bottom 3 get a red star, everyone else gets nothing.</li>
-              <li><span style={{ color: 'var(--accent-green)' }}>●</span> <strong>6 or fewer solvers</strong> that week → top half get a green star, bottom half get a red star (the exact middle gets nothing if the count is odd).</li>
-              <li>Earning a green star or a no star clears your oldest un-cleared red star, if you have one.</li>
-              <li>A red star does not get cleared by anything except a later green star or no star and red stars can over lap.</li>
-              <li>Only people who solved at least one problem that week appear in the ranking — solving nothing means you simply don't appear, not a red star.</li>
+              <li>The board always shows points from solves accepted in the <strong>trailing 7 days</strong>, recalculated live — there's no fixed weekly reset.</li>
+              <li>A solve ages out of the board 7 days after it happened, but it's never un-scored — it just stops counting toward the current total.</li>
+              <li>Only people with at least one solve in the current 7-day window appear in the ranking.</li>
             </ul>
           </section>
         </div>
@@ -247,14 +244,6 @@ const styles = {
     letterSpacing: '1px'
   },
   headerRight: { display: 'flex', gap: 'var(--space-2)' },
-  historyBtn: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '8px 16px',
-    fontSize: '13px'
-  },
   adminBtn: {
     background: 'var(--accent-gold-dim)',
     border: '1px solid var(--accent-gold)',
