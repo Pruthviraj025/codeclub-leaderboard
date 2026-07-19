@@ -3,8 +3,7 @@ const { requireAuth, requireAdmin } = require('../middleware/auth');
 const User = require('../models/User');
 const AdminAction = require('../models/AdminAction');
 const ScoredSubmission = require('../models/ScoredSubmission');
-const { hardDeleteUser, processRecomputeJob } = require('../services/deletionRecomputeService');
-const { sendRecomputeEmails } = require('../services/emailService');
+const { hardDeleteUser } = require('../services/deletionRecomputeService');
 
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
@@ -80,16 +79,11 @@ router.post('/users/:userId/reactivate', async (req, res) => {
   }
 });
 
-// DELETE /api/admin/users/:userId — hard delete + kick off recompute job
+// DELETE /api/admin/users/:userId — hard delete (live leaderboard corrects itself, no recompute job needed)
 router.delete('/users/:userId', async (req, res) => {
   try {
-    const job = await hardDeleteUser(req.params.userId, req.user._id, req.body.reason);
-    // Fire-and-forget: in production this should be picked up by a worker/cron,
-    // not run inline. Kept inline here for simplicity.
-    processRecomputeJob(job._id)
-      .then(() => sendRecomputeEmails(job._id))
-      .catch(err => console.error('Recompute job or email send failed:', err));
-    res.json({ success: true, jobId: job._id });
+    await hardDeleteUser(req.params.userId, req.user._id, req.body.reason);
+    res.json({ success: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -120,29 +114,6 @@ router.patch('/submissions/:submissionId/review', async (req, res) => {
     res.json(submission);
   } catch (err) {
     res.status(500).json({ error: err.message });
-  }
-});
-
-const RecomputeJob = require('../models/RecomputeJob');
-
-// GET /api/admin/recompute-jobs/:jobId — check status, useful after a hard-delete
-router.get('/recompute-jobs/:jobId', async (req, res) => {
-  try {
-    const job = await RecomputeJob.findById(req.params.jobId);
-    if (!job) return res.status(404).json({ error: 'Job not found' });
-    res.json(job);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/admin/recompute-jobs/:jobId/resend-emails — retry any unsent emails
-router.post('/recompute-jobs/:jobId/resend-emails', async (req, res) => {
-  try {
-    const result = await sendRecomputeEmails(req.params.jobId);
-    res.json(result);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
   }
 });
 
