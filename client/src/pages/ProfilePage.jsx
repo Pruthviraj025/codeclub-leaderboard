@@ -75,8 +75,6 @@ export default function ProfilePage() {
   if (!profile) return <div style={styles.pageCenter}><div style={styles.dim}>Loading…</div></div>;
 
   const isOwner = profile.id === sessionUser.id;
-  const greenStars = profile.stars.filter((s) => s.type === 'green');
-  const redStars = profile.stars.filter((s) => s.type === 'red');
 
   return (
     <div style={styles.page}>
@@ -93,8 +91,6 @@ export default function ProfilePage() {
 
           <div style={styles.statRow}>
             <Stat label="CF HANDLE" value={profile.cfHandle || '— not connected —'} />
-            <Stat label="GREEN STARS" value={profile.greenStarCount} color="var(--accent-green)" />
-            <Stat label="ACTIVE RED STARS" value={profile.activeRedStarCount} color="var(--accent-red)" />
           </div>
 
           {isOwner && profile.usn && (
@@ -168,20 +164,6 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div style={styles.starsSection}>
-            <div style={styles.eyebrow}>VERDICT HISTORY</div>
-            <div style={styles.badgeGrid}>
-              {greenStars.map((s, i) => (
-                <span key={`g${i}`} className="scale-in" style={{ ...styles.badgeGreen, animationDelay: `${i * 0.04}s` }}>AC · #{s.rank}</span>
-              ))}
-              {redStars.map((s, i) => (
-                <span key={`r${i}`} className="scale-in" style={{ ...styles.badgeRed, animationDelay: `${(greenStars.length + i) * 0.04}s` }}>WA</span>
-              ))}
-              {greenStars.length === 0 && redStars.length === 0 && (
-                <span style={styles.dim}>No verdicts yet — solve something this week.</span>
-              )}
-            </div>
-          </div>
         </div>
       </main>
     </div>
@@ -235,15 +217,5 @@ const styles = {
   instructions: { fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--text)', marginBottom: 'var(--space-2)', lineHeight: 1.6 },
   link: { color: 'var(--accent-green)', textDecoration: 'underline', fontWeight: 600 },
   verifyMsg: { fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--accent-gold)', marginTop: 'var(--space-2)' },
-  starsSection: { marginTop: 'var(--space-4)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border)' },
-  badgeGrid: { display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' },
-  badgeGreen: {
-    fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 600, color: 'var(--accent-green)',
-    background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)', borderRadius: '4px', padding: '4px 10px'
-  },
-  badgeRed: {
-    fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 600, color: 'var(--accent-red)',
-    background: 'var(--accent-red-dim)', border: '1px solid var(--accent-red)', borderRadius: '4px', padding: '4px 10px'
-  },
   error: { color: 'var(--accent-red)', fontFamily: 'var(--font-mono)' }
 };
