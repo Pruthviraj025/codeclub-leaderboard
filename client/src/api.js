@@ -33,7 +33,6 @@ export const api = {
   signup: (body) => request('/auth/signup', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   currentLeaderboard: () => request('/leaderboard/current'),
-  leaderboardHistory: () => request('/leaderboard/history'),
   refresh: () => request('/leaderboard/refresh', { method: 'POST' }),
   profile: (userId) => request(`/profile/${userId}`),
   updateEmail: (email) => request('/profile/me/email', { method: 'PATCH', body: JSON.stringify({ email }) }),
@@ -47,8 +46,7 @@ export const api = {
   adminReactivate: (userId, reason) => request(`/admin/users/${userId}/reactivate`, { method: 'POST', body: JSON.stringify({ reason }) }),
   adminHardDelete: (userId, reason) => request(`/admin/users/${userId}`, { method: 'DELETE', body: JSON.stringify({ reason }) }),
   adminReviewSubmission: (submissionId, status, reason) => request(`/admin/submissions/${submissionId}/review`, { method: 'PATCH', body: JSON.stringify({ status, reason }) }),
-  adminAuditLog: () => request('/admin/audit-log'),
-  adminRecomputeJob: (jobId) => request(`/admin/recompute-jobs/${jobId}`)
+  adminAuditLog: () => request('/admin/audit-log')
 };
 
 export function saveSession(token, user) {
