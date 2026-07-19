@@ -11,9 +11,7 @@ const ScoredSubmissionSchema = new mongoose.Schema({
   points: { type: Number, required: true }, // resolved value at time of scoring (table is fixed, but store it — never recompute silently)
 
   cfSubmissionId: { type: Number, required: true }, // raw CF submission id, for audit/debug
-  solvedAt: { type: Date, required: true }, // CF submission creationTimeSeconds
-
-  weekId: { type: mongoose.Schema.Types.ObjectId, ref: 'Week', required: true }, // which week this counted toward
+  solvedAt: { type: Date, required: true }, // CF submission creationTimeSeconds — rolling 7-day window is computed live off this
 
   reviewStatus: { type: String, enum: ['unreviewed', 'cleared', 'flagged'], default: 'unreviewed' },
 
