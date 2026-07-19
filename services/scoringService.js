@@ -1,7 +1,6 @@
 const axios = require('axios');
 const User = require('../models/User');
 const ScoredSubmission = require('../models/ScoredSubmission');
-const Week = require('../models/Week');
 const { resolvePoints } = require('../utils/ratingMap');
 
 const REFRESH_COOLDOWN_MS = 15 * 1000; // 15s between refreshes per user
@@ -46,10 +45,6 @@ async function refreshUserScore(userId) {
     throw new Error(`Refresh on cooldown. Try again in ${Math.ceil(waitMs / 1000)}s.`);
   }
 
-  // Find current open week (assumes exactly one 'open' week exists at a time)
-  const currentWeek = await Week.findOne({ status: 'open' });
-  if (!currentWeek) throw new Error('No open week found — leaderboard may be mid-reset.');
-
   const submissions = await fetchCFSubmissions(user.cfHandle);
 
   // Filter: accepted only, after CF-connection timestamp, newer than cursor if present
@@ -80,8 +75,7 @@ async function refreshUserScore(userId) {
         problemRating: rating,
         points,
         cfSubmissionId: sub.id,
-        solvedAt: new Date(sub.creationTimeSeconds * 1000),
-        weekId: currentWeek._id
+        solvedAt: new Date(sub.creationTimeSeconds * 1000)
       });
       newlyScored.push(scored);
       pointsAdded += points;
