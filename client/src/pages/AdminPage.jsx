@@ -95,8 +95,8 @@ function UsersTab() {
   async function handleHardDelete(u) {
     setBusyId(u._id);
     try {
-      const res = await api.adminHardDelete(u._id, 'Hard deleted via admin panel');
-      setMsg(`Deleted. Recompute job: ${res.jobId}`);
+      await api.adminHardDelete(u._id, 'Hard deleted via admin panel');
+      setMsg('Deleted. Leaderboard updates automatically.');
       setConfirmDelete(null);
       await load();
     } catch (err) {
