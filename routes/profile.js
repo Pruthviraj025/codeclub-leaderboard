@@ -37,12 +37,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
       id: user._id,
       name: user.name,
       cfHandle: user.cfHandle,
-      cfConnected: user.cfConnected,
-      greenStarCount: user.greenStarCount,
-      activeRedStarCount: user.activeRedStarCount,
-      stars: user.stars
-        .filter(s => s.type === 'green' || !s.clearedAt) // show green always, red only while active
-        .map(s => ({ type: s.type, rank: s.rank, weekId: s.weekId, awardedAt: s.awardedAt }))
+      cfConnected: user.cfConnected
     };
 
     // Private fields only visible to the profile owner
