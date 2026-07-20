@@ -147,7 +147,10 @@ export default function LeaderboardPage() {
         </div>
       </main>
 
-      <footer style={styles.footer}>made with love ❤️ by PTVRJ</footer>
+      <footer style={styles.footer}>
+        <div>made with love 💖</div>
+        <div>by PTVRJ</div>
+      </footer>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
     </div>
@@ -242,7 +245,8 @@ const styles = {
     fontFamily: 'var(--font-mono)',
     fontSize: '12px',
     color: 'var(--text-dim)',
-    padding: 'var(--space-4) 0'
+    padding: 'var(--space-4) 0',
+    lineHeight: 1.8
   },
   header: {
     display: 'flex',
