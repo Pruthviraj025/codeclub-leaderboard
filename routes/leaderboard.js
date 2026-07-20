@@ -25,25 +25,23 @@ router.get('/current', requireAuth, async (req, res) => {
 
     const totals = await ScoredSubmission.aggregate([
       { $match: { solvedAt: { $gte: windowStart } } },
-      { $group: { _id: '$userId', points: { $sum: '$points' } } },
+      { $group: { _id: '$userId', points: { $sum: '$points' }, latestSolveAt: { $max: '$solvedAt' } } },
       { $sort: { points: -1 } }
     ]);
 
     const userIds = totals.map(t => t._id);
     // Only active users — admin soft-remove must actually hide them from the live board
-    const users = await User.find({ _id: { $in: userIds }, isActive: true }, 'name cfHandle lastRefreshAt');
+    const users = await User.find({ _id: { $in: userIds }, isActive: true }, 'name cfHandle');
     const userMap = new Map(users.map(u => [u._id.toString(), u]));
 
     const leaderboard = totals
       .filter(t => userMap.has(t._id.toString()))
       .map(t => ({ ...t, user: userMap.get(t._id.toString()) }))
-      // Same points → whoever refreshed (and so locked in that total) earliest ranks higher.
-      // No refresh timestamp sorts last among ties.
+      // Same points → whoever's solve that completed that total got ACCEPTED first ranks higher
+      // (real CF acceptance time, not app refresh clicks — refreshing again never hurts you).
       .sort((a, b) => {
         if (b.points !== a.points) return b.points - a.points;
-        const aTime = a.user.lastRefreshAt ? a.user.lastRefreshAt.getTime() : Infinity;
-        const bTime = b.user.lastRefreshAt ? b.user.lastRefreshAt.getTime() : Infinity;
-        return aTime - bTime;
+        return a.latestSolveAt.getTime() - b.latestSolveAt.getTime();
       })
       .map((t, i) => ({
         rank: i + 1,
