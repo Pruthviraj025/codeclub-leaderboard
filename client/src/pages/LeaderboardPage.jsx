@@ -147,6 +147,8 @@ export default function LeaderboardPage() {
         </div>
       </main>
 
+      <footer style={styles.footer}>made with love ❤️ by PTVRJ</footer>
+
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
     </div>
   );
@@ -235,6 +237,13 @@ function InfoModal({ onClose }) {
 
 const styles = {
   page: { minHeight: '100vh' },
+  footer: {
+    textAlign: 'center',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    color: 'var(--text-dim)',
+    padding: 'var(--space-4) 0'
+  },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
