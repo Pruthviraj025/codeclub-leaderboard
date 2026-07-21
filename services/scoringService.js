@@ -60,11 +60,12 @@ async function refreshUserScore(userId) {
   let highestSubmissionId = user.lastCheckedSubmissionId || 0;
 
   for (const sub of candidates) {
-    highestSubmissionId = Math.max(highestSubmissionId, sub.id);
-
     const rating = sub.problem.rating; // undefined if unrated — still scores now, see ratingMap
     const points = resolvePoints(rating);
-    if (points === null) continue; // out-of-range/non-standard rating — skip entirely, not logged
+    if (points === null) continue; // out-of-range/non-standard rating — skip, and DON'T advance the cursor
+                                    // past it, in case the rating table ever covers it later
+
+    highestSubmissionId = Math.max(highestSubmissionId, sub.id);
 
     const problemId = `${sub.problem.contestId}${sub.problem.index}`;
 
