@@ -39,6 +39,15 @@ export const api = {
   startCfVerification: (cfHandle) => request('/cf/start-verification', { method: 'POST', body: JSON.stringify({ cfHandle }) }),
   checkCfVerification: () => request('/cf/verify', { method: 'POST' }),
 
+  // Contests
+  contests: () => request('/contests'),
+
+  // Analytics
+  analyticsDays: () => request('/analytics/days'),
+  analyticsForDay: (date) => request(`/analytics/day/${date}`),
+  analyticsRange: () => request('/analytics/range'),
+  analyticsDeductions: () => request('/analytics/deductions'),
+
   // Admin
   adminListUsers: () => request('/admin/users'),
   adminListSubmissions: (status = 'unreviewed') => request(`/admin/submissions?status=${status}`),
