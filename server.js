@@ -8,6 +8,8 @@ const cfRoutes = require('./routes/cf');
 const leaderboardRoutes = require('./routes/leaderboard');
 const profileRoutes = require('./routes/profile');
 const adminRoutes = require('./routes/admin');
+const analyticsRoutes = require('./routes/analytics');
+const contestsRoutes = require('./routes/contests');
 
 const app = express();
 app.use(cors());
@@ -18,6 +20,8 @@ app.use('/api/cf', cfRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/contests', contestsRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
