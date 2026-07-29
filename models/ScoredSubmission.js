@@ -1,24 +1,121 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// One row per (user, problem) that has ever been scored — this is the dedup safety net.
-// A unique index enforces "first solve only" at the DB level, independent of app logic.
 const ScoredSubmissionSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 
-  // Codeforces problem identity: contestId + index (e.g. "1234A") uniquely identifies a problem
-  problemId: { type: String, required: true }, // e.g. "1234A"
-  problemRating: { type: Number, default: null }, // 800-3500, or null for unrated (unrated now scores a flat UNRATED_POINTS)
-  points: { type: Number, required: true }, // resolved value at time of scoring (table is fixed, but store it — never recompute silently)
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true
+    },
 
-  cfSubmissionId: { type: Number, required: true }, // raw CF submission id, for audit/debug
-  solvedAt: { type: Date, required: true }, // CF submission creationTimeSeconds — rolling 7-day window is computed live off this
+    platform: {
+        type: String,
+        enum: ["codeforces", "leetcode"],
+        required: true,
+        index: true
+    },
 
-  reviewStatus: { type: String, enum: ['unreviewed', 'cleared', 'flagged'], default: 'unreviewed' },
+    // CF -> 1234A
+    // LC -> two-sum
+    problemId: {
+        type: String,
+        required: true
+    },
 
-  createdAt: { type: Date, default: Date.now }
+    problemName: {
+        type: String,
+        default: null
+    },
+
+    // Codeforces only
+    problemRating: {
+        type: Number,
+        default: null
+    },
+
+    // LeetCode only
+    difficulty: {
+        type: String,
+        enum: ["Easy", "Medium", "Hard", null],
+        default: null
+    },
+
+    points: {
+        type: Number,
+        required: true
+    },
+
+    cfSubmissionId: {
+        type: Number,
+        default: null
+    },
+
+    lcSubmissionId: {
+        type: String,
+        default: null
+    },
+
+    solvedAt: {
+        type: Date,
+        required: true,
+        index: true
+    },
+
+    reviewStatus: {
+        type: String,
+        enum: [
+            "unreviewed",
+            "cleared",
+            "flagged"
+        ],
+        default: "unreviewed"
+    },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+
+},
+{
+    versionKey: false
 });
 
-// The actual anti-double-count guarantee: one scored row per user+problem, ever.
-ScoredSubmissionSchema.index({ userId: 1, problemId: 1 }, { unique: true });
+/*
+|--------------------------------------------------------------------------
+| Indexes
+|--------------------------------------------------------------------------
+*/
 
-module.exports = mongoose.model('ScoredSubmission', ScoredSubmissionSchema);
+// User cannot score the same problem twice on the same platform.
+ScoredSubmissionSchema.index(
+    {
+        userId: 1,
+        platform: 1,
+        problemId: 1
+    },
+    {
+        unique: true
+    }
+);
+
+// Leaderboard
+ScoredSubmissionSchema.index({
+    solvedAt: -1
+});
+
+ScoredSubmissionSchema.index({
+    userId: 1,
+    solvedAt: -1
+});
+
+ScoredSubmissionSchema.index({
+    platform: 1,
+    solvedAt: -1
+});
+
+module.exports = mongoose.model(
+    "ScoredSubmission",
+    ScoredSubmissionSchema
+);

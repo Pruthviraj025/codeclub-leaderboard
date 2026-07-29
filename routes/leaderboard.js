@@ -1,60 +1,242 @@
-const express = require('express');
-const { requireAuth } = require('../middleware/auth');
-const { refreshUserScore } = require('../services/scoringService');
-const ScoredSubmission = require('../models/ScoredSubmission');
-const User = require('../models/User');
+const express = require("express");
+
+const { requireAuth } = require("../middleware/auth");
+const { refreshUserScore } = require("../services/scoringService");
+
+const ScoredSubmission = require("../models/ScoredSubmission");
+const User = require("../models/User");
 
 const router = express.Router();
 
-const WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // rolling 7 days
+const WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-// POST /api/leaderboard/refresh — the refresh button
-router.post('/refresh', requireAuth, async (req, res) => {
-  try {
-    const result = await refreshUserScore(req.user._id);
-    res.json(result);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+/*
+|--------------------------------------------------------------------------
+| Refresh leaderboard data
+|--------------------------------------------------------------------------
+*/
+router.post("/refresh", requireAuth, async (req, res) => {
+
+    try {
+
+        const result = await refreshUserScore(req.user._id);
+
+        res.json({
+            success: true,
+            ...result
+        });
+
+    } catch (err) {
+
+        res.status(400).json({
+            success: false,
+            error: err.message
+        });
+
+    }
+
 });
 
-// GET /api/leaderboard/current — live standings: solves accepted in the trailing 7 days
-router.get('/current', requireAuth, async (req, res) => {
-  try {
-    const windowStart = new Date(Date.now() - WINDOW_MS);
+/*
+|--------------------------------------------------------------------------
+| Current Leaderboard
+|--------------------------------------------------------------------------
+*/
+router.get("/current", requireAuth, async (req, res) => {
 
-    const totals = await ScoredSubmission.aggregate([
-      { $match: { solvedAt: { $gte: windowStart } } },
-      { $group: { _id: '$userId', points: { $sum: '$points' }, latestSolveAt: { $max: '$solvedAt' } } },
-      { $sort: { points: -1 } }
-    ]);
+    try {
 
-    const userIds = totals.map(t => t._id);
-    // Only active users — admin soft-remove must actually hide them from the live board
-    const users = await User.find({ _id: { $in: userIds }, isActive: true }, 'name cfHandle');
-    const userMap = new Map(users.map(u => [u._id.toString(), u]));
+        const windowStart =
+            new Date(Date.now() - WINDOW_MS);
 
-    const leaderboard = totals
-      .filter(t => userMap.has(t._id.toString()))
-      .map(t => ({ ...t, user: userMap.get(t._id.toString()) }))
-      // Same points → whoever's solve that completed that total got ACCEPTED first ranks higher
-      // (real CF acceptance time, not app refresh clicks — refreshing again never hurts you).
-      .sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        return a.latestSolveAt.getTime() - b.latestSolveAt.getTime();
-      })
-      .map((t, i) => ({
-        rank: i + 1,
-        userId: t._id,
-        name: t.user.name,
-        cfHandle: t.user.cfHandle || null,
-        points: t.points
-      }));
+        const totals =
+            await ScoredSubmission.aggregate([
 
-    res.json({ windowStart, leaderboard });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+                {
+                    $match: {
+                        solvedAt: {
+                            $gte: windowStart
+                        }
+                    }
+                },
+
+                {
+                    $group: {
+
+                        _id: "$userId",
+
+                        totalPoints: {
+                            $sum: "$points"
+                        },
+
+                        latestSolveAt: {
+                            $max: "$solvedAt"
+                        },
+
+                        codeforcesPoints: {
+
+                            $sum: {
+
+                                $cond: [
+
+                                    {
+                                        $eq: [
+                                            "$platform",
+                                            "codeforces"
+                                        ]
+                                    },
+
+                                    "$points",
+
+                                    0
+
+                                ]
+
+                            }
+
+                        },
+
+                        leetcodePoints: {
+
+                            $sum: {
+
+                                $cond: [
+
+                                    {
+                                        $eq: [
+                                            "$platform",
+                                            "leetcode"
+                                        ]
+                                    },
+
+                                    "$points",
+
+                                    0
+
+                                ]
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            ]);
+
+        const userIds = totals.map(x => x._id);
+
+        const users =
+            await User.find(
+                {
+                    _id: {
+                        $in: userIds
+                    },
+                    isActive: true
+                },
+                "name cfHandle lcUsername"
+            );
+
+        const userMap = new Map(
+            users.map(user => [
+                user._id.toString(),
+                user
+            ])
+        );
+
+        const leaderboard =
+            totals
+
+                .filter(x =>
+                    userMap.has(
+                        x._id.toString()
+                    )
+                )
+
+                .sort((a, b) => {
+
+                    if (
+                        b.totalPoints !==
+                        a.totalPoints
+                    ) {
+
+                        return (
+                            b.totalPoints -
+                            a.totalPoints
+                        );
+
+                    }
+
+                    return (
+                        a.latestSolveAt -
+                        b.latestSolveAt
+                    );
+
+                })
+
+                .map((entry, index) => {
+
+                    const user =
+                        userMap.get(
+                            entry._id.toString()
+                        );
+
+                    return {
+
+                        rank: index + 1,
+
+                        userId: user._id,
+
+                        name: user.name,
+
+                        cfHandle:
+                            user.cfHandle,
+
+                        lcUsername:
+                            user.lcUsername,
+
+                        codeforcesPoints:
+                            entry.codeforcesPoints,
+
+                        leetcodePoints:
+                            entry.leetcodePoints,
+
+                        totalPoints:
+                            entry.totalPoints,
+
+                        latestSolveAt:
+                            entry.latestSolveAt
+
+                    };
+
+                });
+
+        res.json({
+
+            success: true,
+
+            windowStart,
+
+            totalParticipants:
+                leaderboard.length,
+
+            leaderboard
+
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+
+            success: false,
+
+            error: err.message
+
+        });
+
+    }
+
 });
 
 module.exports = router;
