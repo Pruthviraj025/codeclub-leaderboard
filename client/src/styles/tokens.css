@@ -164,4 +164,18 @@ input:focus { border-color: var(--accent-green) !important; }
   .admin-table-inner {
     min-width: 640px !important;
   }
+  .sidebar-shell {
+    flex-direction: column !important;
+  }
+  .app-sidebar {
+    width: 100% !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: var(--space-3) !important;
+    padding: var(--space-2) var(--space-3) !important;
+    overflow-x: auto !important;
+  }
+  .app-sidebar nav {
+    flex-direction: row !important;
+  }
 }

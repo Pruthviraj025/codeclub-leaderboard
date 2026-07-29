@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, getSessionUser, clearSession } from '../api';
+import { api, getSessionUser } from '../api';
+import SidebarLayout from '../components/SidebarLayout';
 
 export default function LeaderboardPage() {
   const [data, setData] = useState(null);
@@ -46,30 +47,11 @@ export default function LeaderboardPage() {
     }
   }
 
-  function handleLogout() {
-    clearSession();
-    navigate('/');
-  }
-
   if (!user) return null;
 
   return (
-    <div style={styles.page}>
-      <header style={styles.header} className="site-header">
-        <div style={styles.logoMark}>{'<CODECLUB/>'}</div>
-        <div style={styles.headerRight} className="header-right">
-          {user.role === 'admin' && (
-            <button style={styles.adminBtn} onClick={() => navigate('/admin')}>Admin</button>
-          )}
-          <button style={styles.profileBtn} onClick={() => navigate(`/profile/${user.id}`)}>
-            My Profile
-          </button>
-          <button style={styles.logoutBtn} onClick={handleLogout}>Log out</button>
-        </div>
-      </header>
-
-      <main style={styles.main} className="page-main">
-        <div style={styles.titleRow} className="title-row">
+    <SidebarLayout active="leaderboard">
+      <div style={styles.titleRow} className="title-row">
           <div>
             <div style={styles.eyebrow}>TRAILING 7 DAYS · LIVE STANDINGS</div>
             <div style={styles.titleWithInfo}>
@@ -145,15 +127,14 @@ export default function LeaderboardPage() {
             <div style={styles.empty}>No solves recorded in the last 7 days. Be the first.</div>
           )}
         </div>
-      </main>
 
-      <footer style={styles.footer}>
-        <div>made with love 💖</div>
-        <div>by PTVRJ</div>
-      </footer>
+        <div style={styles.footer}>
+          <div>made with love 💖</div>
+          <div>by PTVRJ</div>
+        </div>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
-    </div>
+    </SidebarLayout>
   );
 }
 
