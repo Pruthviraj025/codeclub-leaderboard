@@ -119,7 +119,7 @@ export default function LeaderboardPage() {
                   </span>
                 </span>
                 <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="mono queue-col-points">
-                  {row.points}
+                  {row.totalpoints}
                 </span>
               </div>
             ))
