@@ -110,7 +110,7 @@ export default function LeaderboardPage() {
               <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                 {row.cfHandle && (
                   
-                    href={`https://codeforces.com/profile/${row.cfHandle}`}
+                   <a href={`https://codeforces.com/profile/${row.cfHandle}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
@@ -122,7 +122,7 @@ export default function LeaderboardPage() {
                 )}
                 {row.lcUsername && (
                   
-                    href={`https://leetcode.com/${row.lcUsername}`}
+                   <a href={`https://leetcode.com/${row.lcUsername}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
