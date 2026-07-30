@@ -99,7 +99,7 @@ export default function LeaderboardPage() {
                 </span>
                 <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   {row.cfHandle && (
-                    <a
+                    
                       href={`https://codeforces.com/profile/${row.cfHandle}`}
                       target="_blank"
                       rel="noreferrer"
@@ -119,7 +119,7 @@ export default function LeaderboardPage() {
                   </span>
                 </span>
                 <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="mono queue-col-points">
-                  {row.totalpoints}
+                  {row.totalPoints}
                 </span>
               </div>
             ))
