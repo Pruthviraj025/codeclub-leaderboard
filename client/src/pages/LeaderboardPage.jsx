@@ -122,7 +122,7 @@ export default function LeaderboardPage() {
                 )}
                 {row.lcUsername && (
                   
-                   <a href={`https://leetcode.com/${row.lcUsername}`}
+                  <a  href={`https://leetcode.com/${row.lcUsername}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
@@ -290,6 +290,26 @@ function InfoModal({ onClose }) {
               ))}
             </div>
           </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>Scoring formula</div>
+            <div className="mono" style={styles.formulaBox}>
+              Final Score = Base Score × Acceptance Factor × Submission Factor
+              <br /><br />
+              Acceptance Factor = 1 + (50 − Acceptance Rate) / 100
+              <br />
+              Submission Factor = 1 + log₁₀(50,000,000 / Total Submissions) × 0.08
+              <br /><br />
+              Final Score = Round to nearest 100
+              <br />
+              Clamp to the range shown above.
+            </div>
+            <div style={styles.formulaNote}>
+              Points depend on the problem's <strong>difficulty</strong>, <strong>acceptance rate</strong>, and <strong>popularity</strong>.
+              <br />
+              Scores are rounded to the nearest <strong>100</strong>.
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -407,6 +427,23 @@ const styles = {
   },
   ratingNum: { fontSize: '11px', color: 'var(--text-dim)' },
   ratingPts: { fontSize: '13px', color: 'var(--accent-green)', fontWeight: 700 },
+  formulaBox: {
+    marginTop: '10px',
+    padding: '12px',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    background: 'var(--surface-raised)',
+    overflowX: 'auto',
+    fontSize: '13px',
+    lineHeight: 1.8,
+    color: 'var(--text-dim)'
+  },
+  formulaNote: {
+    marginTop: '14px',
+    color: 'var(--text-dim)',
+    lineHeight: 1.7,
+    fontSize: '13px'
+  },
   refreshBtn: {
     background: 'var(--surface-raised)',
     border: '1px solid var(--accent-green)',
