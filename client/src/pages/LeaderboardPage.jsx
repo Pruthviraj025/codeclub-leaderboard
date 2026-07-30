@@ -20,10 +20,12 @@ export default function LeaderboardPage() {
 
   async function loadLeaderboard() {
     try {
+      setLoadingBoard(true);
       const res = await api.currentLeaderboard();
       setData(res);
+      setError('');
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to load leaderboard.');
     } finally {
       setLoadingBoard(false);
     }
@@ -34,10 +36,14 @@ export default function LeaderboardPage() {
     setRefreshMsg('');
     try {
       const res = await api.refresh();
+      const cf = res.codeforces?.pointsAdded || 0;
+      const lc = res.leetcode?.pointsAdded || 0;
+      const total = res.totalPointsAdded || 0;
+
       setRefreshMsg(
-        res.pointsAdded > 0
-          ? `+${res.pointsAdded} points from ${res.newlyScored.length} new solve(s)`
-          : 'No new solves found'
+        total > 0
+          ? `Added ${total} points (CF +${cf}, LC +${lc})`
+          : 'No new solves found.'
       );
       await loadLeaderboard();
     } catch (err) {
@@ -52,86 +58,111 @@ export default function LeaderboardPage() {
   return (
     <SidebarLayout active="leaderboard">
       <div style={styles.titleRow} className="title-row">
-          <div>
-            <div style={styles.eyebrow}>TRAILING 7 DAYS · LIVE STANDINGS</div>
-            <div style={styles.titleWithInfo}>
-              <h1 style={styles.title}>Leaderboard</h1>
-              <button
-                style={styles.infoBtn}
-                onClick={() => setShowInfo(true)}
-                aria-label="How scoring works"
-                title="How scoring works"
-              >
-                i
-              </button>
-            </div>
+        <div>
+          <div style={styles.eyebrow}>TRAILING 7 DAYS · LIVE STANDINGS</div>
+          <div style={styles.titleWithInfo}>
+            <h1 style={styles.title}>Leaderboard</h1>
+            <button
+              style={styles.infoBtn}
+              onClick={() => setShowInfo(true)}
+              aria-label="How scoring works"
+              title="How scoring works"
+            >
+              i
+            </button>
           </div>
-          <button style={styles.refreshBtn} className="refresh-btn" onClick={handleRefresh} disabled={refreshing}>
-            {refreshing ? 'Checking CF…' : '↻ Refresh my solves'}
-          </button>
         </div>
-        {refreshMsg && <div style={styles.refreshMsg}>{refreshMsg}</div>}
+        <button style={styles.refreshBtn} className="refresh-btn" onClick={handleRefresh} disabled={refreshing}>
+          {refreshing ? 'Refreshing…' : '↻ Refresh my solves'}
+        </button>
+      </div>
 
-        {error && <div style={styles.error}>{error}</div>}
+      {refreshMsg && <div style={styles.refreshMsg}>{refreshMsg}</div>}
+      {error && <div style={styles.error}>{error}</div>}
 
-        <div style={styles.queue}>
-          <div style={styles.queueHeader}>
-            <span style={{ ...styles.col, width: '60px' }}>RANK</span>
-            <span style={{ ...styles.col, flex: 1 }}>HANDLE</span>
-            <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="queue-col-points">POINTS</span>
-          </div>
-          {loadingBoard ? (
-            <div style={styles.empty} className="fade-up">Loading standings…</div>
-          ) : data?.leaderboard?.length ? (
-            data.leaderboard.map((row, idx) => (
-              <div
-                key={row.userId}
-                className="row-hover fade-up"
-                style={{
-                  ...styles.queueRow,
-                  ...(row.userId === user.id ? styles.queueRowSelf : {}),
-                  animationDelay: `${idx * 0.03}s`
-                }}
-                onClick={() => navigate(`/profile/${row.userId}`)}
-              >
-                <span style={{ ...styles.col, width: '60px' }} className="mono">
-                  <RankBadge rank={row.rank} />
-                </span>
-                <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                  {row.cfHandle && (
-                    
-                    <a  href={`https://codeforces.com/profile/${row.cfHandle}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      style={styles.cfIconLink}
-                      title={`Open ${row.cfHandle} on Codeforces`}
-                    >
-                      <CfIcon />
-                    </a>
-                  )}
-                  <span
-                    className="mono"
-                    style={styles.nameLink}
-                    onClick={(e) => { e.stopPropagation(); navigate(`/profile/${row.userId}`); }}
+      <div style={styles.queue}>
+        <div style={styles.queueHeader}>
+          <span style={{ ...styles.col, width: '60px' }}>RANK</span>
+          <span style={{ ...styles.col, flex: 1 }}>USER</span>
+          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }}>CF</span>
+          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }}>LC</span>
+          <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="queue-col-points">TOTAL</span>
+        </div>
+
+        {loadingBoard ? (
+          <div style={styles.empty} className="fade-up">Loading standings…</div>
+        ) : data?.leaderboard?.length ? (
+          data.leaderboard.map((row, idx) => (
+            <div
+              key={row.userId}
+              className="row-hover fade-up"
+              style={{
+                ...styles.queueRow,
+                ...(row.userId === user.id ? styles.queueRowSelf : {}),
+                animationDelay: `${idx * 0.03}s`
+              }}
+              onClick={() => navigate(`/profile/${row.userId}`)}
+            >
+              <span style={{ ...styles.col, width: '60px' }} className="mono">
+                <RankBadge rank={row.rank} />
+              </span>
+
+              <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                {row.cfHandle && (
+                  
+                    href={`https://codeforces.com/profile/${row.cfHandle}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={styles.cfIconLink}
+                    title={`Open ${row.cfHandle} on Codeforces`}
                   >
-                    {row.cfHandle || row.name}
-                  </span>
+                    <CfIcon />
+                  </a>
+                )}
+                {row.lcUsername && (
+                  
+                    href={`https://leetcode.com/${row.lcUsername}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={styles.cfIconLink}
+                    title={`Open ${row.lcUsername} on LeetCode`}
+                  >
+                    <LeetCodeIcon />
+                  </a>
+                )}
+                <span
+                  className="mono"
+                  style={styles.nameLink}
+                  onClick={(e) => { e.stopPropagation(); navigate(`/profile/${row.userId}`); }}
+                >
+                  {row.cfHandle || row.lcUsername || row.name}
                 </span>
-                <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="mono queue-col-points">
-                  {row.totalPoints}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div style={styles.empty}>No solves recorded in the last 7 days. Be the first.</div>
-          )}
-        </div>
+              </span>
 
-        <div style={styles.footer}>
-          <div>made with love 💖</div>
-          <div>by PTVRJ</div>
-        </div>
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)' }} className="mono">
+                {row.codeforcesPoints}
+              </span>
+
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116' }} className="mono">
+                {row.leetcodePoints}
+              </span>
+
+              <span style={{ ...styles.col, width: '100px', textAlign: 'right', fontWeight: 700, color: 'var(--text)' }} className="mono queue-col-points">
+                {row.totalPoints}
+              </span>
+            </div>
+          ))
+        ) : (
+          <div style={styles.empty}>No solves recorded in the last 7 days. Be the first.</div>
+        )}
+      </div>
+
+      <div style={styles.footer}>
+        <div>made with love 💖</div>
+        <div>by PTVRJ</div>
+      </div>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
     </SidebarLayout>
@@ -157,6 +188,16 @@ function CfIcon() {
   );
 }
 
+function LeetCodeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M16.5 18.5L21 14l-4.5-4.5" stroke="#FFA116" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 14H9" stroke="#FFA116" strokeWidth="2" strokeLinecap="round" />
+      <path d="M10 5L3 12l7 7" stroke="#B3B3B3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 // Mirrors utils/ratingMap.js on the backend — keep in sync if that ever changes.
 const RATING_MAP = [
   [800, 200], [900, 300], [1000, 600], [1100, 700], [1200, 1000],
@@ -167,6 +208,12 @@ const RATING_MAP = [
   [3300, 5100], [3400, 5400], [3500, 5500]
 ];
 const UNRATED_POINTS = 100;
+
+const LEETCODE_POINTS = [
+  { difficulty: 'Easy', color: '#4CAF50', range: '200–400' },
+  { difficulty: 'Medium', color: '#FFC107', range: '700–1200' },
+  { difficulty: 'Hard', color: '#F44336', range: '1500–2500' }
+];
 
 function InfoModal({ onClose }) {
   return (
@@ -179,18 +226,45 @@ function InfoModal({ onClose }) {
 
         <div style={styles.modalBody}>
           <section style={styles.section}>
-            <div style={styles.sectionTitle}>Counting a solve</div>
+            <div style={styles.sectionTitle}>Supported platforms</div>
             <ul style={styles.list}>
-              <li>Connect your Codeforces handle on your Profile page first — only submissions made <em>after</em> connecting are counted.</li>
-              <li>Only <strong>Accepted (AC)</strong> submissions count. Wrong answers, TLEs, etc. don't score anything.</li>
-              <li>Each problem counts once — resubmitting an already-solved problem doesn't add points again.</li>
-              <li>Unrated problems (no CF rating) count too — flat {UNRATED_POINTS} points each.</li>
-              <li>Nothing updates automatically — hit <strong>"↻ Refresh my solves"</strong> on this page to pull your latest submissions from Codeforces. There's a short cooldown between refreshes.</li>
+              <li>Codeforces Accepted submissions are scored.</li>
+              <li>LeetCode Accepted submissions are also scored.</li>
+              <li>Both platforms contribute toward your <strong>Total Points</strong>.</li>
             </ul>
           </section>
 
           <section style={styles.section}>
-            <div style={styles.sectionTitle}>Points by problem rating</div>
+            <div style={styles.sectionTitle}>Codeforces scoring</div>
+            <ul style={styles.list}>
+              <li>Connect your Codeforces handle on your Profile page first — only submissions made <em>after</em> connecting are counted.</li>
+              <li>Only <strong>Accepted (AC)</strong> submissions count.</li>
+              <li>Each problem counts once — resubmitting doesn't add points again.</li>
+              <li>Unrated problems count too — flat {UNRATED_POINTS} points each.</li>
+            </ul>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>LeetCode scoring</div>
+            <ul style={styles.list}>
+              <li>Only <strong>Accepted</strong> submissions are scored.</li>
+              <li>Each problem awards points only once.</li>
+              <li>Points depend on difficulty, acceptance rate, and popularity.</li>
+              <li>Final scores are rounded to the nearest <strong>100</strong>.</li>
+            </ul>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>The 7-day window</div>
+            <ul style={styles.list}>
+              <li>The board always shows points from solves accepted in the <strong>trailing 7 days</strong>, recalculated live — no fixed weekly reset.</li>
+              <li>A solve ages out after 7 days, but it's never un-scored — it just stops counting toward the current total.</li>
+              <li>Only people with at least one solve in the current 7-day window appear in the ranking.</li>
+            </ul>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>Codeforces rating → points</div>
             <div style={styles.ratingGrid}>
               <div style={styles.ratingCell}>
                 <span className="mono" style={styles.ratingNum}>unrated</span>
@@ -206,12 +280,15 @@ function InfoModal({ onClose }) {
           </section>
 
           <section style={styles.section}>
-            <div style={styles.sectionTitle}>The 7-day window</div>
-            <ul style={styles.list}>
-              <li>The board always shows points from solves accepted in the <strong>trailing 7 days</strong>, recalculated live — there's no fixed weekly reset.</li>
-              <li>A solve ages out of the board 7 days after it happened, but it's never un-scored — it just stops counting toward the current total.</li>
-              <li>Only people with at least one solve in the current 7-day window appear in the ranking.</li>
-            </ul>
+            <div style={styles.sectionTitle}>LeetCode difficulty → possible points</div>
+            <div style={styles.lcGrid}>
+              {LEETCODE_POINTS.map(item => (
+                <div key={item.difficulty} style={styles.ratingCell}>
+                  <span className="mono" style={styles.ratingNum}>{item.difficulty}</span>
+                  <span className="mono" style={{ ...styles.ratingPts, color: item.color }}>{item.range}</span>
+                </div>
+              ))}
+            </div>
           </section>
         </div>
       </div>
@@ -229,46 +306,9 @@ const styles = {
     padding: 'var(--space-4) 0',
     lineHeight: 1.8
   },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 'var(--space-3) var(--space-5)',
-    borderBottom: '1px solid var(--border)'
-  },
-  logoMark: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '14px',
-    color: 'var(--accent-green)',
-    letterSpacing: '1px'
-  },
   headerRight: { display: 'flex', gap: 'var(--space-2)' },
-  adminBtn: {
-    background: 'var(--accent-gold-dim)',
-    border: '1px solid var(--accent-gold)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--accent-gold)',
-    padding: '8px 16px',
-    fontSize: '13px'
-  },
-  profileBtn: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text)',
-    padding: '8px 16px',
-    fontSize: '13px'
-  },
-  logoutBtn: {
-    background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '8px 16px',
-    fontSize: '13px'
-  },
-  main: { maxWidth: '720px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
-  titleRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-2)' },
+  main: { maxWidth: '860px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
+  titleRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-2)', gap: '16px', flexWrap: 'wrap' },
   eyebrow: {
     fontFamily: 'var(--font-mono)',
     fontSize: '11px',
@@ -308,7 +348,7 @@ const styles = {
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
-    maxWidth: '540px',
+    maxWidth: '620px',
     width: '100%',
     maxHeight: '85vh',
     overflowY: 'auto',
@@ -349,6 +389,11 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
     gap: '6px'
+  },
+  lcGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '10px'
   },
   ratingCell: {
     display: 'flex',
