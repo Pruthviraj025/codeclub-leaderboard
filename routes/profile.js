@@ -1,6 +1,7 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const User = require('../models/User');
+const ScoredSubmission = require('../models/ScoredSubmission');
 
 const router = express.Router();
 
@@ -26,29 +27,93 @@ router.patch('/me/email', requireAuth, async (req, res) => {
 });
 
 // GET /api/profile/:userId — view own or someone else's profile (public fields only)
+// GET /api/profile/:userId
 router.get('/:userId', requireAuth, async (req, res) => {
   try {
+
     const user = await User.findById(req.params.userId);
-    if (!user || !user.isActive) return res.status(404).json({ error: 'Profile not found' });
 
-    const isOwner = user._id.toString() === req.user._id.toString();
-
-    const publicProfile = {
-      id: user._id,
-      name: user.name,
-      cfHandle: user.cfHandle,
-      cfConnected: user.cfConnected
-    };
-
-    // Private fields only visible to the profile owner
-    if (isOwner) {
-      publicProfile.usn = user.usn;
-      publicProfile.email = user.email;
+    if (!user || !user.isActive) {
+      return res.status(404).json({
+        error: 'Profile not found'
+      });
     }
 
-    res.json(publicProfile);
+    const isOwner =
+      user._id.toString() === req.user._id.toString();
+
+    // ------------------------------------
+    // Aggregate leaderboard points
+    // ------------------------------------
+
+    const stats = await ScoredSubmission.aggregate([
+      {
+        $match: {
+          userId: user._id
+        }
+      },
+      {
+        $group: {
+          _id: "$platform",
+          points: {
+            $sum: "$pointsAwarded"
+          }
+        }
+      }
+    ]);
+
+    let codeforcesPoints = 0;
+    let leetcodePoints = 0;
+
+    for (const row of stats) {
+
+      if (row._id === "codeforces") {
+        codeforcesPoints = row.points;
+      }
+
+      if (row._id === "leetcode") {
+        leetcodePoints = row.points;
+      }
+
+    }
+
+    const totalPoints =
+      codeforcesPoints +
+      leetcodePoints;
+
+    const profile = {
+
+      id: user._id,
+
+      name: user.name,
+
+      cfHandle: user.cfHandle,
+      cfConnected: user.cfConnected,
+
+      lcUsername: user.lcUsername,
+      lcConnected: user.lcConnected,
+
+      codeforcesPoints,
+      leetcodePoints,
+      totalPoints
+
+    };
+
+    if (isOwner) {
+
+      profile.usn = user.usn;
+      profile.email = user.email;
+
+    }
+
+    res.json(profile);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
 });
 

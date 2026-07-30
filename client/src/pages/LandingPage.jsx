@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, saveSession, warmUpServer } from '../api';
+import { api, warmUpServer } from "../api";
+import { useAuth } from "../context/AuthContext";
 
 const BOOT_LINE = '> initializing maximum productivity';
 
@@ -14,6 +15,7 @@ export default function LandingPage() {
   const [bootDone, setBootDone] = useState(false);
   const [slowHint, setSlowHint] = useState(false);
   const navigate = useNavigate();
+  const auth = useAuth();
 
   useEffect(() => {
     warmUpServer(); // wake a sleeping Render backend before the user even submits
@@ -42,8 +44,8 @@ export default function LandingPage() {
       const data = mode === 'join'
         ? await api.signup(form)
         : await api.login({ email: form.email, password: form.password });
-      saveSession(data.token, data.user);
-      navigate('/leaderboard');
+      auth.login(data.token, data.user);
+navigate("/leaderboard");
     } catch (err) {
       setError(err.message);
     } finally {
