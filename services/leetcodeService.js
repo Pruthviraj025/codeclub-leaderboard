@@ -290,16 +290,7 @@ async function refreshLeetCodeScore(userId) {
         user.lcLastSubmissionTimestamp || 0;
 
     const docs = [];
-
-    for (const submission of candidates) {
-
-        highestTimestamp = Math.max(
-
-            highestTimestamp,
-
-            Number(submission.timestamp)
-
-        );
+for (const submission of candidates) {
 
         const question =
             questionMap.get(
@@ -330,10 +321,17 @@ async function refreshLeetCodeScore(userId) {
         if (points == null)
             continue;
 
-        //--------------------------------------
-        // Create submission document
-        //--------------------------------------
+        // Only advance the cursor once we know this submission
+        // will actually be scored — otherwise a submission that
+        // fails to resolve gets permanently skipped on every
+        // future sync.
+        highestTimestamp = Math.max(
 
+            highestTimestamp,
+
+            Number(submission.timestamp)
+
+        );
         docs.push({
 
             userId:
