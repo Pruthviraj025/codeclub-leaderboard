@@ -41,6 +41,27 @@ const ScoredSubmissionSchema = new mongoose.Schema({
         default: null
     },
 
+    // LeetCode only — needed by resolveLeetCodePoints() for rescoring
+    acceptanceRate: {
+        type: Number,
+        default: null
+    },
+
+    acceptedCount: {
+        type: Number,
+        default: null
+    },
+
+    totalSubmissions: {
+        type: Number,
+        default: null
+    },
+
+    scoringVersion: {
+        type: Number,
+        default: null
+    },
+
     points: {
         type: Number,
         required: true
