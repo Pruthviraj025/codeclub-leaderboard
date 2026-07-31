@@ -1,20 +1,20 @@
-// One-time rescore: updates `points` on every existing ScoredSubmission to match
-// the current utils/ratingMap.js table (run this after changing the point values).
+// One-time rescore: updates `points` on every existing ScoredSubmission to
+// match the current scoring tables (utils/ratingMap.js for Codeforces,
+// utils/leetcodePoints.js for LeetCode). Run this after changing either
+// point table, and always AFTER scripts/backfillPlatform.js.
 //
 // Run with: node scripts/rescoreSubmissions.js
 //
 // Note: this only touches submissions that were already scored and stored.
-// Problems that were unrated and previously SKIPPED entirely (before unrated
-// started counting) were never recorded, so there's nothing here to backfill
-// for those — the user would need to hit "Refresh" again, but their
-// lastCheckedSubmissionId cursor has already moved past those CF submissions,
-// so a plain refresh won't re-pull them either. Backfilling those requires a
-// separate reset of lastCheckedSubmissionId, which this script does NOT do.
+// Problems that were skipped entirely at scoring time (e.g. out-of-range CF
+// rating, or unresolvable LC difficulty) were never recorded, so there's
+// nothing here to backfill for those.
 
 require('dotenv').config();
 const mongoose = require('mongoose');
 const ScoredSubmission = require('../models/ScoredSubmission');
 const { resolvePoints } = require('../utils/ratingMap');
+const { resolveLeetCodePoints } = require('../utils/leetcodePoints');
 
 async function run() {
   await mongoose.connect(process.env.MONGO_URI);
@@ -25,25 +25,44 @@ async function run() {
 
   let changed = 0;
   let skipped = 0;
+  let unchanged = 0;
 
   for (const sub of submissions) {
-    const newPoints = resolvePoints(sub.problemRating);
-    if (newPoints === null) {
-      // out-of-range/non-standard rating — leave as-is, nothing to resolve it to
+    let newPoints;
+
+    if (sub.platform === 'codeforces') {
+      newPoints = resolvePoints(sub.problemRating);
+    } else if (sub.platform === 'leetcode') {
+      newPoints = resolveLeetCodePoints({
+        difficulty: sub.difficulty,
+        acceptanceRate: sub.acceptanceRate,
+        totalSubmissions: sub.totalSubmissions
+      });
+    } else {
+      // shouldn't happen after backfillPlatform.js, but don't touch unknowns
       skipped++;
       continue;
     }
+
+    if (newPoints === null) {
+      // out-of-range rating / unresolvable difficulty — leave as-is
+      skipped++;
+      continue;
+    }
+
     if (newPoints !== sub.points) {
       sub.points = newPoints;
       await sub.save();
       changed++;
+    } else {
+      unchanged++;
     }
   }
 
   console.log(`\nRescore complete.`);
   console.log(`- Updated: ${changed}`);
-  console.log(`- Unchanged: ${submissions.length - changed - skipped}`);
-  console.log(`- Skipped (out-of-range rating, left as-is): ${skipped}`);
+  console.log(`- Unchanged: ${unchanged}`);
+  console.log(`- Skipped (unresolvable, left as-is): ${skipped}`);
 
   process.exit(0);
 }
