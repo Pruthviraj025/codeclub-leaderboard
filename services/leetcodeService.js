@@ -11,20 +11,61 @@ const BASE_URL = "https://alfa-leetcode-api.onrender.com";
 const WINDOW_SECONDS = 7 * 24 * 60 * 60;
 const QUESTION_CACHE_DAYS = 30;
 
-async function fetchRecentAccepted(username) {
-    const { data } = await axios.get(
-        `${BASE_URL}/${username}/acSubmission`,
-        {
-            timeout: 15000
-        }
-    );
+const MAX_RETRIES = 3;
 
-    if (!Array.isArray(data.submission)) {
-        console.error("Unexpected LeetCode response:", data);
-        throw new Error("Unable to fetch LeetCode submissions.");
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchRecentAccepted(username) {
+
+    let lastError;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+
+        try {
+
+            const { data } = await axios.get(
+                `${BASE_URL}/${username}/acSubmission`,
+                {
+                    timeout: 15000
+                }
+            );
+
+            if (!Array.isArray(data.submission)) {
+                console.error("Unexpected LeetCode response:", data);
+                throw new Error("Unable to fetch LeetCode submissions.");
+            }
+
+            return data.submission;
+
+        } catch (err) {
+
+            lastError = err;
+
+            const status = err.response && err.response.status;
+
+            if (status === 429 && attempt < MAX_RETRIES) {
+
+                const retryAfter = err.response.headers["retry-after"];
+
+                const wait = retryAfter
+                    ? Number(retryAfter) * 1000
+                    : 3000 * Math.pow(2, attempt - 1);
+
+                console.log(
+                    `LeetCode rate limited for ${username}, retrying in ${wait}ms...`
+                );
+
+                await sleep(wait);
+                continue;
+            }
+
+            throw err;
+        }
     }
 
-    return data.submission;
+    throw lastError;
 }
 
 /**
@@ -39,21 +80,21 @@ async function fetchQuestions(titleSlugs) {
     //------------------------------------------
 
     const expiry = new Date(
-    Date.now() -
-    QUESTION_CACHE_DAYS * 24 * 60 * 60 * 1000
-);
+        Date.now() -
+        QUESTION_CACHE_DAYS * 24 * 60 * 60 * 1000
+    );
 
-const cached = await LeetCodeQuestion.find({
+    const cached = await LeetCodeQuestion.find({
 
-    titleSlug: {
-        $in: titleSlugs
-    },
+        titleSlug: {
+            $in: titleSlugs
+        },
 
-    lastFetchedAt: {
-        $gte: expiry
-    }
+        lastFetchedAt: {
+            $gte: expiry
+        }
 
-});
+    });
 
     const questionMap = new Map();
 
@@ -184,26 +225,26 @@ const cached = await LeetCodeQuestion.find({
 
         await Promise.all(
 
-    documents.map(doc =>
+            documents.map(doc =>
 
-        LeetCodeQuestion.findOneAndUpdate(
+                LeetCodeQuestion.findOneAndUpdate(
 
-            {
-                titleSlug: doc.titleSlug
-            },
+                    {
+                        titleSlug: doc.titleSlug
+                    },
 
-            doc,
+                    doc,
 
-            {
-                upsert: true,
-                new: true
-            }
+                    {
+                        upsert: true,
+                        new: true
+                    }
 
-        )
+                )
 
-    )
+            )
 
-).catch(() => {});
+        ).catch(() => {});
 
     }
 
@@ -290,7 +331,8 @@ async function refreshLeetCodeScore(userId) {
         user.lcLastSubmissionTimestamp || 0;
 
     const docs = [];
-for (const submission of candidates) {
+
+    for (const submission of candidates) {
 
         const question =
             questionMap.get(
@@ -321,10 +363,6 @@ for (const submission of candidates) {
         if (points == null)
             continue;
 
-        // Only advance the cursor once we know this submission
-        // will actually be scored — otherwise a submission that
-        // fails to resolve gets permanently skipped on every
-        // future sync.
         highestTimestamp = Math.max(
 
             highestTimestamp,
@@ -332,6 +370,7 @@ for (const submission of candidates) {
             Number(submission.timestamp)
 
         );
+
         docs.push({
 
             userId:
