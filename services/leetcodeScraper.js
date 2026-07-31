@@ -1,6 +1,11 @@
 const axios = require("axios");
 
 const BASE_URL = "https://alfa-leetcode-api.onrender.com";
+const MAX_RETRIES = 3;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 /**
  * Fetches problem metadata from alfa-leetcode-api's /select endpoint.
@@ -9,52 +14,89 @@ const BASE_URL = "https://alfa-leetcode-api.onrender.com";
  */
 async function scrapeProblem(titleSlug) {
 
-    const { data } = await axios.get(
-        `${BASE_URL}/select`,
-        {
-            params: { titleSlug },
-            timeout: 15000
+    let lastError;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+
+        try {
+
+            const { data } = await axios.get(
+                `${BASE_URL}/select`,
+                {
+                    params: { titleSlug },
+                    timeout: 15000
+                }
+            );
+
+            if (!data || !data.difficulty) {
+
+                console.log(
+                    `No usable data for ${titleSlug}. Raw response:`,
+                    JSON.stringify(data)
+                );
+
+                return null;
+
+            }
+
+            const acceptanceRate =
+                typeof data.acRate === "number"
+                    ? data.acRate
+                    : parseFloat(data.acRate);
+
+            return {
+
+                titleSlug,
+
+                questionTitle:
+                    data.questionTitle || data.title || null,
+
+                difficulty:
+                    data.difficulty,
+
+                acceptanceRate:
+                    Number.isFinite(acceptanceRate) ? acceptanceRate : null,
+
+                acceptedCount:
+                    data.totalAccepted ?? null,
+
+                totalSubmissions:
+                    data.totalSubmission ?? data.totalSubmissions ?? null
+
+            };
+
+        } catch (err) {
+
+            lastError = err;
+
+            const status = err.response && err.response.status;
+
+            if (status === 429 && attempt < MAX_RETRIES) {
+
+                const retryAfter =
+                    err.response.headers["retry-after"];
+
+                const wait =
+                    retryAfter
+                        ? Number(retryAfter) * 1000
+                        : 3000 * Math.pow(2, attempt - 1);
+
+                console.log(
+                    `LeetCode API rate limited for ${titleSlug}, retrying in ${wait}ms...`
+                );
+
+                await sleep(wait);
+                continue;
+
+            }
+
+            throw err;
+
         }
-    );
-
-    if (!data || !data.difficulty) {
-
-        console.log(
-            `No usable data for ${titleSlug}. Raw response:`,
-            JSON.stringify(data)
-        );
-
-        return null;
 
     }
 
-    // acRate comes back as a plain number (e.g. 54.32) in this API,
-    // unlike the old scraper which had to parse it out of page text.
-    const acceptanceRate =
-        typeof data.acRate === "number"
-            ? data.acRate
-            : parseFloat(data.acRate);
-
-    return {
-
-        titleSlug,
-
-        questionTitle:
-            data.questionTitle || data.title || null,
-
-        difficulty:
-            data.difficulty,
-
-        acceptanceRate:
-            Number.isFinite(acceptanceRate) ? acceptanceRate : null,
-
-        acceptedCount:
-            data.totalAccepted ?? null,
-
-        totalSubmissions:
-            data.totalSubmission ?? data.totalSubmissions ?? null
-
-    };
+    throw lastError;
 
 }
 
