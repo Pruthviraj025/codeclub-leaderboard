@@ -145,10 +145,6 @@ navigate("/leaderboard");
                   required
                 />
 
-                {mode === 'login' && (
-                  <a href="/forgot-password" style={styles.forgotLink}>Forgot password?</a>
-                )}
-
                 {error && <div style={styles.error}>✕ {error}</div>}
                 {loading && slowHint && (
                   <div style={styles.hint}>Server was asleep — waking it up, this can take ~30s…</div>
