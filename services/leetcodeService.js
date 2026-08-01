@@ -28,7 +28,7 @@ async function fetchRecentAccepted(username) {
             const { data } = await axios.get(
                 `${BASE_URL}/${username}/acSubmission`,
                 {
-                    timeout: 15000
+                    timeout: 30000
                 }
             );
 
@@ -45,16 +45,25 @@ async function fetchRecentAccepted(username) {
 
             const status = err.response && err.response.status;
 
-            if (status === 429 && attempt < MAX_RETRIES) {
+            // Retry on rate limit, cold-start timeouts, and upstream 5xx —
+            // alfa-leetcode-api sleeps on Render free tier and throws these
+            // instead of 429 when waking up.
+            const retryable =
+                status === 429 ||
+                status >= 500 ||
+                !status; // no response = timeout/ECONNRESET/ECONNABORTED
 
-                const retryAfter = err.response.headers["retry-after"];
+            if (retryable && attempt < MAX_RETRIES) {
+
+                const retryAfter =
+                    err.response && err.response.headers["retry-after"];
 
                 const wait = retryAfter
                     ? Number(retryAfter) * 1000
                     : 3000 * Math.pow(2, attempt - 1);
 
                 console.log(
-                    `LeetCode rate limited for ${username}, retrying in ${wait}ms...`
+                    `LeetCode fetch failed for ${username} (${status || err.code}), retrying in ${wait}ms...`
                 );
 
                 await sleep(wait);
