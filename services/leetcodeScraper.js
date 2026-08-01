@@ -24,7 +24,7 @@ async function scrapeProblem(titleSlug) {
                 `${BASE_URL}/select`,
                 {
                     params: { titleSlug },
-                    timeout: 15000
+                    timeout: 30000
                 }
             );
 
@@ -71,10 +71,15 @@ async function scrapeProblem(titleSlug) {
 
             const status = err.response && err.response.status;
 
-            if (status === 429 && attempt < MAX_RETRIES) {
+            const retryable =
+                status === 429 ||
+                status >= 500 ||
+                !status;
+
+            if (retryable && attempt < MAX_RETRIES) {
 
                 const retryAfter =
-                    err.response.headers["retry-after"];
+                    err.response && err.response.headers["retry-after"];
 
                 const wait =
                     retryAfter
@@ -82,7 +87,7 @@ async function scrapeProblem(titleSlug) {
                         : 3000 * Math.pow(2, attempt - 1);
 
                 console.log(
-                    `LeetCode API rate limited for ${titleSlug}, retrying in ${wait}ms...`
+                    `LeetCode API fetch failed for ${titleSlug} (${status || err.code}), retrying in ${wait}ms...`
                 );
 
                 await sleep(wait);
