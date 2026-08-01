@@ -29,6 +29,27 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
 
+    /*
+    |--------------------------------------------------------------------------
+    | Password reset (OTP)
+    |--------------------------------------------------------------------------
+    */
+
+    resetOtpHash: {
+        type: String,
+        default: null
+    },
+
+    resetOtpExpiry: {
+        type: Date,
+        default: null
+    },
+
+    resetOtpAttempts: {
+        type: Number,
+        default: 0
+    },
+
     role: {
         type: String,
         enum: ["user", "admin"],
