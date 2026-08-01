@@ -145,6 +145,10 @@ navigate("/leaderboard");
                   required
                 />
 
+                {mode === 'login' && (
+                  <a href="/forgot-password" style={styles.forgotLink}>Forgot password?</a>
+                )}
+
                 {error && <div style={styles.error}>✕ {error}</div>}
                 {loading && slowHint && (
                   <div style={styles.hint}>Server was asleep — waking it up, this can take ~30s…</div>
@@ -284,6 +288,13 @@ const styles = {
     color: 'var(--accent-red)',
     fontSize: '13px',
     fontFamily: 'var(--font-mono)'
+  },
+  forgotLink: {
+    color: 'var(--text-dim)',
+    fontSize: '12px',
+    fontFamily: 'var(--font-mono)',
+    textAlign: 'right',
+    textDecoration: 'underline'
   },
   hint: {
     color: 'var(--accent-gold)',
