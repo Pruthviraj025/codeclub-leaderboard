@@ -40,11 +40,22 @@ export default function LeaderboardPage() {
       const lc = res.leetcode?.pointsAdded || 0;
       const total = res.totalPointsAdded || 0;
 
-      setRefreshMsg(
-        total > 0
-          ? `Added ${total} points (CF +${cf}, LC +${lc})`
-          : 'No new solves found.'
-      );
+      const errs = [
+        res.codeforces?.error ? `CF: ${res.codeforces.error}` : null,
+        res.leetcode?.error ? `LC: ${res.leetcode.error}` : null
+      ].filter(Boolean);
+
+      if (errs.length) {
+        setRefreshMsg(
+          `Added ${total} points (CF +${cf}, LC +${lc}). ${errs.join(' · ')}`
+        );
+      } else {
+        setRefreshMsg(
+          total > 0
+            ? `Added ${total} points (CF +${cf}, LC +${lc})`
+            : 'No new solves found.'
+        );
+      }
       await loadLeaderboard();
     } catch (err) {
       setRefreshMsg(err.message);
