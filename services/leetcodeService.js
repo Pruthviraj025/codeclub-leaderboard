@@ -101,6 +101,13 @@ async function fetchQuestions(titleSlugs) {
 
         lastFetchedAt: {
             $gte: expiry
+        },
+
+        // Rows with null acceptanceRate are from the pre-fix broken
+        // scraper (see leetcodeScraper.js fetchStats() comment) — don't
+        // trust them as "fresh", force a re-scrape instead.
+        acceptanceRate: {
+            $ne: null
         }
 
     });

@@ -1,14 +1,78 @@
 const axios = require("axios");
 
 const BASE_URL = "https://alfa-leetcode-api.onrender.com";
+const LC_GRAPHQL_URL = "https://leetcode.com/graphql";
 const MAX_RETRIES = 3;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// alfa-leetcode-api's /select endpoint requests `stats` from LeetCode's
+// GraphQL but its formatQuestionData() never maps it into the response —
+// data.acRate / data.totalSubmission are always undefined there (verified
+// against alfa-leetcode-api source, src/FormatUtils/problemData.ts). So
+// acceptanceRate/totalSubmissions must come from LeetCode's public GraphQL
+// directly instead.
+async function fetchStats(titleSlug) {
+
+    const query = `
+        query questionStats($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+                stats
+            }
+        }
+    `;
+
+    const { data } = await axios.post(
+        LC_GRAPHQL_URL,
+        {
+            query,
+            variables: { titleSlug }
+        },
+        {
+            timeout: 30000,
+            headers: {
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0"
+            }
+        }
+    );
+
+    const rawStats =
+        data &&
+        data.data &&
+        data.data.question &&
+        data.data.question.stats;
+
+    if (!rawStats)
+        return { acceptanceRate: null, acceptedCount: null, totalSubmissions: null };
+
+    let parsed;
+
+    try {
+        parsed = JSON.parse(rawStats);
+    } catch {
+        return { acceptanceRate: null, acceptedCount: null, totalSubmissions: null };
+    }
+
+    const acceptanceRate =
+        parsed.acRate != null
+            ? parseFloat(String(parsed.acRate).replace("%", ""))
+            : null;
+
+    return {
+        acceptanceRate: Number.isFinite(acceptanceRate) ? acceptanceRate : null,
+        acceptedCount: Number.isFinite(parsed.totalAcceptedRaw) ? parsed.totalAcceptedRaw : null,
+        totalSubmissions: Number.isFinite(parsed.totalSubmissionRaw) ? parsed.totalSubmissionRaw : null
+    };
+
+}
+
 /**
- * Fetches problem metadata from alfa-leetcode-api's /select endpoint.
+ * Fetches problem metadata from alfa-leetcode-api's /select endpoint
+ * (difficulty/title), plus acceptanceRate/totalSubmissions straight
+ * from LeetCode's own GraphQL (see fetchStats() above for why).
  * Replaces the old Playwright-based scraper, which depended on a
  * local machine's Chrome profile and could never run on Render.
  */
@@ -39,10 +103,20 @@ async function scrapeProblem(titleSlug) {
 
             }
 
-            const acceptanceRate =
-                typeof data.acRate === "number"
-                    ? data.acRate
-                    : parseFloat(data.acRate);
+            let stats = {
+                acceptanceRate: null,
+                acceptedCount: null,
+                totalSubmissions: null
+            };
+
+            try {
+                stats = await fetchStats(titleSlug);
+            } catch (statsErr) {
+                console.log(
+                    `Stats fetch failed for ${titleSlug}, scoring will use default factors:`,
+                    statsErr.message
+                );
+            }
 
             return {
 
@@ -55,13 +129,13 @@ async function scrapeProblem(titleSlug) {
                     data.difficulty,
 
                 acceptanceRate:
-                    Number.isFinite(acceptanceRate) ? acceptanceRate : null,
+                    stats.acceptanceRate,
 
                 acceptedCount:
-                    data.totalAccepted ?? null,
+                    stats.acceptedCount,
 
                 totalSubmissions:
-                    data.totalSubmission ?? data.totalSubmissions ?? null
+                    stats.totalSubmissions
 
             };
 
@@ -106,5 +180,6 @@ async function scrapeProblem(titleSlug) {
 }
 
 module.exports = {
-    scrapeProblem
+    scrapeProblem,
+    fetchStats
 };
