@@ -149,10 +149,10 @@ input:focus { border-color: var(--accent-green) !important; }
 
 /* mobile: underline should sit at the very bottom of the row instead */
 @media (max-width: 640px) {
-  .nav-link::after {
-    left: 8px;
-    right: 8px;
-    bottom: 0px;
+  .queue-col-cf,
+  .queue-col-lc {
+    width: 56px !important;
+    font-size: 11px !important;
   }
 }
 @keyframes fadeUp {
