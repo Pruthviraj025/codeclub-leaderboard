@@ -95,6 +95,12 @@
   z-index: 50;
   width: min(360px, 92vw);
 }
+@media (max-width: 640px) {
+  .form-overlay {
+    top: 50% !important;
+    left: 50% !important;
+  }
+}
 .form-overlay > div:first-child button {
   white-space: nowrap;
   font-size: 12px;
