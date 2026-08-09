@@ -3,6 +3,7 @@
    ========================================================================== */
 
 /* --- Layer 1: Background Environment & Effects --- */
+import '../styles/LandingPage.css';
 .landing-bg-overlay {
   position: absolute;
   inset: 0;
