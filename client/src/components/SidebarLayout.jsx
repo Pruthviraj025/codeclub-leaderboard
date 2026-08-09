@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, CalendarDays, BarChart3, Shield, User, LogOut } from 'lucide-react';
+import { Trophy, CalendarDays, BarChart3, Shield, User, LogOut, Menu, X } from 'lucide-react';
 import { getSessionUser, clearSession } from '../api';
 
 const NAV_ITEMS = [
@@ -12,50 +13,81 @@ const NAV_ITEMS = [
 export default function SidebarLayout({ active, children }) {
   const user = getSessionUser();
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   function handleLogout() {
     clearSession();
     navigate('/');
   }
 
+  function go(path) {
+    navigate(path);
+    setMobileOpen(false);
+  }
+
+  function renderNavItems() {
+    return (
+      <>
+        {NAV_ITEMS.map(item => {
+          const Icon = item.icon;
+          const isActive = active === item.key;
+          return (
+            <button
+              key={item.key}
+              className={`nav-link${isActive ? ' active' : ''}`}
+              onClick={() => go(item.path)}
+            >
+              <Icon size={17} strokeWidth={2} />
+              {item.label}
+            </button>
+          );
+        })}
+
+        <button className="nav-link" onClick={() => go(`/profile/${user?.id}`)}>
+          <User size={17} strokeWidth={2} /> My Profile
+        </button>
+
+        {user?.role === 'admin' && (
+          <button style={styles.adminBtn} onClick={() => go('/admin')}>
+            <Shield size={15} /> Admin
+          </button>
+        )}
+
+        <button className="nav-link" onClick={handleLogout}>
+          <LogOut size={17} strokeWidth={2} /> Log out
+        </button>
+      </>
+    );
+  }
+
   return (
     <div style={styles.shell} className="sidebar-shell">
       <aside style={styles.sidebar} className="app-sidebar">
-        <div style={styles.logoMark}>
-          {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+        <div style={styles.sidebarTop} className="app-sidebar-top">
+          <div style={styles.logoMark}>
+            {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+          </div>
+
+          <button
+            style={styles.hamburgerBtn}
+            className="mobile-menu-btn"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setMobileOpen(o => !o)}
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
 
-        <nav style={styles.nav}>
-          {NAV_ITEMS.map(item => {
-            const Icon = item.icon;
-            const isActive = active === item.key;
-            return (
-              <button
-                key={item.key}
-                className={`nav-link${isActive ? ' active' : ''}`}
-                onClick={() => navigate(item.path)}
-              >
-                <Icon size={17} strokeWidth={2} />
-                {item.label}
-              </button>
-            );
-          })}
-
-          <button className="nav-link" onClick={() => navigate(`/profile/${user?.id}`)}>
-            <User size={17} strokeWidth={2} /> My Profile
-          </button>
-
-          {user?.role === 'admin' && (
-            <button style={styles.adminBtn} onClick={() => navigate('/admin')}>
-              <Shield size={15} /> Admin
-            </button>
-          )}
-
-          <button className="nav-link" onClick={handleLogout}>
-            <LogOut size={17} strokeWidth={2} /> Log out
-          </button>
+        <nav style={styles.nav} className="app-nav-desktop">
+          {renderNavItems()}
         </nav>
       </aside>
+
+      {mobileOpen && (
+        <nav style={styles.mobileDropdown} className="mobile-nav-dropdown">
+          {renderNavItems()}
+        </nav>
+      )}
 
       <div style={styles.contentCol} className="app-content-col">
         <main style={styles.main} className="page-main">
@@ -82,6 +114,21 @@ const styles = {
     flexDirection: 'column',
     gap: 'var(--space-5)'
   },
+  sidebarTop: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  hamburgerBtn: {
+    display: 'none',
+    background: 'transparent',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text)',
+    padding: '6px',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   logoMark: {
     fontFamily: "'Orbitron', sans-serif",
     fontWeight: 700,
@@ -95,6 +142,14 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-1)'
+  },
+  mobileDropdown: {
+    display: 'none',
+    flexDirection: 'column',
+    gap: 'var(--space-1)',
+    background: 'var(--surface)',
+    borderBottom: '1px solid var(--border)',
+    padding: 'var(--space-3)'
   },
   adminBtn: {
     display: 'flex', alignItems: 'center', gap: '8px',
