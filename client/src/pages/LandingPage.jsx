@@ -1,423 +1,402 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api, warmUpServer } from "../api";
-import { useAuth } from "../context/AuthContext";
-import ccLogo from '../assets/cc-logo-white.png';
-import '../styles/LandingPage.css';
+/* ==========================================================================
+   CodeClub Landing Page — Refined Ocean Energy & Cinematic Animation
+   ========================================================================== */
 
-const BOOT_LINES = [
-  '> initializing maximum productivity..... ',
-  '> loading leaderboard protocol.........',
-  '> syncing codeclub server...... ',
-  '> ready.',
-];
-
-const NUM_LIGHTS = 8;
-const LIGHT_STAGGER = 0.08;
-const NUM_PARTICLES = 61;
-
-const RING_LIGHTS = Array.from({ length: NUM_LIGHTS }).map((_, i) => {
-  const angle = (360 / NUM_LIGHTS) * i - 90;
-  const rad = (angle * Math.PI) / 180;
-  const radiusPercent = 43.75;
-  return {
-    x: 50 + radiusPercent * Math.cos(rad),
-    y: 50 + radiusPercent * Math.sin(rad),
-    delay: i * LIGHT_STAGGER,
-  };
-});
-
-const PARTICLES = Array.from({ length: NUM_PARTICLES }).map(() => ({
-  top: Math.random() * 100,
-  left: Math.random() * 100,
-  size: 2 + Math.random() * 3,
-  delay: Math.random() * 8,
-  duration: 6 + Math.random() * 6,
-}));
-
-// Loops "<CODECLUB/>" typing forever — used as a loading indicator
-function CodeClubLoader() {
-  const [text, setText] = useState('');
-
-  useEffect(() => {
-    const full = '<CODECLUB/>';
-    let i = 0;
-    let deleting = false;
-    let timeoutId;
-
-    function tick() {
-      if (!deleting) {
-        i++;
-        setText(full.slice(0, i));
-        if (i === full.length) {
-          timeoutId = setTimeout(() => { deleting = true; tick(); }, 700);
-          return;
-        }
-        timeoutId = setTimeout(tick, 90);
-      } else {
-        i--;
-        setText(full.slice(0, i));
-        if (i === 0) {
-          timeoutId = setTimeout(() => { deleting = false; tick(); }, 300);
-          return;
-        }
-        timeoutId = setTimeout(tick, 45);
-      }
-    }
-    tick();
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  const slashIndex = text.indexOf('/');
-
-  return (
-    <div className="codeclub-loader">
-      {slashIndex === -1 ? (
-        text
-      ) : (
-        <>
-          {text.slice(0, slashIndex)}
-          <span className="codeclub-loader-slash">/</span>
-          {text.slice(slashIndex + 1)}
-        </>
-      )}
-      <span className="cursor-blink">▍</span>
-    </div>
-  );
+/* --- Layer 1: Background Environment & Effects --- */
+.landing-bg-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.landing-boot-line {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  line-height: 1.6;
 }
 
-export default function LandingPage() {
-  const [showForm, setShowForm] = useState(false);
-  const [joinTransition, setJoinTransition] = useState(false);
-  const [mode, setMode] = useState('join');
-  const [form, setForm] = useState({ name: '', usn: '', email: '', password: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [bootLines, setBootLines] = useState([]);
-  const [bootDone, setBootDone] = useState(false);
-  const [slowHint, setSlowHint] = useState(false);
-  const navigate = useNavigate();
-  const auth = useAuth();
-
-  useEffect(() => {
-    warmUpServer();
-  }, []);
-
-  useEffect(() => {
-    let lineIdx = 0;
-    let charIdx = 0;
-    let timeoutId;
-
-    function typeNext() {
-      if (lineIdx >= BOOT_LINES.length) {
-        setBootDone(true);
-        return;
-      }
-      const line = BOOT_LINES[lineIdx];
-      charIdx++;
-      setBootLines((prev) => {
-        const copy = [...prev];
-        copy[lineIdx] = line.slice(0, charIdx);
-        return copy;
-      });
-      if (charIdx === line.length) {
-        lineIdx++;
-        charIdx = 0;
-        timeoutId = setTimeout(typeNext, 300);
-      } else {
-        timeoutId = setTimeout(typeNext, 22);
-      }
-    }
-    typeNext();
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  function handleJoinClick() {
-    setJoinTransition(true);
-    setTimeout(() => {
-      setShowForm(true);
-      setMode('login');
-      setJoinTransition(false);
-    }, 550);
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    setSlowHint(false);
-    const slowTimer = setTimeout(() => setSlowHint(true), 2500);
-    try {
-      const data = mode === 'join'
-        ? await api.signup(form)
-        : await api.login({ email: form.email, password: form.password });
-      auth.login(data.token, data.user);
-      navigate("/leaderboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      clearTimeout(slowTimer);
-      setLoading(false);
-      setSlowHint(false);
-    }
-  }
-
-  return (
-    <div style={styles.page}>
-
-      <div className="landing-bg-overlay">
-        <div className="ocean-gradient" />
-        <div className="electric-wave-1" />
-        <div className="electric-wave-2" />
-        {PARTICLES.map((p, i) => (
-          <div
-            key={i}
-            className="space-particle"
-            style={{
-              top: `${p.top}%`,
-              left: `${p.left}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div style={styles.bootLine} className="mono landing-boot-line">
-        {bootLines.map((line, i) => (
-          <div key={i}>
-            {line}
-            {!bootDone && i === bootLines.length - 1 && <span className="cursor-blink">▍</span>}
-          </div>
-        ))}
-      </div>
-
-      <div style={{ ...styles.corner, top: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderBottom: 'none' }} />
-      <div style={{ ...styles.corner, top: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderBottom: 'none' }} />
-      <div style={{ ...styles.corner, bottom: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderTop: 'none' }} />
-      <div style={{ ...styles.corner, bottom: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderTop: 'none' }} />
-
-      <div style={styles.quote} className="mono fade-up landing-quote">
-        {'// "Productive days are the days where you do what you want to do"'}
-      </div>
-
-      <div style={styles.center}>
-        <div className="stage">
-          <div className={`ring-wrap ${showForm ? 'ring-hidden' : ''} ${joinTransition ? 'ring-burst' : ''}`}>
-            {RING_LIGHTS.map((l, i) => (
-              <div
-                key={i}
-                className="ring-light"
-                style={{
-                  left: `${l.x}%`,
-                  top: `${l.y}%`,
-                  animationDelay: `${l.delay}s`,
-                }}
-              />
-            ))}
-            <img src={ccLogo} alt="CodeClub" className="ring-logo" />
-            <div className={`ring-subtitle ${showForm ? 'ring-hidden' : ''}`}>
-              LEADERBOARD
-            </div>
-          </div>
-
-          {joinTransition && <div className="join-flash" />}
-
-          {showForm && (
-            <form style={styles.form} className="scale-in form-overlay" onSubmit={handleSubmit}>
-              <div style={styles.tabRow}>
-                <button
-                  type="button"
-                  onClick={() => setMode('join')}
-                  style={{ ...styles.tab, ...(mode === 'join' ? styles.tabActive : {}) }}
-                >
-                  New here
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('login')}
-                  style={{ ...styles.tab, ...(mode === 'login' ? styles.tabActive : {}) }}
-                >
-                  Already a member
-                </button>
-              </div>
-
-              {mode === 'join' && (
-                <>
-                  <input
-                    style={styles.input}
-                    placeholder="Full name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                  />
-                  <input
-                    style={styles.input}
-                    placeholder="USN"
-                    value={form.usn}
-                    onChange={(e) => setForm({ ...form, usn: e.target.value })}
-                    required
-                  />
-                </>
-              )}
-              <input
-                style={styles.input}
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-              />
-              <input
-                style={styles.input}
-                type="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-              />
-
-              {error && <div style={styles.error}>✕ {error}</div>}
-
-              {loading && (
-                <div style={styles.loadingWrap}>
-                  {slowHint ? (
-                    <>
-                      <CodeClubLoader />
-                      <div style={styles.hint}>Server was asleep — waking it up, hang tight…</div>
-                    </>
-                  ) : (
-                    <CodeClubLoader />
-                  )}
-                </div>
-              )}
-
-              <button style={styles.submitBtn} type="submit" disabled={loading}>
-                {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
-              </button>
-            </form>
-          )}
-        </div>
-
-        {!showForm && !joinTransition && (
-          <button
-            className="join-btn-redesign"
-            onClick={handleJoinClick}
-          >
-            Join
-          </button>
-        )}
-      </div>
-    </div>
-  );
+.landing-quote {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.5px;
+}
+.ocean-gradient {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 50% 42%, rgba(16, 75, 120, 0.18) 0%, rgba(12, 7, 26, 0.35) 45%, rgba(0, 0, 0, 0.96) 80%),
+    linear-gradient(180deg, #000000 0%, #05030a 30%, #080514 65%, #000000 100%);
 }
 
-const styles = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 'var(--space-4)',
-    position: 'relative',
-    background: '#000',
-    overflow: 'hidden',
-  },
-  corner: {
-    position: 'absolute',
-    width: '20px',
-    height: '20px',
-    border: '1px solid var(--border-hover)',
-    opacity: 0.6,
-    pointerEvents: 'none'
-  },
-  bootLine: {
-    position: 'absolute',
-    top: 'var(--space-4)',
-    left: 'var(--space-4)',
-    fontSize: '12px',
-    color: 'var(--accent-green)',
-    opacity: 0.7
-  },
-  quote: {
-    position: 'absolute',
-    bottom: 'var(--space-4)',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    fontSize: '12px',
-    color: 'var(--accent-green)',
-    letterSpacing: '0.3px',
-    opacity: 0.85,
-    textAlign: 'center',
-    maxWidth: '90vw',
-    padding: '0 var(--space-3)'
-  },
-  center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)', position: 'relative', zIndex: 1 },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-3)',
-    width: 'min(320px, 100%)',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: 'var(--space-4)'
-  },
-  tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' },
-  tab: {
-    flex: 1,
-    minWidth: 0,
-    background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '8px 4px',
-    fontSize: '12px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  },
-  tabActive: {
-    borderColor: 'var(--accent-green)',
-    color: 'var(--accent-green)'
-  },
-  input: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 12px',
-    color: 'var(--text)',
-    fontSize: '14px',
-    fontFamily: 'var(--font-mono)',
-    outline: 'none'
-  },
-  submitBtn: {
-    background: 'var(--accent-green)',
-    color: '#0A1A10',
-    border: 'none',
-    borderRadius: 'var(--radius-sm)',
-    padding: '12px',
-    fontWeight: 600,
-    marginTop: 'var(--space-1)'
-  },
-  error: {
-    color: 'var(--accent-red)',
-    fontSize: '13px',
-    fontFamily: 'var(--font-mono)'
-  },
-  loadingWrap: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '4px 0'
-  },
-  hint: {
-    color: 'var(--accent-gold)',
-    fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
-    textAlign: 'center'
+.electric-wave-1,
+.electric-wave-2 {
+  position: absolute;
+  width: 150%;
+  height: 220px;
+  top: 32%;
+  left: -25%;
+  background: radial-gradient(ellipse at center, rgba(23, 111, 168, 0.09) 0%, rgba(17, 16, 42, 0.04) 50%, transparent 75%);
+  filter: blur(45px);
+  transform: rotate(-6deg);
+  animation: waveFlow1 8s ease-in-out infinite alternate;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.electric-wave-2 {
+  top: 44%;
+  left: -15%;
+  background: radial-gradient(ellipse at center, rgba(44, 155, 214, 0.07) 0%, rgba(12, 7, 26, 0.05) 55%, transparent 80%);
+  filter: blur(55px);
+  transform: rotate(7deg);
+  animation: waveFlow2 8s ease-in-out infinite alternate;
+  opacity: 0.55;
+}
+
+@keyframes waveFlow1 {
+  0% { transform: translateY(-20px) rotate(-6deg) scaleX(1); opacity: 0.45; }
+  50% { transform: translateY(15px) rotate(-3deg) scaleX(1.15); opacity: 0.75; }
+  100% { transform: translateY(-10px) rotate(-8deg) scaleX(0.95); opacity: 0.45; }
+}
+
+@keyframes waveFlow2 {
+  0% { transform: translateY(15px) rotate(7deg) scaleX(1.1); opacity: 0.35; }
+  50% { transform: translateY(-25px) rotate(3deg) scaleX(0.9); opacity: 0.65; }
+  100% { transform: translateY(10px) rotate(9deg) scaleX(1.05); opacity: 0.35; }
+}
+
+.space-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: #7dd8ff;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(125, 216, 255, 0.6);
+  animation: floatParticle 8s ease-in-out infinite alternate;
+}
+
+@keyframes floatParticle {
+  0% { opacity: 0.12; transform: translateY(0px) scale(0.7); }
+  50% { opacity: 0.55; transform: translateY(-16px) scale(1.2); }
+  100% { opacity: 0.08; transform: translateY(-32px) scale(0.6); }
+}
+
+/* --- Layer 1.5: Stage wrapper so form can overlap ring (added) --- */
+.stage {
+  position: relative;
+  width: 280px;
+  margin: 0 auto;
+}
+
+.form-overlay {
+  position: fixed;
+  top: 30%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: min(360px, 92vw);
+}
+@media (max-width: 640px) {
+  .form-overlay {
+    top: 50% !important;
+    left: 50% !important;
   }
-};
+}
+.form-overlay > div:first-child button {
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 10px 6px;
+}
+.ring-hidden {
+  filter: blur(10px);
+  opacity: 0.25;
+  pointer-events: none;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+/* --- Layer 2: 8-Light Energy Ring (Materialize -> 2s Hold -> Smooth Dissolve) --- */
+.ring-wrap {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto 12px auto;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+.ring-light {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #061a35;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.3);
+  animation: ringLightFourLoop 3.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes ringLightFourLoop {
+  /* Loop 1 (0% - 25%): dim, light-colored ignite */
+  0% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0.3);
+    background: #104b78;
+    box-shadow: 0 0 6px rgba(23, 111, 168, 0.4);
+  }
+  20% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: #7dd8ff;
+    box-shadow: 0 0 12px #7dd8ff, 0 0 20px rgba(125, 216, 255, 0.5);
+  }
+
+  /* Loop 2 (25% - 50%): ignite brightly — logo fades in during this window */
+  25% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+    background: #bde8ff;
+    box-shadow: 0 0 14px #bde8ff, 0 0 26px rgba(44, 155, 214, 0.6);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+    background: #ffffff;
+    box-shadow:
+      0 0 8px #ffffff,
+      0 0 20px #7dd8ff,
+      0 0 36px #2c9bd6,
+      0 0 55px rgba(23, 111, 168, 0.8);
+  }
+
+  /* Loop 3 (50% - 75%): dip then re-ignite */
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    background: #e0f2fe;
+    box-shadow: 0 0 10px #ffffff, 0 0 24px rgba(23, 111, 168, 0.6);
+  }
+  60% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.88);
+    background: #176fa8;
+    box-shadow: 0 0 6px rgba(23, 111, 168, 0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+    background: #ffffff;
+    box-shadow:
+      0 0 8px #ffffff,
+      0 0 18px #7dd8ff,
+      0 0 32px #2c9bd6,
+      0 0 48px rgba(23, 111, 168, 0.75);
+  }
+
+  /* Loop 4 (75% - 100%): turn off 
+  75% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: #bde8ff;
+    box-shadow: 0 0 10px rgba(44, 155, 214, 0.5);
+  }
+  90% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0.6);
+    background: #0b3157;
+    box-shadow: 0 0 4px rgba(23, 111, 168, 0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+    background: #061a35;
+    box-shadow: none;
+  }*/
+}
+
+.ring-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(85px, 58%, 200px);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  filter: drop-shadow(0 0 0px transparent);
+  animation: ringLogoMaterialize 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 1.4s; /* = end of loop 1 / start of loop 2 */
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes ringLogoMaterialize {
+  0% {
+    opacity: 0;
+    filter: blur(6px) drop-shadow(0 0 0px transparent);
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  60% {
+    opacity: 0.85;
+    filter: blur(1.5px) drop-shadow(0 0 14px rgb(251, 251, 251));
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px) drop-shadow(0 0 20px #90d0da) drop-shadow(0 0 35px rgba(44, 155, 214, 0.55));
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+.ring-subtitle {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 14px;
+  white-space: nowrap;
+  user-select: none;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--accent-green);
+  opacity: 0;
+  animation: subtitleFadeIn 1s ease 1.2s both;
+  filter: drop-shadow(0px 3px 6px #5ecee2);
+}
+/* Join click transition — brief energy burst before the form appears */
+.ring-burst {
+  animation: ringBurst 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes ringBurst {
+  0% {
+    filter: brightness(1) blur(0px);
+    transform: scale(1);
+  }
+  35% {
+    filter: brightness(2.2) blur(1px);
+    transform: scale(1.08);
+  }
+  100% {
+    filter: brightness(0.3) blur(6px);
+    transform: scale(0.9);
+    opacity: 0.15;
+  }
+}
+
+.join-flash {
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(125, 216, 255, 0.5) 0%, rgba(44, 155, 214, 0.2) 40%, transparent 70%);
+  animation: joinFlash 0.55s ease-out forwards;
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes joinFlash {
+  0% { opacity: 0; transform: scale(0.6); }
+  40% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+
+/* Looping <CODECLUB/> typing loader — used while waiting on the server */
+.codeclub-loader {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #ffffff;
+  user-select: none;
+  text-align: center;
+}
+
+.codeclub-loader-slash {
+  color: var(--accent-green);
+}
+@keyframes subtitleFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(0px); }
+  to { opacity: 0.65; transform: translateX(-50%) translateY(0); }
+}
+/* --- Layer 4: Calming Join Button Entrance & Styling --- */
+.fade-in-btn {
+  opacity: 0;
+  transform: translateY(12px);
+  filter: blur(8px);
+  animation: buttonEntrance 1.0s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 1.231s;
+}
+
+@keyframes buttonEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.fade-in-btn:hover {
+  border-color: rgba(125, 216, 255, 0.7) !important;
+  box-shadow: 0 0 24px rgba(44, 155, 214, 0.5), 0 0 0 1px rgba(125, 216, 255, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+.fade-out-exit {
+  animation: landingExit 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+@keyframes landingExit {
+  0% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.96);
+  }
+}
+.join-btn-redesign {
+  background: rgba(13, 27, 46, 0.6);
+  color: #e0f2fe;
+  border: 1px solid rgba(125, 216, 255, 0.4);
+  border-radius: 10px;
+  padding: 14px 52px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 0 1px rgba(125, 216, 255, 0.15),
+    0 0 20px rgba(44, 155, 214, 0.25),
+    inset 0 0 12px rgba(125, 216, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+.join-btn-redesign:hover {
+  border-color: rgba(125, 216, 255, 0.8);
+  color: #ffffff;
+
+  transform: translateY(-2px);
+}
+
+.join-btn-redesign:active {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring-light,
+  .ring-logo,
+  .fade-in-btn,
+  .electric-wave-1,
+  .electric-wave-2,
+  .space-particle {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+  }
+}
