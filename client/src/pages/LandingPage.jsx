@@ -226,7 +226,8 @@ export default function LandingPage() {
           {joinTransition && <div className="join-flash" />}
 
           {showForm && (
-            <form style={styles.form} className="scale-in form-overlay" onSubmit={handleSubmit}>
+            <div className="form-overlay-wrap">
+              <form style={styles.form} className="scale-in form-overlay" onSubmit={handleSubmit}>
               <div style={styles.tabRow}>
                 <button
                   type="button"
@@ -298,6 +299,7 @@ export default function LandingPage() {
                 {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
               </button>
             </form>
+            </div>
           )}
         </div>
 
