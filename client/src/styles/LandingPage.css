@@ -89,17 +89,11 @@
 
 .form-overlay {
   position: fixed;
-  top: 30%;
-  left: 38%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
   width: min(360px, 92vw);
-}
-@media (max-width: 640px) {
-  .form-overlay {
-    top: 50% !important;
-    left: 50% !important;
-  }
 }
 .form-overlay > div:first-child button {
   white-space: nowrap;
