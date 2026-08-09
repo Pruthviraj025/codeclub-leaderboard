@@ -44,7 +44,7 @@ export default function ContestsPage() {
             {grouped[div].map(c => (
               <a
                 key={c.id}
-                href={c.url}
+                href={contestLink(c)}
                 target="_blank"
                 rel="noreferrer"
                 style={styles.card}
@@ -75,6 +75,16 @@ export default function ContestsPage() {
   );
 }
 
+// Upcoming contests don't have a live /contest/{id} page yet on Codeforces —
+// that route 404s ("contest not found") until the contest actually starts.
+// Route those to the registration page instead.
+function contestLink(c) {
+  if (c.phase === 'BEFORE') {
+    return `https://codeforces.com/contestRegistration/${c.id}`;
+  }
+  return c.url;
+}
+
 function phaseLabel(phase) {
   if (phase === 'BEFORE') return 'UPCOMING';
   if (phase === 'CODING') return 'LIVE';
@@ -89,10 +99,13 @@ function phaseStyle(phase) {
 const styles = {
   titleRow: { marginBottom: 'var(--space-4)' },
   eyebrow: {
-    fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.08em',
-    color: 'var(--text-dim)', marginBottom: 'var(--space-1)'
+    fontFamily: "'Orbitron', sans-serif", fontSize: '11px', letterSpacing: '2px',
+    color: 'var(--text-dim)', marginBottom: 'var(--space-1)', userSelect: 'none'
   },
-  title: { fontSize: '32px', fontWeight: 700, margin: 0 },
+  title: {
+    fontFamily: "'Orbitron', sans-serif", fontSize: '32px', fontWeight: 700, margin: 0,
+    letterSpacing: '1px'
+  },
   error: {
     color: 'var(--accent-red)', background: 'var(--accent-red-dim)',
     padding: 'var(--space-3)', borderRadius: 'var(--radius)', marginBottom: 'var(--space-3)'
@@ -100,8 +113,10 @@ const styles = {
   empty: { color: 'var(--text-dim)', padding: 'var(--space-4) 0' },
   section: { marginBottom: 'var(--space-5)' },
   sectionTitle: {
-    fontSize: '13px', fontWeight: 700, letterSpacing: '0.04em',
-    color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 'var(--space-2)'
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '12px', fontWeight: 700, letterSpacing: '2px',
+    color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 'var(--space-2)',
+    userSelect: 'none'
   },
   grid: {
     display: 'grid',
@@ -117,9 +132,14 @@ const styles = {
   },
   cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' },
   phaseBadge: {
-    fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em',
-    padding: '3px 8px', borderRadius: '999px'
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '9px', fontWeight: 700, letterSpacing: '1px',
+    padding: '3px 8px', borderRadius: '999px', userSelect: 'none'
   },
-  cardName: { fontSize: '14px', fontWeight: 600, color: 'var(--text)', marginBottom: 'var(--space-1)' },
+  cardName: {
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginBottom: 'var(--space-1)',
+    letterSpacing: '0.3px'
+  },
   cardMeta: { fontSize: '12px', color: 'var(--text-dim)' }
 };

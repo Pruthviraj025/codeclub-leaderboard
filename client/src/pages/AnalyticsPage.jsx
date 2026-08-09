@@ -6,8 +6,7 @@ import SidebarLayout from '../components/SidebarLayout';
 
 const MODES = [
   { key: 'day', label: 'Pick a day' },
-  { key: 'range', label: 'Past 7 days' },
-  { key: 'deductions', label: 'Live 7-day window (deductions)' }
+  { key: 'range', label: 'Past 7 days' }
 ];
 
 export default function AnalyticsPage() {
@@ -17,6 +16,7 @@ export default function AnalyticsPage() {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [expiringToday, setExpiringToday] = useState(null);
   const user = getSessionUser();
   const navigate = useNavigate();
 
@@ -28,6 +28,13 @@ export default function AnalyticsPage() {
         setSelectedDay(res.days[res.days.length - 1]?.date || '');
       })
       .catch(err => setError(err.message));
+
+    api.analyticsDeductions()
+      .then(res => {
+        const today = res.forecast?.[0];
+        setExpiringToday(today ? today.pointsExpiring : 0);
+      })
+      .catch(() => setExpiringToday(null));
   }, []);
 
   useEffect(() => {
@@ -43,12 +50,9 @@ export default function AnalyticsPage() {
       if (mode === 'day') {
         const res = await api.analyticsForDay(selectedDay);
         setChartData(res.breakdown.map(b => ({ label: String(b.rating), value: b.count })));
-      } else if (mode === 'range') {
+      } else {
         const res = await api.analyticsRange();
         setChartData(res.breakdown.map(b => ({ label: String(b.rating), value: b.count })));
-      } else {
-        const res = await api.analyticsDeductions();
-        setChartData(res.forecast.map(f => ({ label: f.label, value: f.pointsExpiring, expiresOn: f.expiresOn })));
       }
     } catch (err) {
       setError(err.message);
@@ -59,9 +63,8 @@ export default function AnalyticsPage() {
 
   if (!user) return null;
 
-  const isDeductions = mode === 'deductions';
-  const yLabel = isDeductions ? 'Points expiring' : 'Problems solved';
-  const xLabel = isDeductions ? 'Day' : 'Rating';
+  const yLabel = 'Problems solved';
+  const xLabel = 'Rating';
 
   return (
     <SidebarLayout active="analytics">
@@ -96,13 +99,13 @@ export default function AnalyticsPage() {
             ))}
           </select>
         )}
-      </div>
 
-      {mode === 'deductions' && (
-        <div style={styles.hint}>
-          Points earned on each day expire from your live total exactly 7 days later — this is what's scheduled to drop off.
-        </div>
-      )}
+        {mode === 'range' && expiringToday !== null && (
+          <div style={styles.expireBadge}>
+            Points to expire today: <span style={styles.expireValue}>{expiringToday}</span>
+          </div>
+        )}
+      </div>
 
       {error && <div style={styles.error}>{error}</div>}
 
@@ -125,13 +128,15 @@ export default function AnalyticsPage() {
                 label={{ value: yLabel, angle: -90, position: 'insideLeft', fill: 'var(--text-dim)', fontSize: 12 }}
                 allowDecimals={false}
               />
+
               <Tooltip
+                cursor={{ fill: 'var(--surface-raised)', opacity: 0.5 }}
                 contentStyle={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)' }}
                 formatter={(value) => [value, yLabel]}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                 {chartData.map((_, i) => (
-                  <Cell key={i} fill={isDeductions ? 'var(--accent-red)' : 'var(--accent-green)'} />
+                  <Cell key={i} fill="var(--accent-green)" />
                 ))}
               </Bar>
             </BarChart>
@@ -145,23 +150,43 @@ export default function AnalyticsPage() {
 const styles = {
   titleRow: { marginBottom: 'var(--space-3)' },
   eyebrow: {
-    fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.08em',
-    color: 'var(--text-dim)', marginBottom: 'var(--space-1)'
+    fontFamily: "'Orbitron', sans-serif", fontSize: '11px', letterSpacing: '2px',
+    color: 'var(--text-dim)', marginBottom: 'var(--space-1)', userSelect: 'none'
   },
-  title: { fontSize: '32px', fontWeight: 700, margin: 0 },
+  title: {
+    fontFamily: "'Orbitron', sans-serif", fontSize: '32px', fontWeight: 700, margin: 0,
+    letterSpacing: '1px'
+  },
   controls: {
     display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)',
-    alignItems: 'center', marginBottom: 'var(--space-3)'
+    alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)'
   },
   tabRow: { display: 'flex', gap: 'var(--space-1)', background: 'var(--surface)', padding: '4px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' },
   tab: {
     background: 'transparent', border: 'none', color: 'var(--text-dim)',
-    fontSize: '13px', fontWeight: 600, padding: '8px 14px', borderRadius: 'var(--radius-sm)'
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '12px', fontWeight: 600, letterSpacing: '0.5px',
+    padding: '8px 14px', borderRadius: 'var(--radius-sm)', userSelect: 'none'
   },
   tabActive: { background: 'var(--surface-raised)', color: 'var(--text)' },
   select: {
     background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)',
     borderRadius: 'var(--radius-sm)', padding: '8px 12px', fontSize: '13px', fontFamily: 'var(--font-mono)'
+  },
+  expireBadge: {
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '13px',
+    color: 'var(--text-dim)',
+    letterSpacing: '0.5px',
+    background: 'var(--accent-red-dim)',
+    border: '1px solid var(--accent-red)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '8px 14px',
+    userSelect: 'none'
+  },
+  expireValue: {
+    color: 'var(--accent-red)',
+    fontWeight: 700
   },
   hint: { color: 'var(--text-dim)', fontSize: '13px', marginBottom: 'var(--space-3)' },
   error: {

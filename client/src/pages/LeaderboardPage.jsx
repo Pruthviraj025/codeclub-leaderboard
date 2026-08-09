@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, getSessionUser } from '../api';
 import SidebarLayout from '../components/SidebarLayout';
 
+
 export default function LeaderboardPage() {
   const [data, setData] = useState(null);
   const [loadingBoard, setLoadingBoard] = useState(true);
@@ -120,8 +121,8 @@ export default function LeaderboardPage() {
 
               <span style={{ ...styles.col, flex: 1, display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                 {row.cfHandle && (
-                  
-                   <a href={`https://codeforces.com/profile/${row.cfHandle}`}
+
+                  <a href={`https://codeforces.com/profile/${row.cfHandle}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
@@ -132,8 +133,8 @@ export default function LeaderboardPage() {
                   </a>
                 )}
                 {row.lcUsername && (
-                  
-                  <a  href={`https://leetcode.com/${row.lcUsername}`}
+
+                  <a href={`https://leetcode.com/${row.lcUsername}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
@@ -152,15 +153,15 @@ export default function LeaderboardPage() {
                 </span>
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)' }} className="mono">
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }}>
                 {row.codeforcesPoints}
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116' }} className="mono">
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }}>
                 {row.leetcodePoints}
               </span>
 
-              <span style={{ ...styles.col, width: '100px', textAlign: 'right', fontWeight: 700, color: 'var(--text)' }} className="mono queue-col-points">
+              <span style={{ ...styles.col, width: '100px', textAlign: 'right', fontWeight: 700, color: 'var(--text)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-points">
                 {row.totalPoints}
               </span>
             </div>
@@ -331,7 +332,7 @@ const styles = {
   page: { minHeight: '100vh' },
   footer: {
     textAlign: 'center',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "'Orbitron', sans-serif",
     fontSize: '12px',
     color: 'var(--text-dim)',
     padding: 'var(--space-4) 0',
@@ -339,15 +340,29 @@ const styles = {
   },
   headerRight: { display: 'flex', gap: 'var(--space-2)' },
   main: { maxWidth: '860px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
-  titleRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-2)', gap: '16px', flexWrap: 'wrap' },
+  titleRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 'var(--space-2)',
+    marginTop: 'var(--space-4)', // add this
+    gap: '16px',
+    flexWrap: 'wrap'
+  },
   eyebrow: {
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "'Orbitron', sans-serif",
     fontSize: '11px',
     color: 'var(--accent-green)',
-    letterSpacing: '2px',
+    letterSpacing: '4px',
     marginBottom: 'var(--space-1)'
   },
-  title: { fontSize: '28px', margin: 0, fontWeight: 700 },
+  title: {
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '28px',
+    margin: 0,
+    letterSpacing: '4px',
+    fontWeight: 700
+  },
   titleWithInfo: { display: 'flex', alignItems: 'center', gap: '10px' },
   infoBtn: {
     width: '22px',
@@ -356,7 +371,7 @@ const styles = {
     border: '1px solid var(--border)',
     background: 'var(--surface-raised)',
     color: 'var(--text-dim)',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "'Orbitron', sans-serif",
     fontSize: '12px',
     fontStyle: 'italic',
     lineHeight: 1,
@@ -383,7 +398,8 @@ const styles = {
     width: '100%',
     maxHeight: '85vh',
     overflowY: 'auto',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+    fontFamily: "'Orbitron', sans-serif"
   },
   modalHeader: {
     display: 'flex',
@@ -395,12 +411,12 @@ const styles = {
     top: 0,
     background: 'var(--surface)'
   },
-  modalTitle: { margin: 0, fontSize: '18px' },
-  closeBtn: { background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '16px', cursor: 'pointer' },
+  modalTitle: { margin: 0, fontSize: '18px', fontFamily: "'Orbitron', sans-serif" },
+  closeBtn: { background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '16px', cursor: 'pointer', fontFamily: "'Orbitron', sans-serif" },
   modalBody: { padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' },
   section: {},
   sectionTitle: {
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "'Orbitron', sans-serif",
     fontSize: '12px',
     letterSpacing: '1.5px',
     color: 'var(--accent-green)',
@@ -414,7 +430,8 @@ const styles = {
     gap: '8px',
     fontSize: '13px',
     color: 'var(--text)',
-    lineHeight: 1.5
+    lineHeight: 1.5,
+    fontFamily: "'Orbitron', sans-serif"
   },
   ratingGrid: {
     display: 'grid',
@@ -453,7 +470,8 @@ const styles = {
     marginTop: '14px',
     color: 'var(--text-dim)',
     lineHeight: 1.7,
-    fontSize: '13px'
+    fontSize: '13px',
+    fontFamily: "'Orbitron', sans-serif"
   },
   refreshBtn: {
     background: 'var(--surface-raised)',
@@ -462,15 +480,16 @@ const styles = {
     borderRadius: 'var(--radius-sm)',
     padding: '10px 16px',
     fontSize: '13px',
-    fontFamily: 'var(--font-mono)'
+    letterSpacing: '3.5px',
+    fontFamily: "'Orbitron', sans-serif"
   },
   refreshMsg: {
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "'Orbitron', sans-serif",
     fontSize: '12px',
     color: 'var(--accent-gold)',
     marginBottom: 'var(--space-3)'
   },
-  error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: '13px' },
+  error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' },
   queue: {
     marginTop: 'var(--space-4)',
     border: '1px solid var(--border)',
@@ -484,7 +503,7 @@ const styles = {
     borderBottom: '1px solid var(--border)'
   },
   col: {
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "'Orbitron', sans-serif",
     fontSize: '11px',
     color: 'var(--text-dim)',
     letterSpacing: '1px'
@@ -500,5 +519,5 @@ const styles = {
   queueRowSelf: { background: 'var(--accent-green-dim)' },
   cfIconLink: { display: 'flex', alignItems: 'center', flexShrink: 0 },
   nameLink: { cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: '13px' }
+  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' }
 };

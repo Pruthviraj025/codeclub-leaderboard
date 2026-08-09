@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api, getSessionUser } from "../api";
+import SidebarLayout from "../components/SidebarLayout";
 
 export default function ProfilePage() {
 
@@ -274,11 +275,13 @@ export default function ProfilePage() {
 
         return (
 
-            <div style={styles.pageCenter}>
-                <div style={styles.error}>
-                    {error}
+            <SidebarLayout>
+                <div style={styles.pageCenter}>
+                    <div style={styles.error}>
+                        {error}
+                    </div>
                 </div>
-            </div>
+            </SidebarLayout>
 
         );
 
@@ -288,11 +291,13 @@ export default function ProfilePage() {
 
         return (
 
-            <div style={styles.pageCenter}>
-                <div style={styles.dim}>
-                    Loading...
+            <SidebarLayout>
+                <div style={styles.pageCenter}>
+                    <div style={styles.dim}>
+                        Loading...
+                    </div>
                 </div>
-            </div>
+            </SidebarLayout>
 
         );
 
@@ -303,22 +308,10 @@ export default function ProfilePage() {
 
         return (
 
-    <div style={styles.page}>
+    <SidebarLayout>
 
-        <header style={styles.header}>
-
-            <button
-                style={styles.backBtn}
-                onClick={() => navigate("/leaderboard")}
-            >
-                ← Leaderboard
-            </button>
-
-        </header>
-
-        <main
+        <div
             style={styles.main}
-            className="page-main"
         >
 
             <div
@@ -678,7 +671,7 @@ export default function ProfilePage() {
                 padding: "12px",
                 border: "1px solid var(--border)",
                 borderRadius: "6px",
-                fontFamily: "var(--font-mono)",
+                fontFamily: "'Orbitron', sans-serif",
                 color: "#FFA116",
                 wordBreak: "break-all"
             }}
@@ -764,9 +757,9 @@ export default function ProfilePage() {
 
             </div>
 
-        </main>
+        </div>
 
-    </div>
+    </SidebarLayout>
 
 );
 
@@ -831,8 +824,9 @@ const styles = {
         border: "none",
         color: "var(--text-dim)",
         cursor: "pointer",
-        fontFamily: "var(--font-mono)",
-        fontSize: "13px"
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: "13px",
+        letterSpacing: "0.5px"
     },
 
     main: {
@@ -856,12 +850,14 @@ const styles = {
 
     name: {
         margin: 0,
-        fontSize: "30px",
-        fontWeight: 700
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: "28px",
+        fontWeight: 700,
+        letterSpacing: "0.5px"
     },
 
     youTag: {
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "10px",
         color: "var(--accent-gold)",
         border: "1px solid var(--accent-gold)",
@@ -882,33 +878,37 @@ const styles = {
     },
 
     statLabel: {
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "10px",
         color: "var(--text-dim)",
-        letterSpacing: "1px",
+        letterSpacing: "1.5px"
+        ,
         marginBottom: "5px"
     },
 
     statValue: {
         fontSize: "18px",
-        fontWeight: 700
+        fontWeight: 700,
+        fontFamily: "'Orbitron', sans-serif"
     },
 
     privateBlock: {
         marginTop: "28px",
         paddingTop: "20px",
-        borderTop: "1px solid var(--border)"
+        borderTop: "1px solid var(--border)",
+        fontFamily: "'Orbitron', sans-serif"
     },
 
     privateLine: {
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "13px",
         marginBottom: "10px",
         lineHeight: 1.6
     },
 
     dim: {
-        color: "var(--text-dim)"
+        color: "var(--text-dim)",
+        fontFamily: "'Orbitron', sans-serif"
     },
 
     editLink: {
@@ -919,7 +919,7 @@ const styles = {
         padding: 0,
         marginLeft: "8px",
         textDecoration: "underline",
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "11px"
     },
 
@@ -931,7 +931,7 @@ const styles = {
 
     eyebrow: {
         color: "var(--accent-green)",
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "11px",
         letterSpacing: "2px",
         marginBottom: "14px"
@@ -951,7 +951,7 @@ const styles = {
         border: "1px solid var(--border)",
         borderRadius: "var(--radius-sm)",
         padding: "11px 14px",
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "13px"
     },
 
@@ -963,11 +963,12 @@ const styles = {
         padding: "11px 18px",
         cursor: "pointer",
         fontWeight: 600,
-        fontSize: "13px"
+        fontSize: "13px",
+        fontFamily: "'Orbitron', sans-serif"
     },
 
     instructions: {
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         fontSize: "13px",
         lineHeight: 1.7,
         color: "var(--text)"
@@ -976,18 +977,19 @@ const styles = {
     link: {
         color: "var(--accent-green)",
         fontWeight: 600,
-        textDecoration: "underline"
+        textDecoration: "underline",
+        fontFamily: "'Orbitron', sans-serif"
     },
 
     verifyMsg: {
         marginTop: "14px",
-        fontFamily: "var(--font-mono)",
+        fontFamily: "'Orbitron', sans-serif",
         color: "var(--accent-gold)",
         fontSize: "12px"
     },
 
     error: {
         color: "var(--accent-red)",
-        fontFamily: "var(--font-mono)"
+        fontFamily: "'Orbitron', sans-serif"
     }
 };
