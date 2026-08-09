@@ -256,14 +256,16 @@ input:focus { border-color: var(--accent-green) !important; }
   }
   .app-sidebar {
     width: 100% !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: var(--space-3) !important;
-    padding: var(--space-2) var(--space-3) !important;
-    overflow-x: auto !important;
+    padding: var(--space-3) !important;
   }
-  .app-sidebar nav {
-    flex-direction: row !important;
+  .mobile-menu-btn {
+    display: inline-flex !important;
+  }
+  .app-nav-desktop {
+    display: none !important;
+  }
+  .mobile-nav-dropdown {
+    display: flex !important;
   }
 }
 @media (max-width: 640px) {
