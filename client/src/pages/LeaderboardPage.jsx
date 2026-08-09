@@ -96,6 +96,8 @@ export default function LeaderboardPage() {
         <div style={styles.queueHeader}>
           <span style={{ ...styles.col, width: '48px' }} className="queue-col-rank">RANK</span>
           <span style={{ ...styles.col, flex: 1 }}>USER</span>
+          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-cf">CF</span>
+          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-lc">LC</span>
           <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-points">TOTAL</span>
         </div>
 
@@ -149,6 +151,14 @@ export default function LeaderboardPage() {
                 >
                   {row.cfHandle || row.lcUsername || row.name}
                 </span>
+              </span>
+
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cf">
+                {row.codeforcesPoints}
+              </span>
+
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-lc">
+                {row.leetcodePoints}
               </span>
 
               <span style={{ ...styles.col, width: '90px', textAlign: 'right', fontWeight: 700, color: 'var(--text)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-points">
@@ -488,6 +498,7 @@ const styles = {
   },
   queueHeader: {
     display: 'flex',
+    gap: '10px',
     padding: '10px 16px',
     background: 'var(--surface-raised)',
     borderBottom: '1px solid var(--border)'
@@ -501,6 +512,7 @@ const styles = {
   queueRow: {
     display: 'flex',
     alignItems: 'center',
+    gap: '10px',
     padding: '14px 16px',
     background: 'var(--surface)',
     borderBottom: '1px solid var(--border)',
