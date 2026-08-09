@@ -275,7 +275,7 @@ export default function ProfilePage() {
 
         return (
 
-            <SidebarLayout>
+            <SidebarLayout active="profile">
                 <div style={styles.pageCenter}>
                     <div style={styles.error}>
                         {error}
@@ -291,7 +291,7 @@ export default function ProfilePage() {
 
         return (
 
-            <SidebarLayout>
+            <SidebarLayout active="profile">
                 <div style={styles.pageCenter}>
                     <div style={styles.dim}>
                         Loading...
@@ -308,7 +308,7 @@ export default function ProfilePage() {
 
         return (
 
-    <SidebarLayout>
+    <SidebarLayout active="profile">
 
         <div
             style={styles.main}
