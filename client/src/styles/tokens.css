@@ -149,10 +149,10 @@ input:focus { border-color: var(--accent-green) !important; }
 
 /* mobile: underline should sit at the very bottom of the row instead */
 @media (max-width: 640px) {
-  .queue-col-cf,
-  .queue-col-lc {
-    width: 56px !important;
-    font-size: 11px !important;
+  .nav-link::after {
+    left: 8px;
+    right: 8px;
+    bottom: 0px;
   }
 }
 @keyframes fadeUp {
@@ -220,6 +220,15 @@ input:focus { border-color: var(--accent-green) !important; }
   .queue-col-points {
     width: 64px !important;
   }
+  .queue-col-rank {
+    width: 34px !important;
+  }
+  .queue-col-cf,
+  .queue-col-lc {
+    width: 44px !important;
+    font-size: 11px !important;
+  }
+
   .cf-form {
     flex-wrap: wrap !important;
   }
