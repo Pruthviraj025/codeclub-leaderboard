@@ -366,15 +366,19 @@ const styles = {
     padding: 'var(--space-4)'
   },
   tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' },
-  tab: {
-    flex: 1,
-    background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '8px',
-    fontSize: '12px'
-  },
+tab: {
+  flex: 1,
+  minWidth: 0,           // add — let flex:1 actually shrink
+  background: 'transparent',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius-sm)',
+  color: 'var(--text-dim)',
+  padding: '8px',
+  fontSize: '12px',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis'   // fallback if text still tight
+},
   tabActive: {
     borderColor: 'var(--accent-green)',
     color: 'var(--accent-green)'
