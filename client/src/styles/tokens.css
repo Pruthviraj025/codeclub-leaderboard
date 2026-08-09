@@ -218,15 +218,10 @@ input:focus { border-color: var(--accent-green) !important; }
     width: 100% !important;
   }
   .queue-col-points {
-    width: 64px !important;
+    width: 74px !important;
   }
   .queue-col-rank {
-    width: 34px !important;
-  }
-  .queue-col-cf,
-  .queue-col-lc {
-    width: 44px !important;
-    font-size: 11px !important;
+    width: 36px !important;
   }
 
   .cf-form {
@@ -264,7 +259,7 @@ input:focus { border-color: var(--accent-green) !important; }
   .app-nav-desktop {
     display: none !important;
   }
-  .mobile-nav-dropdown {
+  .mobile-nav-page {
     display: flex !important;
   }
 }
