@@ -43,12 +43,19 @@ export default function SidebarLayout({ active, children }) {
           );
         })}
 
-        <button className="nav-link" onClick={() => go(`/profile/${user?.id}`)}>
+        <button
+          className={`nav-link${active === 'profile' ? ' active' : ''}`}
+          onClick={() => go(`/profile/${user?.id}`)}
+        >
           <User size={17} strokeWidth={2} /> My Profile
         </button>
 
         {user?.role === 'admin' && (
-          <button style={styles.adminBtn} onClick={() => go('/admin')}>
+          <button
+            style={styles.adminBtn}
+            className={active === 'admin' ? 'admin-active' : ''}
+            onClick={() => go('/admin')}
+          >
             <Shield size={15} /> Admin
           </button>
         )}
@@ -64,18 +71,18 @@ export default function SidebarLayout({ active, children }) {
     <div style={styles.shell} className="sidebar-shell">
       <aside style={styles.sidebar} className="app-sidebar">
         <div style={styles.sidebarTop} className="app-sidebar-top">
-          <div style={styles.logoMark}>
-            {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
-          </div>
-
           <button
             style={styles.hamburgerBtn}
             className="mobile-menu-btn"
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            onClick={() => setMobileOpen(o => !o)}
+            aria-label="Open menu"
+            onClick={() => setMobileOpen(true)}
           >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            <Menu size={20} />
           </button>
+
+          <div style={styles.logoMark}>
+            {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+          </div>
         </div>
 
         <nav style={styles.nav} className="app-nav-desktop">
@@ -84,9 +91,23 @@ export default function SidebarLayout({ active, children }) {
       </aside>
 
       {mobileOpen && (
-        <nav style={styles.mobileDropdown} className="mobile-nav-dropdown">
-          {renderNavItems()}
-        </nav>
+        <div style={styles.mobileMenuPage} className="mobile-nav-page">
+          <div style={styles.mobileMenuHeader}>
+            <div style={styles.logoMark}>
+              {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+            </div>
+            <button
+              style={styles.hamburgerBtn}
+              aria-label="Close menu"
+              onClick={() => setMobileOpen(false)}
+            >
+              <X size={22} />
+            </button>
+          </div>
+          <nav style={styles.mobileMenuNav}>
+            {renderNavItems()}
+          </nav>
+        </div>
       )}
 
       <div style={styles.contentCol} className="app-content-col">
@@ -143,13 +164,26 @@ const styles = {
     flexDirection: 'column',
     gap: 'var(--space-1)'
   },
-  mobileDropdown: {
+  mobileMenuPage: {
     display: 'none',
+    position: 'fixed',
+    inset: 0,
+    zIndex: 200,
+    background: 'var(--bg)',
+    flexDirection: 'column'
+  },
+  mobileMenuHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 'var(--space-3) var(--space-4)',
+    borderBottom: '1px solid var(--border)'
+  },
+  mobileMenuNav: {
+    display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--space-1)',
-    background: 'var(--surface)',
-    borderBottom: '1px solid var(--border)',
-    padding: 'var(--space-3)'
+    gap: 'var(--space-2)',
+    padding: 'var(--space-4)'
   },
   adminBtn: {
     display: 'flex', alignItems: 'center', gap: '8px',
