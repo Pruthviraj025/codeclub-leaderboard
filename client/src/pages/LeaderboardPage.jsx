@@ -94,10 +94,10 @@ export default function LeaderboardPage() {
 
       <div style={styles.queue}>
         <div style={styles.queueHeader}>
-          <span style={{ ...styles.col, width: '60px' }}>RANK</span>
+          <span style={{ ...styles.col, width: '60px' }} className="queue-col-rank">RANK</span>
           <span style={{ ...styles.col, flex: 1 }}>USER</span>
-          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }}>CF</span>
-          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }}>LC</span>
+          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-cf">CF</span>
+          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-lc">LC</span>
           <span style={{ ...styles.col, width: '100px', textAlign: 'right' }} className="queue-col-points">TOTAL</span>
         </div>
 
@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
               }}
               onClick={() => navigate(`/profile/${row.userId}`)}
             >
-              <span style={{ ...styles.col, width: '60px' }} className="mono">
+              <span style={{ ...styles.col, width: '60px' }} className="mono queue-col-rank">
                 <RankBadge rank={row.rank} />
               </span>
 
@@ -153,11 +153,11 @@ export default function LeaderboardPage() {
                 </span>
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }}>
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cf">
                 {row.codeforcesPoints}
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }}>
+              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-lc">
                 {row.leetcodePoints}
               </span>
 
