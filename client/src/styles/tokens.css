@@ -6,7 +6,7 @@
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap');
 :root {
   /* Color */
   --bg: #10141C;
@@ -16,8 +16,8 @@
   --border-hover: #3A4356;
   --text: #E7E9EE;
   --text-dim: #8B94A7;
-  --accent-green: #4CAF6D;
-  --accent-green-dim: #4CAF6D22;
+--accent-green: #56acf3;
+--accent-green-dim: #2b3238;/**/
   --accent-red: #E5534B;
   --accent-red-dim: #E5534B22;
   --accent-gold: #D4A657;
@@ -78,11 +78,89 @@ button:disabled { opacity: 0.6; cursor: default; }
 input { transition: border-color 0.15s var(--ease); }
 input:focus { border-color: var(--accent-green) !important; }
 
-.mono { font-family: var(--font-mono); }
+.mono {
+  font-family: 'Orbitron', sans-serif; /* was var(--font-mono) */
+}
+@keyframes navGlow {
+  from { text-shadow: 0 0 0px transparent; }
+  to { text-shadow: 0 0 8px var(--accent-green-glow, rgba(86,172,243,0.5)); }
+}
 
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 10px 12px;
+  text-align: left;
+  width: 100%;
+  user-select: none;
+  cursor: pointer;
+  transition: color 0.25s var(--ease);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  background: var(--accent-green);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease);
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav-link.active {
+  color: var(--text);
+  animation: navGlow 0.4s ease forwards;
+}
+.nav-link.active::after {
+  transform: scaleX(1);
+  background: var(--accent-gold);
+}
+
+/* icon gets a tiny lift on active/hover instead of a colored box */
+.nav-link svg {
+  transition: transform 0.25s var(--ease), color 0.25s var(--ease);
+}
+.nav-link:hover svg,
+.nav-link.active svg {
+  transform: translateY(-1px);
+  color: var(--accent-gold);
+}
+
+/* mobile: underline should sit at the very bottom of the row instead */
+@media (max-width: 640px) {
+  .nav-link::after {
+    left: 8px;
+    right: 8px;
+    bottom: 0px;
+  }
+}
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.28s var(--ease) both;
 }
 @keyframes blink {
   0%, 49% { opacity: 1; }
@@ -177,5 +255,12 @@ input:focus { border-color: var(--accent-green) !important; }
   }
   .app-sidebar nav {
     flex-direction: row !important;
+  }
+}
+@media (max-width: 640px) {
+  .sidebar-bottom {
+    margin-top: 0 !important;
+    flex-direction: row !important;
+    gap: var(--space-2) !important;
   }
 }

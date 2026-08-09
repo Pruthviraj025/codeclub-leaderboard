@@ -18,7 +18,7 @@ export default function AdminPage() {
     <div style={styles.page}>
       <header style={styles.header}>
         <button style={styles.backBtn} onClick={() => navigate('/leaderboard')}>← Leaderboard</button>
-        <div style={styles.headerTitle} className="mono">ADMIN CONSOLE</div>
+        <div style={styles.headerTitle}>ADMIN CONSOLE</div>
       </header>
 
       <main style={styles.main} className="page-main">
@@ -41,7 +41,6 @@ function TabButton({ active, onClick, children }) {
     <button
       onClick={onClick}
       style={{ ...styles.tab, ...(active ? styles.tabActive : {}) }}
-      className="mono"
     >
       {children}
     </button>
@@ -113,54 +112,59 @@ function UsersTab() {
 
       <div style={styles.table} className="admin-table-scroll">
         <div className="admin-table-inner">
-        <div style={styles.tableHeader}>
-          <span style={{ ...styles.col, flex: 2 }}>NAME / USN</span>
-          <span style={{ ...styles.col, flex: 1 }}>CF HANDLE</span>
-          <span style={{ ...styles.col, width: '90px' }}>STATUS</span>
-          <span style={{ ...styles.col, width: '90px' }}>ROLE</span>
-          <span style={{ ...styles.col, width: '260px' }}>ACTIONS</span>
-        </div>
-        {users.map((u) => (
-          <div key={u._id} style={styles.tableRow} className="row-hover">
-            <span style={{ flex: 2 }}>
-              <div>{u.name}</div>
-              <div className="mono" style={styles.subtext}>{u.usn}</div>
-            </span>
-            <span style={{ flex: 1 }} className="mono">
-              {u.cfHandle || <span style={styles.dim}>—</span>}
-              {u.cfConnected && <span style={styles.verifiedDot} title="Verified">●</span>}
-            </span>
-            <span style={{ width: '90px' }}>
-              <StatusPill active={u.isActive} />
-            </span>
-            <span style={{ width: '90px' }} className="mono">
-              {u.role === 'admin' ? <span style={{ color: 'var(--accent-gold)' }}>admin</span> : 'user'}
-            </span>
-            <span style={{ width: '260px', display: 'flex', gap: '6px' }}>
-              {u.isActive ? (
-                <button style={styles.actionBtn} disabled={busyId === u._id} onClick={() => handleSoftRemove(u)}>
-                  Soft-remove
-                </button>
-              ) : (
-                <button style={styles.actionBtnGreen} disabled={busyId === u._id} onClick={() => handleReactivate(u)}>
-                  Reactivate
-                </button>
-              )}
-              {confirmDelete === u._id ? (
-                <>
-                  <button style={styles.actionBtnRed} disabled={busyId === u._id} onClick={() => handleHardDelete(u)}>
-                    Confirm delete
-                  </button>
-                  <button style={styles.actionBtn} onClick={() => setConfirmDelete(null)}>Cancel</button>
-                </>
-              ) : (
-                <button style={styles.actionBtnRedOutline} onClick={() => setConfirmDelete(u._id)}>
-                  Hard-delete
-                </button>
-              )}
-            </span>
+          <div style={styles.tableHeader}>
+            <span style={{ ...styles.col, flex: 2 }}>NAME / USN</span>
+            <span style={{ ...styles.col, flex: 1 }}>CF HANDLE</span>
+            <span style={{ ...styles.col, flex: 1 }}>LC HANDLE</span>
+            <span style={{ ...styles.col, width: '90px' }}>STATUS</span>
+            <span style={{ ...styles.col, width: '90px' }}>ROLE</span>
+            <span style={{ ...styles.col, width: '260px' }}>ACTIONS</span>
           </div>
-        ))}
+          {users.map((u) => (
+            <div key={u._id} style={styles.tableRow} className="row-hover">
+              <span style={{ flex: 2 }}>
+                <div>{u.name}</div>
+                <div className="mono" style={styles.subtext}>{u.usn}</div>
+              </span>
+              <span style={{ flex: 1 }} className="mono">
+                {u.cfHandle || <span style={styles.dim}>—</span>}
+                {u.cfConnected && <span style={styles.verifiedDot} title="Verified">●</span>}
+              </span>
+              <span style={{ flex: 1 }} className="mono">
+                {u.lcUsername || <span style={styles.dim}>—</span>}
+                {u.lcConnected && <span style={styles.verifiedDot} title="Verified">●</span>}
+              </span>
+              <span style={{ width: '90px' }}>
+                <StatusPill active={u.isActive} />
+              </span>
+              <span style={{ width: '90px' }} className="mono">
+                {u.role === 'admin' ? <span style={{ color: 'var(--accent-gold)' }}>admin</span> : 'user'}
+              </span>
+              <span style={{ width: '260px', display: 'flex', gap: '6px' }}>
+                {u.isActive ? (
+                  <button style={styles.actionBtn} disabled={busyId === u._id} onClick={() => handleSoftRemove(u)}>
+                    Soft-remove
+                  </button>
+                ) : (
+                  <button style={styles.actionBtnGreen} disabled={busyId === u._id} onClick={() => handleReactivate(u)}>
+                    Reactivate
+                  </button>
+                )}
+                {confirmDelete === u._id ? (
+                  <>
+                    <button style={styles.actionBtnRed} disabled={busyId === u._id} onClick={() => handleHardDelete(u)}>
+                      Confirm delete
+                    </button>
+                    <button style={styles.actionBtn} onClick={() => setConfirmDelete(null)}>Cancel</button>
+                  </>
+                ) : (
+                  <button style={styles.actionBtnRedOutline} onClick={() => setConfirmDelete(u._id)}>
+                    Hard-delete
+                  </button>
+                )}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -213,29 +217,29 @@ function ReviewTab() {
       ) : (
         <div style={styles.table} className="admin-table-scroll">
           <div className="admin-table-inner">
-          <div style={styles.tableHeader}>
-            <span style={{ ...styles.col, flex: 1 }}>USER</span>
-            <span style={{ ...styles.col, flex: 1 }}>PROBLEM</span>
-            <span style={{ ...styles.col, width: '80px' }}>RATING</span>
-            <span style={{ ...styles.col, width: '80px' }}>POINTS</span>
-            <span style={{ ...styles.col, width: '180px' }}>ACTIONS</span>
-          </div>
-          {submissions.map((s) => (
-            <div key={s._id} style={styles.tableRow} className="row-hover">
-              <span style={{ flex: 1 }}>{s.userId?.name || 'Unknown'}</span>
-              <span style={{ flex: 1 }} className="mono">{s.problemId}</span>
-              <span style={{ width: '80px' }} className="mono">{s.problemRating}</span>
-              <span style={{ width: '80px' }} className="mono">{s.points}</span>
-              <span style={{ width: '180px', display: 'flex', gap: '6px' }}>
-                <button style={styles.actionBtnGreen} disabled={busyId === s._id} onClick={() => handleReview(s, 'cleared')}>
-                  Clear
-                </button>
-                <button style={styles.actionBtnRed} disabled={busyId === s._id} onClick={() => handleReview(s, 'flagged')}>
-                  Flag
-                </button>
-              </span>
+            <div style={styles.tableHeader}>
+              <span style={{ ...styles.col, flex: 1 }}>USER</span>
+              <span style={{ ...styles.col, flex: 1 }}>PROBLEM</span>
+              <span style={{ ...styles.col, width: '80px' }}>RATING</span>
+              <span style={{ ...styles.col, width: '80px' }}>POINTS</span>
+              <span style={{ ...styles.col, width: '180px' }}>ACTIONS</span>
             </div>
-          ))}
+            {submissions.map((s) => (
+              <div key={s._id} style={styles.tableRow} className="row-hover">
+                <span style={{ flex: 1 }}>{s.userId?.name || 'Unknown'}</span>
+                <span style={{ flex: 1 }} className="mono">{s.problemId}</span>
+                <span style={{ width: '80px' }} className="mono">{s.problemRating}</span>
+                <span style={{ width: '80px' }} className="mono">{s.points}</span>
+                <span style={{ width: '180px', display: 'flex', gap: '6px' }}>
+                  <button style={styles.actionBtnGreen} disabled={busyId === s._id} onClick={() => handleReview(s, 'cleared')}>
+                    Clear
+                  </button>
+                  <button style={styles.actionBtnRed} disabled={busyId === s._id} onClick={() => handleReview(s, 'flagged')}>
+                    Flag
+                  </button>
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -258,20 +262,20 @@ function AuditTab() {
       {error && <div style={styles.error}>{error}</div>}
       <div style={styles.table} className="admin-table-scroll">
         <div className="admin-table-inner">
-        <div style={styles.tableHeader}>
-          <span style={{ ...styles.col, width: '120px' }}>ACTION</span>
-          <span style={{ ...styles.col, flex: 1 }}>TARGET</span>
-          <span style={{ ...styles.col, flex: 1 }}>REASON</span>
-          <span style={{ ...styles.col, width: '160px' }}>WHEN</span>
-        </div>
-        {actions.map((a) => (
-          <div key={a._id} style={styles.tableRow}>
-            <span style={{ width: '120px' }}><ActionPill action={a.action} /></span>
-            <span style={{ flex: 1 }} className="mono">{a.targetUserSnapshot?.name || '—'}</span>
-            <span style={{ flex: 1, color: 'var(--text-dim)' }}>{a.reason || '—'}</span>
-            <span style={{ width: '160px' }} className="mono">{new Date(a.createdAt).toLocaleString()}</span>
+          <div style={styles.tableHeader}>
+            <span style={{ ...styles.col, width: '120px' }}>ACTION</span>
+            <span style={{ ...styles.col, flex: 1 }}>TARGET</span>
+            <span style={{ ...styles.col, flex: 1 }}>REASON</span>
+            <span style={{ ...styles.col, width: '190px' }}>WHEN</span>
           </div>
-        ))}
+          {actions.map((a) => (
+            <div key={a._id} style={styles.tableRow}>
+              <span style={{ width: '120px' }}><ActionPill action={a.action} /></span>
+              <span style={{ flex: 1 }} className="mono">{a.targetUserSnapshot?.name || '—'}</span>
+              <span style={{ flex: 1, color: 'var(--text-dim)' }}>{a.reason || '—'}</span>
+              <span style={{ width: '190px', whiteSpace: 'nowrap' }} className="mono">{new Date(a.createdAt).toLocaleString()}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -298,8 +302,15 @@ const styles = {
     padding: 'var(--space-3) var(--space-5)',
     borderBottom: '1px solid var(--border)'
   },
-  backBtn: { background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '13px', fontFamily: 'var(--font-mono)' },
-  headerTitle: { fontSize: '12px', color: 'var(--accent-gold)', letterSpacing: '2px' },
+  backBtn: {
+    background: 'transparent', border: 'none', color: 'var(--text-dim)',
+    fontSize: '13px', fontFamily: "'Orbitron', sans-serif"
+  },
+  headerTitle: {
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '13px', fontWeight: 700, color: 'var(--accent-gold)', letterSpacing: '3px',
+    userSelect: 'none'
+  },
   main: { maxWidth: '960px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
   tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' },
   tab: {
@@ -308,7 +319,10 @@ const styles = {
     borderRadius: 'var(--radius-sm)',
     color: 'var(--text-dim)',
     padding: '8px 16px',
-    fontSize: '12px'
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '12px',
+    letterSpacing: '0.5px',
+    userSelect: 'none'
   },
   tabActive: { borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' },
   table: { border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' },
@@ -324,37 +338,44 @@ const styles = {
     padding: '12px 16px',
     background: 'var(--surface)',
     borderBottom: '1px solid var(--border)',
-    fontSize: '13px'
+    fontSize: '13px',
+    fontFamily: "'Orbitron', sans-serif"
   },
-  col: { fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-dim)', letterSpacing: '1px' },
-  subtext: { fontSize: '11px', color: 'var(--text-dim)' },
-  dim: { color: 'var(--text-dim)' },
+  col: {
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '10px', color: 'var(--text-dim)', letterSpacing: '1.5px',
+    userSelect: 'none'
+  },
+  subtext: { fontSize: '11px', color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif" },
+  dim: { color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif" },
   verifiedDot: { color: 'var(--accent-green)', marginLeft: '6px', fontSize: '10px' },
   pillGreen: {
     color: 'var(--accent-green)', background: 'var(--accent-green-dim)',
-    border: '1px solid var(--accent-green)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px'
+    border: '1px solid var(--accent-green)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px',
+    fontFamily: "'Orbitron', sans-serif"
   },
   pillRed: {
     color: 'var(--accent-red)', background: 'var(--accent-red-dim)',
-    border: '1px solid var(--accent-red)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px'
+    border: '1px solid var(--accent-red)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px',
+    fontFamily: "'Orbitron', sans-serif"
   },
   actionBtn: {
     background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '4px',
-    color: 'var(--text)', padding: '6px 10px', fontSize: '11px'
+    color: 'var(--text)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif"
   },
   actionBtnGreen: {
     background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)', borderRadius: '4px',
-    color: 'var(--accent-green)', padding: '6px 10px', fontSize: '11px'
+    color: 'var(--accent-green)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif"
   },
   actionBtnRed: {
     background: 'var(--accent-red)', border: 'none', borderRadius: '4px',
-    color: '#2A0A08', padding: '6px 10px', fontSize: '11px', fontWeight: 600
+    color: '#2A0A08', padding: '6px 10px', fontSize: '11px', fontWeight: 600, fontFamily: "'Orbitron', sans-serif"
   },
   actionBtnRedOutline: {
     background: 'transparent', border: '1px solid var(--accent-red)', borderRadius: '4px',
-    color: 'var(--accent-red)', padding: '6px 10px', fontSize: '11px'
+    color: 'var(--accent-red)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif"
   },
-  error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: '13px' },
-  infoMsg: { color: 'var(--accent-gold)', marginBottom: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: '12px' },
-  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: '13px' }
+  error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' },
+  infoMsg: { color: 'var(--accent-gold)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '12px' },
+  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' }
 };

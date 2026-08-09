@@ -2,50 +2,157 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, warmUpServer } from "../api";
 import { useAuth } from "../context/AuthContext";
+import ccLogo from '../assets/cc-logo-white.png';
+import '../styles/LandingPage.css';
 
-const BOOT_LINE = '> initializing maximum productivity';
+const BOOT_LINES = [
+  '> initializing maximum productivity..... ',
+  '> loading leaderboard protocol.........',
+  '> syncing codeclub server...... ',
+  '> ready.',
+];
+
+const NUM_LIGHTS = 8;
+const LIGHT_STAGGER = 0.08;
+const NUM_PARTICLES = 61;
+
+const RING_LIGHTS = Array.from({ length: NUM_LIGHTS }).map((_, i) => {
+  const angle = (360 / NUM_LIGHTS) * i - 90;
+  const rad = (angle * Math.PI) / 180;
+  const radiusPercent = 43.75;
+  return {
+    x: 50 + radiusPercent * Math.cos(rad),
+    y: 50 + radiusPercent * Math.sin(rad),
+    delay: i * LIGHT_STAGGER,
+  };
+});
+
+const PARTICLES = Array.from({ length: NUM_PARTICLES }).map(() => ({
+  top: Math.random() * 100,
+  left: Math.random() * 100,
+  size: 2 + Math.random() * 3,
+  delay: Math.random() * 8,
+  duration: 6 + Math.random() * 6,
+}));
+
+// Loops "<CODECLUB/>" typing forever — used as a loading indicator
+function CodeClubLoader() {
+  const [text, setText] = useState('');
+
+  useEffect(() => {
+    const full = '<CODECLUB/>';
+    let i = 0;
+    let deleting = false;
+    let timeoutId;
+
+    function tick() {
+      if (!deleting) {
+        i++;
+        setText(full.slice(0, i));
+        if (i === full.length) {
+          timeoutId = setTimeout(() => { deleting = true; tick(); }, 700);
+          return;
+        }
+        timeoutId = setTimeout(tick, 90);
+      } else {
+        i--;
+        setText(full.slice(0, i));
+        if (i === 0) {
+          timeoutId = setTimeout(() => { deleting = false; tick(); }, 300);
+          return;
+        }
+        timeoutId = setTimeout(tick, 45);
+      }
+    }
+    tick();
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  const slashIndex = text.indexOf('/');
+
+  return (
+    <div className="codeclub-loader">
+      {slashIndex === -1 ? (
+        text
+      ) : (
+        <>
+          {text.slice(0, slashIndex)}
+          <span className="codeclub-loader-slash">/</span>
+          {text.slice(slashIndex + 1)}
+        </>
+      )}
+      <span className="cursor-blink">▍</span>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const [showForm, setShowForm] = useState(false);
+  const [joinTransition, setJoinTransition] = useState(false);
   const [mode, setMode] = useState('join');
   const [form, setForm] = useState({ name: '', usn: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [bootText, setBootText] = useState('');
+  const [bootLines, setBootLines] = useState([]);
   const [bootDone, setBootDone] = useState(false);
   const [slowHint, setSlowHint] = useState(false);
   const navigate = useNavigate();
   const auth = useAuth();
 
   useEffect(() => {
-    warmUpServer(); // wake a sleeping Render backend before the user even submits
+    warmUpServer();
   }, []);
 
   useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      setBootText(BOOT_LINE.slice(0, i + 1));
-      i++;
-      if (i === BOOT_LINE.length) {
-        clearInterval(interval);
-        setTimeout(() => setBootDone(true), 250);
+    let lineIdx = 0;
+    let charIdx = 0;
+    let timeoutId;
+
+    function typeNext() {
+      if (lineIdx >= BOOT_LINES.length) {
+        setBootDone(true);
+        return;
       }
-    }, 22);
-    return () => clearInterval(interval);
+      const line = BOOT_LINES[lineIdx];
+      charIdx++;
+      setBootLines((prev) => {
+        const copy = [...prev];
+        copy[lineIdx] = line.slice(0, charIdx);
+        return copy;
+      });
+      if (charIdx === line.length) {
+        lineIdx++;
+        charIdx = 0;
+        timeoutId = setTimeout(typeNext, 300);
+      } else {
+        timeoutId = setTimeout(typeNext, 22);
+      }
+    }
+    typeNext();
+    return () => clearTimeout(timeoutId);
   }, []);
+
+  function handleJoinClick() {
+    setJoinTransition(true);
+    setTimeout(() => {
+      setShowForm(true);
+      setMode('login');
+      setJoinTransition(false);
+    }, 550);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
     setSlowHint(false);
-    const slowTimer = setTimeout(() => setSlowHint(true), 4000);
+    const slowTimer = setTimeout(() => setSlowHint(true), 2500);
     try {
       const data = mode === 'join'
         ? await api.signup(form)
         : await api.login({ email: form.email, password: form.password });
       auth.login(data.token, data.user);
-navigate("/leaderboard");
+      navigate("/leaderboard");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -57,105 +164,150 @@ navigate("/leaderboard");
 
   return (
     <div style={styles.page}>
-      <div style={styles.bootLine} className="mono">
-        {bootText}
-        {!bootDone && <span className="cursor-blink">▍</span>}
+
+      <div className="landing-bg-overlay">
+        <div className="ocean-gradient" />
+        <div className="electric-wave-1" />
+        <div className="electric-wave-2" />
+        {PARTICLES.map((p, i) => (
+          <div
+            key={i}
+            className="space-particle"
+            style={{
+              top: `${p.top}%`,
+              left: `${p.left}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.duration}s`,
+            }}
+          />
+        ))}
       </div>
 
-      {/* Terminal-window corner framing */}
+      <div style={styles.bootLine} className="mono landing-boot-line">
+        {bootLines.map((line, i) => (
+          <div key={i}>
+            {line}
+            {!bootDone && i === bootLines.length - 1 && <span className="cursor-blink">▍</span>}
+          </div>
+        ))}
+      </div>
+
       <div style={{ ...styles.corner, top: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderBottom: 'none' }} />
       <div style={{ ...styles.corner, top: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderBottom: 'none' }} />
       <div style={{ ...styles.corner, bottom: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderTop: 'none' }} />
       <div style={{ ...styles.corner, bottom: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderTop: 'none' }} />
 
-      {bootDone && (
-        <div style={styles.quote} className="mono fade-up">
-          {'// "Productive days are the days where you do what you want to do"'}
-        </div>
-      )}
+      <div style={styles.quote} className="mono fade-up landing-quote">
+        {'// "Productive days are the days where you do what you want to do"'}
+      </div>
 
       <div style={styles.center}>
-        {bootDone && (
-          <>
-            <div style={styles.logoBlock} className="fade-up">
-              <div style={styles.logoText}>{'<CODECLUB/>'}</div>
-              <div style={styles.logoRule} />
-              <div style={styles.logoSubtitle}>LEADERBOARD</div>
+        <div className="stage">
+          <div className={`ring-wrap ${showForm ? 'ring-hidden' : ''} ${joinTransition ? 'ring-burst' : ''}`}>
+            {RING_LIGHTS.map((l, i) => (
+              <div
+                key={i}
+                className="ring-light"
+                style={{
+                  left: `${l.x}%`,
+                  top: `${l.y}%`,
+                  animationDelay: `${l.delay}s`,
+                }}
+              />
+            ))}
+            <img src={ccLogo} alt="CodeClub" className="ring-logo" />
+            <div className={`ring-subtitle ${showForm ? 'ring-hidden' : ''}`}>
+              LEADERBOARD
             </div>
+          </div>
 
-            {!showForm ? (
-              <button
-                style={styles.joinBtn}
-                className="fade-up"
-                onClick={() => setShowForm(true)}
-              >
-                Join
-              </button>
-            ) : (
-              <form style={styles.form} className="scale-in" onSubmit={handleSubmit}>
-                <div style={styles.tabRow}>
-                  <button
-                    type="button"
-                    onClick={() => setMode('join')}
-                    style={{ ...styles.tab, ...(mode === 'join' ? styles.tabActive : {}) }}
-                  >
-                    New here
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMode('login')}
-                    style={{ ...styles.tab, ...(mode === 'login' ? styles.tabActive : {}) }}
-                  >
-                    Already a member
-                  </button>
-                </div>
+          {joinTransition && <div className="join-flash" />}
 
-                {mode === 'join' && (
-                  <>
-                    <input
-                      style={styles.input}
-                      placeholder="Full name"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      required
-                    />
-                    <input
-                      style={styles.input}
-                      placeholder="USN"
-                      value={form.usn}
-                      onChange={(e) => setForm({ ...form, usn: e.target.value })}
-                      required
-                    />
-                  </>
-                )}
-                <input
-                  style={styles.input}
-                  type="email"
-                  placeholder="Email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  required
-                />
-                <input
-                  style={styles.input}
-                  type="password"
-                  placeholder="Password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  required
-                />
-
-                {error && <div style={styles.error}>✕ {error}</div>}
-                {loading && slowHint && (
-                  <div style={styles.hint}>Server was asleep — waking it up, this can take ~30s…</div>
-                )}
-
-                <button style={styles.submitBtn} type="submit" disabled={loading}>
-                  {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
+          {showForm && (
+            <form style={styles.form} className="scale-in form-overlay" onSubmit={handleSubmit}>
+              <div style={styles.tabRow}>
+                <button
+                  type="button"
+                  onClick={() => setMode('join')}
+                  style={{ ...styles.tab, ...(mode === 'join' ? styles.tabActive : {}) }}
+                >
+                  New here
                 </button>
-              </form>
-            )}
-          </>
+                <button
+                  type="button"
+                  onClick={() => setMode('login')}
+                  style={{ ...styles.tab, ...(mode === 'login' ? styles.tabActive : {}) }}
+                >
+                  Already a member
+                </button>
+              </div>
+
+              {mode === 'join' && (
+                <>
+                  <input
+                    style={styles.input}
+                    placeholder="Full name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                  <input
+                    style={styles.input}
+                    placeholder="USN"
+                    value={form.usn}
+                    onChange={(e) => setForm({ ...form, usn: e.target.value })}
+                    required
+                  />
+                </>
+              )}
+              <input
+                style={styles.input}
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+              <input
+                style={styles.input}
+                type="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+              />
+
+              {error && <div style={styles.error}>✕ {error}</div>}
+
+              {loading && (
+                <div style={styles.loadingWrap}>
+                  {slowHint ? (
+                    <>
+                      <CodeClubLoader />
+                      <div style={styles.hint}>Server was asleep — waking it up, hang tight…</div>
+                    </>
+                  ) : (
+                    <CodeClubLoader />
+                  )}
+                </div>
+              )}
+
+              <button style={styles.submitBtn} type="submit" disabled={loading}>
+                {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
+              </button>
+            </form>
+          )}
+        </div>
+
+        {!showForm && !joinTransition && (
+          <button
+            className="join-btn-redesign"
+            onClick={handleJoinClick}
+          >
+            Join
+          </button>
         )}
       </div>
     </div>
@@ -169,7 +321,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 'var(--space-4)',
-    position: 'relative'
+    position: 'relative',
+    background: '#000',
+    overflow: 'hidden',
   },
   corner: {
     position: 'absolute',
@@ -200,43 +354,7 @@ const styles = {
     maxWidth: '90vw',
     padding: '0 var(--space-3)'
   },
-  center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)' },
-  logoBlock: { textAlign: 'center' },
-  logoText: {
-    fontFamily: 'var(--font-mono)',
-    fontWeight: 700,
-    fontSize: 'clamp(26px, 8vw, 38px)',
-    letterSpacing: '2px',
-    color: 'var(--text)',
-    textShadow: '0 0 30px #ffffff22'
-  },
-  logoRule: {
-    width: '80px',
-    height: '2px',
-    background: 'linear-gradient(90deg, transparent, var(--accent-green), transparent)',
-    margin: '18px auto 0',
-    opacity: 0.7
-  },
-  logoSubtitle: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '11px',
-    fontWeight: 500,
-    letterSpacing: '4px',
-    color: 'var(--accent-green)',
-    opacity: 0.65,
-    marginTop: '12px'
-  },
-  joinBtn: {
-    background: 'var(--accent-green)',
-    color: '#0A1A10',
-    border: 'none',
-    borderRadius: 'var(--radius)',
-    padding: '14px 48px',
-    fontSize: '16px',
-    fontWeight: 600,
-    letterSpacing: '1px',
-    boxShadow: '0 0 0 1px var(--accent-green), 0 8px 24px -8px var(--accent-green-dim)'
-  },
+  center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)', position: 'relative', zIndex: 1 },
   form: {
     display: 'flex',
     flexDirection: 'column',
@@ -285,16 +403,17 @@ const styles = {
     fontSize: '13px',
     fontFamily: 'var(--font-mono)'
   },
-  forgotLink: {
-    color: 'var(--text-dim)',
-    fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
-    textAlign: 'right',
-    textDecoration: 'underline'
+  loadingWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '4px 0'
   },
   hint: {
     color: 'var(--accent-gold)',
     fontSize: '12px',
-    fontFamily: 'var(--font-mono)'
+    fontFamily: 'var(--font-mono)',
+    textAlign: 'center'
   }
 };

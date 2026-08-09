@@ -11,7 +11,7 @@ router.use(requireAuth, requireAdmin);
 // GET /api/admin/users — list all users for the admin panel
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected createdAt')
+    const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected lcUsername lcConnected createdAt')
       .sort({ createdAt: -1 });
     res.json(users);
   } catch (err) {
