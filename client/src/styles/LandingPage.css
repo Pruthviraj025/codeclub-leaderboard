@@ -87,12 +87,18 @@
   margin: 0 auto;
 }
 
-.form-overlay {
+.form-overlay-wrap {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 50;
+  pointer-events: none;
+  padding: var(--space-4);
+}
+.form-overlay {
+  pointer-events: auto;
   width: min(360px, 92vw);
 }
 .form-overlay > div:first-child button {
