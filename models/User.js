@@ -172,6 +172,16 @@ const UserSchema = new mongoose.Schema({
         default: null
     },
 
+    lastCfRefreshAt: {
+        type: Date,
+        default: null
+    },
+
+    lastLcRefreshAt: {
+        type: Date,
+        default: null
+    },
+
     createdAt: {
         type: Date,
         default: Date.now
