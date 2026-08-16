@@ -161,35 +161,51 @@ async function fetchQuestions(titleSlugs) {
 
     const documents = [];
 
-    const scraped = await Promise.all(
+    // alfa-leetcode-api is a free-tier service — firing every missing
+    // problem at it simultaneously can overwhelm/rate-limit it and cause
+    // requests to hang far longer than a single 30s timeout would suggest.
+    // Scrape in small concurrent batches instead of all-at-once or one-by-one.
+    const SCRAPE_CONCURRENCY = 3;
 
-        missing.map(async slug => {
+    const scraped = [];
 
-            try {
+    for (let i = 0; i < missing.length; i += SCRAPE_CONCURRENCY) {
 
-                console.log(
-                    `Scraping LeetCode problem: ${slug}`
-                );
+        const batch = missing.slice(i, i + SCRAPE_CONCURRENCY);
 
-                const data =
-                    await scrapeProblem(slug);
+        const batchResults = await Promise.all(
 
-                return { slug, data };
+            batch.map(async slug => {
 
-            } catch (err) {
+                try {
 
-                console.error(
-                    `Unable to scrape ${slug}`,
-                    err.message
-                );
+                    console.log(
+                        `Scraping LeetCode problem: ${slug}`
+                    );
 
-                return { slug, data: null };
+                    const data =
+                        await scrapeProblem(slug);
 
-            }
+                    return { slug, data };
 
-        })
+                } catch (err) {
 
-    );
+                    console.error(
+                        `Unable to scrape ${slug}`,
+                        err.message
+                    );
+
+                    return { slug, data: null };
+
+                }
+
+            })
+
+        );
+
+        scraped.push(...batchResults);
+
+    }
 
     for (const { slug, data } of scraped) {
 
