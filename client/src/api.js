@@ -6,14 +6,30 @@ function getToken() {
 
 async function request(path, options = {}) {
     const token = getToken();
-    const res = await fetch(`${BASE_URL}${path}`, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(options.headers || {})
+    const timeoutMs = options.timeoutMs || 60000;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    let res;
+    try {
+        res = await fetch(`${BASE_URL}${path}`, {
+            ...options,
+            signal: controller.signal,
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                ...(options.headers || {})
+            }
+        });
+    } catch (err) {
+        if (err.name === "AbortError") {
+            throw new Error("Request timed out. The server may be slow to respond — try again.");
         }
-    });
+        throw new Error("Network error. Check your connection and try again.");
+    } finally {
+        clearTimeout(timeoutId);
+    }
+
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
         throw new Error(res.ok ? "Unexpected response from server." : `Server error (${res.status}). Backend may still be starting.`);
@@ -32,7 +48,7 @@ export const api = {
     currentLeaderboard: () => request("/leaderboard/current"),
     refresh: () => request("/leaderboard/refresh", { method: "POST" }),
     refreshCf: () => request("/leaderboard/refresh/cf", { method: "POST" }),
-    refreshLc: () => request("/leaderboard/refresh/lc", { method: "POST" }),
+    refreshLc: () => request("/leaderboard/refresh/lc", { method: "POST", timeoutMs: 100000 }),
     profile: userId => request(`/profile/${userId}`),
     updateEmail: email => request("/profile/me/email", { method: "PATCH", body: JSON.stringify({ email }) }),
     startCfVerification: cfHandle => request("/cf/start-verification", { method: "POST", body: JSON.stringify({ cfHandle }) }),
