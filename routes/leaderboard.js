@@ -1,7 +1,7 @@
 const express = require("express");
 
 const { requireAuth } = require("../middleware/auth");
-const { refreshUserScore } = require("../services/scoringService");
+const { refreshUserScore, refreshCfOnly, refreshLcOnly } = require("../services/scoringService");
 
 const ScoredSubmission = require("../models/ScoredSubmission");
 const User = require("../models/User");
@@ -20,6 +20,60 @@ router.post("/refresh", requireAuth, async (req, res) => {
     try {
 
         const result = await refreshUserScore(req.user._id);
+
+        res.json({
+            success: true,
+            ...result
+        });
+
+    } catch (err) {
+
+        res.status(400).json({
+            success: false,
+            error: err.message
+        });
+
+    }
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Refresh Codeforces only
+|--------------------------------------------------------------------------
+*/
+router.post("/refresh/cf", requireAuth, async (req, res) => {
+
+    try {
+
+        const result = await refreshCfOnly(req.user._id);
+
+        res.json({
+            success: true,
+            ...result
+        });
+
+    } catch (err) {
+
+        res.status(400).json({
+            success: false,
+            error: err.message
+        });
+
+    }
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Refresh LeetCode only
+|--------------------------------------------------------------------------
+*/
+router.post("/refresh/lc", requireAuth, async (req, res) => {
+
+    try {
+
+        const result = await refreshLcOnly(req.user._id);
 
         res.json({
             success: true,
