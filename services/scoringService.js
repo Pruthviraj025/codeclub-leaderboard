@@ -283,9 +283,103 @@ async function refreshUserScore(
 
 }
 
+/**
+ * Refreshes Codeforces only. Independent cooldown from LeetCode,
+ * so checking one platform never blocks the other.
+ */
+async function refreshCfOnly(userId, options = {}) {
+
+    const user =
+        await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (
+        !options.ignoreCooldown &&
+        user.lastCfRefreshAt &&
+        Date.now() -
+            user.lastCfRefreshAt.getTime() <
+            REFRESH_COOLDOWN_MS
+    ) {
+
+        const wait =
+            REFRESH_COOLDOWN_MS -
+            (
+                Date.now() -
+                user.lastCfRefreshAt.getTime()
+            );
+
+        throw new Error(
+            `Refresh on cooldown. Try again in ${Math.ceil(wait / 1000)}s`
+        );
+
+    }
+
+    const result =
+        await refreshCodeforcesScore(user);
+
+    user.lastCfRefreshAt = new Date();
+
+    await user.save();
+
+    return result;
+
+}
+
+/**
+ * Refreshes LeetCode only. Independent cooldown from Codeforces,
+ * so checking one platform never blocks the other.
+ */
+async function refreshLcOnly(userId, options = {}) {
+
+    const user =
+        await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (
+        !options.ignoreCooldown &&
+        user.lastLcRefreshAt &&
+        Date.now() -
+            user.lastLcRefreshAt.getTime() <
+            REFRESH_COOLDOWN_MS
+    ) {
+
+        const wait =
+            REFRESH_COOLDOWN_MS -
+            (
+                Date.now() -
+                user.lastLcRefreshAt.getTime()
+            );
+
+        throw new Error(
+            `Refresh on cooldown. Try again in ${Math.ceil(wait / 1000)}s`
+        );
+
+    }
+
+    const result =
+        await refreshLeetCodeScore(user._id);
+
+    user.lastLcRefreshAt = new Date();
+
+    await user.save();
+
+    return result;
+
+}
+
 module.exports = {
 
     refreshUserScore,
+
+    refreshCfOnly,
+
+    refreshLcOnly,
 
     refreshCodeforcesScore,
 
