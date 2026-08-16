@@ -8,8 +8,10 @@ export default function LeaderboardPage() {
   const [data, setData] = useState(null);
   const [loadingBoard, setLoadingBoard] = useState(true);
   const [error, setError] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshMsg, setRefreshMsg] = useState('');
+  const [refreshingCf, setRefreshingCf] = useState(false);
+  const [refreshingLc, setRefreshingLc] = useState(false);
+  const [cfMsg, setCfMsg] = useState('');
+  const [lcMsg, setLcMsg] = useState('');
   const [showInfo, setShowInfo] = useState(false);
   const user = getSessionUser();
   const navigate = useNavigate();
@@ -32,36 +34,33 @@ export default function LeaderboardPage() {
     }
   }
 
-  async function handleRefresh() {
-    setRefreshing(true);
-    setRefreshMsg('');
+  async function handleRefreshCf() {
+    setRefreshingCf(true);
+    setCfMsg('');
     try {
-      const res = await api.refresh();
-      const cf = res.codeforces?.pointsAdded || 0;
-      const lc = res.leetcode?.pointsAdded || 0;
-      const total = res.totalPointsAdded || 0;
-
-      const errs = [
-        res.codeforces?.error ? `CF: ${res.codeforces.error}` : null,
-        res.leetcode?.error ? `LC: ${res.leetcode.error}` : null
-      ].filter(Boolean);
-
-      if (errs.length) {
-        setRefreshMsg(
-          `Added ${total} points (CF +${cf}, LC +${lc}). ${errs.join(' · ')}`
-        );
-      } else {
-        setRefreshMsg(
-          total > 0
-            ? `Added ${total} points (CF +${cf}, LC +${lc})`
-            : 'No new solves found.'
-        );
-      }
+      const res = await api.refreshCf();
+      const added = res.pointsAdded || 0;
+      setCfMsg(added > 0 ? `CF: +${added} points` : 'CF: No new solves found.');
       await loadLeaderboard();
     } catch (err) {
-      setRefreshMsg(err.message);
+      setCfMsg(`CF: ${err.message}`);
     } finally {
-      setRefreshing(false);
+      setRefreshingCf(false);
+    }
+  }
+
+  async function handleRefreshLc() {
+    setRefreshingLc(true);
+    setLcMsg('');
+    try {
+      const res = await api.refreshLc();
+      const added = res.pointsAdded || 0;
+      setLcMsg(added > 0 ? `LC: +${added} points` : 'LC: No new solves found.');
+      await loadLeaderboard();
+    } catch (err) {
+      setLcMsg(`LC: ${err.message}`);
+    } finally {
+      setRefreshingLc(false);
     }
   }
 
@@ -84,12 +83,18 @@ export default function LeaderboardPage() {
             </button>
           </div>
         </div>
-        <button style={styles.refreshBtn} className="refresh-btn" onClick={handleRefresh} disabled={refreshing}>
-          {refreshing ? 'Refreshing…' : '↻ Refresh my solves'}
-        </button>
+        <div style={styles.refreshBtnGroup}>
+          <button style={styles.refreshBtnCf} className="refresh-btn" onClick={handleRefreshCf} disabled={refreshingCf}>
+            {refreshingCf ? 'Checking…' : '↻ Refresh CF'}
+          </button>
+          <button style={styles.refreshBtnLc} className="refresh-btn" onClick={handleRefreshLc} disabled={refreshingLc}>
+            {refreshingLc ? 'Checking…' : '↻ Refresh LC'}
+          </button>
+        </div>
       </div>
 
-      {refreshMsg && <div style={styles.refreshMsg}>{refreshMsg}</div>}
+      {cfMsg && <div style={styles.refreshMsg}>{cfMsg}</div>}
+      {lcMsg && <div style={{ ...styles.refreshMsg, color: '#FFA116' }}>{lcMsg}</div>}
       {error && <div style={styles.error}>{error}</div>}
 
       <div style={styles.queue}>
@@ -473,10 +478,25 @@ const styles = {
     fontSize: '13px',
     fontFamily: "'Orbitron', sans-serif"
   },
-  refreshBtn: {
+  refreshBtnGroup: {
+    display: 'flex',
+    gap: '10px',
+    flexWrap: 'wrap'
+  },
+  refreshBtnCf: {
     background: 'var(--surface-raised)',
     border: '1px solid var(--accent-green)',
     color: 'var(--accent-green)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '10px 16px',
+    fontSize: '13px',
+    letterSpacing: '3.5px',
+    fontFamily: "'Orbitron', sans-serif"
+  },
+  refreshBtnLc: {
+    background: 'var(--surface-raised)',
+    border: '1px solid #FFA116',
+    color: '#FFA116',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 16px',
     fontSize: '13px',
