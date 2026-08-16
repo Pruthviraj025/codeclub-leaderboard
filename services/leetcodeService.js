@@ -161,75 +161,83 @@ async function fetchQuestions(titleSlugs) {
 
     const documents = [];
 
-    for (const slug of missing) {
+    const scraped = await Promise.all(
 
-        try {
+        missing.map(async slug => {
 
-            console.log(
-                `Scraping LeetCode problem: ${slug}`
-            );
-
-            const data =
-                await scrapeProblem(slug);
-
-            if (
-                !data ||
-                !data.difficulty
-            ) {
+            try {
 
                 console.log(
-                    `Skipping ${slug}`
+                    `Scraping LeetCode problem: ${slug}`
                 );
 
-                continue;
+                const data =
+                    await scrapeProblem(slug);
+
+                return { slug, data };
+
+            } catch (err) {
+
+                console.error(
+                    `Unable to scrape ${slug}`,
+                    err.message
+                );
+
+                return { slug, data: null };
 
             }
 
-            questionMap.set(
+        })
+
+    );
+
+    for (const { slug, data } of scraped) {
+
+        if (
+            !data ||
+            !data.difficulty
+        ) {
+
+            console.log(
+                `Skipping ${slug}`
+            );
+
+            continue;
+
+        }
+
+        questionMap.set(
+            slug,
+            data
+        );
+
+        documents.push({
+
+            titleSlug:
                 slug,
-                data
-            );
 
-            documents.push({
+            title:
+                data.questionTitle,
 
-                titleSlug:
-                    slug,
+            difficulty:
+                data.difficulty,
 
-                title:
-                    data.questionTitle,
+            acceptanceRate:
+                data.acceptanceRate,
 
-                difficulty:
-                    data.difficulty,
+            acceptedCount:
+                data.acceptedCount,
 
-                acceptanceRate:
-                    data.acceptanceRate,
+            totalSubmissions:
+                data.totalSubmissions,
 
-                acceptedCount:
-                    data.acceptedCount,
+            topicTags:
+                data.topicTags || [],
 
-                totalSubmissions:
-                    data.totalSubmissions,
+            lastFetchedAt:
+                new Date()
 
-                topicTags:
-                    data.topicTags || [],
-
-                lastFetchedAt:
-                    new Date()
-
-            });
-
-        }
-        catch (err) {
-
-            console.error(
-
-                `Unable to scrape ${slug}`,
-
-                err.message
-
-            );
-
-        }
+        });
 
     }
 
