@@ -155,10 +155,14 @@ async function scrapeProblem(titleSlug) {
                 const retryAfter =
                     err.response && err.response.headers["retry-after"];
 
-                const wait =
+                const MAX_WAIT_MS = 60000;
+
+                const wait = Math.min(
                     retryAfter
                         ? Number(retryAfter) * 1000
-                        : 3000 * Math.pow(2, attempt - 1);
+                        : 3000 * Math.pow(2, attempt - 1),
+                    MAX_WAIT_MS
+                );
 
                 console.log(
                     `LeetCode API fetch failed for ${titleSlug} (${status || err.code}), retrying in ${wait}ms...`
