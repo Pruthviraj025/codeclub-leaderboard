@@ -3,7 +3,9 @@ const cron = require("node-cron");
 const User = require("../models/User");
 const { refreshUserScore } = require("../services/scoringService");
 
-const CONCURRENT_WORKERS = 5;
+const CONCURRENT_WORKERS = 2;
+
+let syncInProgress = false;
 
 async function processUsers(users) {
 
@@ -58,7 +60,19 @@ async function processUsers(users) {
 
 function startLeaderboardSync() {
 
-    cron.schedule("*/15 * * * *", async () => {
+    cron.schedule("*/30 * * * *", async () => {
+
+        if (syncInProgress) {
+
+            console.log(
+                "Leaderboard sync still running from previous tick — skipping this one."
+            );
+
+            return;
+
+        }
+
+        syncInProgress = true;
 
         console.log("\n========== Leaderboard Sync ==========");
 
@@ -95,6 +109,10 @@ function startLeaderboardSync() {
                 "Cron job failed:",
                 err.message
             );
+
+        } finally {
+
+            syncInProgress = false;
 
         }
 
