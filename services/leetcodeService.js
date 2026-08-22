@@ -58,9 +58,14 @@ async function fetchRecentAccepted(username) {
                 const retryAfter =
                     err.response && err.response.headers["retry-after"];
 
-                const wait = retryAfter
-                    ? Number(retryAfter) * 1000
-                    : 3000 * Math.pow(2, attempt - 1);
+                const MAX_WAIT_MS = 60000;
+
+                const wait = Math.min(
+                    retryAfter
+                        ? Number(retryAfter) * 1000
+                        : 3000 * Math.pow(2, attempt - 1),
+                    MAX_WAIT_MS
+                );
 
                 console.log(
                     `LeetCode fetch failed for ${username} (${status || err.code}), retrying in ${wait}ms...`
