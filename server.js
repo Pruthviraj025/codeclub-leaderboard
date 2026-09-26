@@ -13,6 +13,8 @@ const profileRoutes = require('./routes/profile');
 const adminRoutes = require('./routes/admin');
 const analyticsRoutes = require('./routes/analytics');
 const contestsRoutes = require('./routes/contests');
+const suggestionsRoutes = require('./routes/suggestions');
+const hackathonsRoutes = require('./routes/hackathons');
 const { startLeaderboardSync } = require('./jobs/leaderboardSync');
 
 const app = express();
@@ -27,6 +29,8 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/contests', contestsRoutes);
+app.use('/api/suggestions', suggestionsRoutes);
+app.use('/api/hackathons', hackathonsRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

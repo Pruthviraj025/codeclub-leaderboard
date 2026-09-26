@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, CalendarDays, BarChart3, Shield, User, LogOut, Menu, X } from 'lucide-react';
+import { Trophy, CalendarDays, BarChart3, Rocket, Shield, User, LogOut, Menu, X, MessageSquarePlus } from 'lucide-react';
 import { getSessionUser, clearSession } from '../api';
 
 const NAV_ITEMS = [
   { key: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
   { key: 'contests', label: 'Contests', icon: CalendarDays, path: '/contests' },
+  { key: 'hackathons', label: 'Hackathons', icon: Rocket, path: '/hackathons' },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' }
 ];
 
+
+import ReleaseNotesModal from './ReleaseNotesModal';
 
 export default function SidebarLayout({ active, children }) {
   const user = getSessionUser();
@@ -67,6 +70,18 @@ export default function SidebarLayout({ active, children }) {
     );
   }
 
+  function renderSuggestionBtn() {
+    return (
+      <button
+        style={styles.suggestionBtn}
+        className={active === 'suggestions' ? 'suggestion-active' : ''}
+        onClick={() => go('/suggestions')}
+      >
+        <MessageSquarePlus size={17} strokeWidth={2} /> Give a suggestion
+      </button>
+    );
+  }
+
   return (
     <div style={styles.shell} className="sidebar-shell">
       <aside style={styles.sidebar} className="app-sidebar">
@@ -88,6 +103,10 @@ export default function SidebarLayout({ active, children }) {
         <nav style={styles.nav} className="app-nav-desktop">
           {renderNavItems()}
         </nav>
+
+        <div style={styles.sidebarBottom} className="app-sidebar-bottom">
+          {renderSuggestionBtn()}
+        </div>
       </aside>
 
       {mobileOpen && (
@@ -107,6 +126,9 @@ export default function SidebarLayout({ active, children }) {
           <nav style={styles.mobileMenuNav}>
             {renderNavItems()}
           </nav>
+          <div style={styles.mobileMenuBottom}>
+            {renderSuggestionBtn()}
+          </div>
         </div>
       )}
 
@@ -115,6 +137,7 @@ export default function SidebarLayout({ active, children }) {
           {children}
         </main>
       </div>
+      <ReleaseNotesModal />
     </div>
   );
 }
@@ -133,7 +156,8 @@ const styles = {
     padding: 'var(--space-4) var(--space-3)',
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--space-5)'
+    gap: 'var(--space-5)',
+    minHeight: '100vh'
   },
   sidebarTop: {
     display: 'flex',
@@ -162,7 +186,29 @@ const styles = {
   nav: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--space-1)'
+    gap: 'var(--space-1)',
+    flex: 1
+  },
+  sidebarBottom: {
+    borderTop: '1px solid var(--border)',
+    paddingTop: 'var(--space-3)'
+  },
+  mobileMenuBottom: {
+    marginTop: 'auto',
+    padding: 'var(--space-4)',
+    borderTop: '1px solid var(--border)'
+  },
+  suggestionBtn: {
+    display: 'flex', alignItems: 'center', gap: '8px',
+    background: 'transparent',
+    color: 'var(--text-dim)',
+    border: '1px dashed var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '10px 12px',
+    fontSize: '13px',
+    width: '100%',
+    justifyContent: 'flex-start',
+    cursor: 'pointer'
   },
   mobileMenuPage: {
     display: 'none',

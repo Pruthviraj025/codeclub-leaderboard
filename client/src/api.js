@@ -68,7 +68,15 @@ export const api = {
     adminReactivate: (userId, reason) => request(`/admin/users/${userId}/reactivate`, { method: "POST", body: JSON.stringify({ reason }) }),
     adminHardDelete: (userId, reason) => request(`/admin/users/${userId}`, { method: "DELETE", body: JSON.stringify({ reason }) }),
     adminReviewSubmission: (submissionId, status, reason) => request(`/admin/submissions/${submissionId}/review`, { method: "PATCH", body: JSON.stringify({ status, reason }) }),
-    adminAuditLog: () => request("/admin/audit-log")
+    adminAuditLog: () => request("/admin/audit-log"),
+    adminListSuggestions: () => request("/admin/suggestions"),
+    adminDeleteSuggestion: suggestionId => request(`/admin/suggestions/${suggestionId}`, { method: "DELETE" }),
+    submitSuggestion: text => request("/suggestions", { method: "POST", body: JSON.stringify({ text }) }),
+    mySuggestions: () => request("/suggestions/mine"),
+    hackathons: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return request(`/hackathons${query ? `?${query}` : ''}`);
+    }
 };
 
 export function saveSession(token, user) {

@@ -3,6 +3,7 @@ const { requireAuth, requireAdmin } = require('../middleware/auth');
 const User = require('../models/User');
 const AdminAction = require('../models/AdminAction');
 const ScoredSubmission = require('../models/ScoredSubmission');
+const Suggestion = require('../models/Suggestion');
 const { hardDeleteUser } = require('../services/deletionRecomputeService');
 
 const router = express.Router();
@@ -122,6 +123,29 @@ router.get('/audit-log', async (req, res) => {
   try {
     const actions = await AdminAction.find().sort({ createdAt: -1 }).limit(100);
     res.json(actions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/admin/suggestions — list all user suggestions (admin only)
+router.get('/suggestions', async (req, res) => {
+  try {
+    const suggestions = await Suggestion.find()
+      .populate('userId', 'name usn email')
+      .sort({ createdAt: -1 })
+      .limit(200);
+    res.json(suggestions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/admin/suggestions/:suggestionId — dismiss/delete a suggestion
+router.delete('/suggestions/:suggestionId', async (req, res) => {
+  try {
+    await Suggestion.findByIdAndDelete(req.params.suggestionId);
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

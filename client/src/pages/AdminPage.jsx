@@ -25,11 +25,13 @@ export default function AdminPage() {
         <div style={styles.tabRow} className="admin-tab-row">
           <TabButton active={tab === 'users'} onClick={() => setTab('users')}>Users</TabButton>
           <TabButton active={tab === 'review'} onClick={() => setTab('review')}>Review Queue</TabButton>
+          <TabButton active={tab === 'suggestions'} onClick={() => setTab('suggestions')}>User Suggestions</TabButton>
           <TabButton active={tab === 'audit'} onClick={() => setTab('audit')}>Audit Log</TabButton>
         </div>
 
         {tab === 'users' && <UsersTab />}
         {tab === 'review' && <ReviewTab />}
+        {tab === 'suggestions' && <SuggestionsTab />}
         {tab === 'audit' && <AuditTab />}
       </main>
     </div>
@@ -118,51 +120,84 @@ function UsersTab() {
             <span style={{ ...styles.col, flex: 1 }}>LC HANDLE</span>
             <span style={{ ...styles.col, width: '90px' }}>STATUS</span>
             <span style={{ ...styles.col, width: '90px' }}>ROLE</span>
-            <span style={{ ...styles.col, width: '260px' }}>ACTIONS</span>
+            <span style={{ ...styles.col, width: '180px' }}>ACTIONS</span>
           </div>
-          {users.map((u) => (
-            <div key={u._id} style={styles.tableRow} className="row-hover">
-              <span style={{ flex: 2 }}>
-                <div>{u.name}</div>
-                <div className="mono" style={styles.subtext}>{u.usn}</div>
-              </span>
-              <span style={{ flex: 1 }} className="mono">
-                {u.cfHandle || <span style={styles.dim}>—</span>}
-                {u.cfConnected && <span style={styles.verifiedDot} title="Verified">●</span>}
-              </span>
-              <span style={{ flex: 1 }} className="mono">
-                {u.lcUsername || <span style={styles.dim}>—</span>}
-                {u.lcConnected && <span style={styles.verifiedDot} title="Verified">●</span>}
-              </span>
-              <span style={{ width: '90px' }}>
-                <StatusPill active={u.isActive} />
-              </span>
-              <span style={{ width: '90px' }} className="mono">
-                {u.role === 'admin' ? <span style={{ color: 'var(--accent-gold)' }}>admin</span> : 'user'}
-              </span>
-              <span style={{ width: '260px', display: 'flex', gap: '6px' }}>
+
+          {users.map(u => (
+            <div key={u._id} style={styles.tableRow}>
+              <div style={{ flex: 2 }}>
+                <div style={{ fontWeight: 600 }}>{u.name}</div>
+                <div style={styles.subtext}>{u.usn} · {u.email}</div>
+              </div>
+
+              <div style={{ flex: 1 }}>
+                {u.cfHandle ? (
+                  <span>
+                    {u.cfHandle}
+                    {u.cfConnected && <span style={styles.verifiedDot} title="Verified">✓</span>}
+                  </span>
+                ) : (
+                  <span style={styles.dim}>—</span>
+                )}
+              </div>
+
+              <div style={{ flex: 1 }}>
+                {u.lcUsername ? (
+                  <span>
+                    {u.lcUsername}
+                    {u.lcConnected && <span style={styles.verifiedDot} title="Verified">✓</span>}
+                  </span>
+                ) : (
+                  <span style={styles.dim}>—</span>
+                )}
+              </div>
+
+              <div style={{ width: '90px' }}>
+                <span style={u.isActive ? styles.pillGreen : styles.pillRed}>
+                  {u.isActive ? 'Active' : 'Soft-Rem'}
+                </span>
+              </div>
+
+              <div style={{ width: '90px' }}>
+                <span style={styles.dim}>{u.role}</span>
+              </div>
+
+              <div style={{ width: '180px', display: 'flex', gap: '6px' }}>
                 {u.isActive ? (
-                  <button style={styles.actionBtn} disabled={busyId === u._id} onClick={() => handleSoftRemove(u)}>
-                    Soft-remove
+                  <button
+                    style={styles.actionBtn}
+                    disabled={busyId === u._id}
+                    onClick={() => handleSoftRemove(u)}
+                  >
+                    Soft-Remove
                   </button>
                 ) : (
-                  <button style={styles.actionBtnGreen} disabled={busyId === u._id} onClick={() => handleReactivate(u)}>
+                  <button
+                    style={styles.actionBtnGreen}
+                    disabled={busyId === u._id}
+                    onClick={() => handleReactivate(u)}
+                  >
                     Reactivate
                   </button>
                 )}
+
                 {confirmDelete === u._id ? (
-                  <>
-                    <button style={styles.actionBtnRed} disabled={busyId === u._id} onClick={() => handleHardDelete(u)}>
-                      Confirm delete
-                    </button>
-                    <button style={styles.actionBtn} onClick={() => setConfirmDelete(null)}>Cancel</button>
-                  </>
+                  <button
+                    style={styles.actionBtnRed}
+                    disabled={busyId === u._id}
+                    onClick={() => handleHardDelete(u)}
+                  >
+                    Confirm?
+                  </button>
                 ) : (
-                  <button style={styles.actionBtnRedOutline} onClick={() => setConfirmDelete(u._id)}>
-                    Hard-delete
+                  <button
+                    style={styles.actionBtnRedOutline}
+                    onClick={() => setConfirmDelete(u._id)}
+                  >
+                    Delete
                   </button>
                 )}
-              </span>
+              </div>
             </div>
           ))}
         </div>
@@ -171,36 +206,135 @@ function UsersTab() {
   );
 }
 
-function StatusPill({ active }) {
-  return (
-    <span style={active ? styles.pillGreen : styles.pillRed} className="mono">
-      {active ? 'active' : 'removed'}
-    </span>
-  );
-}
-
-/* ---------------- Review Tab ---------------- */
+/* ---------------- Review Queue Tab ---------------- */
 
 function ReviewTab() {
   const [submissions, setSubmissions] = useState([]);
+  const [filter, setFilter] = useState('unreviewed');
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [filter]);
 
   async function load() {
     try {
-      const res = await api.adminListSubmissions('unreviewed');
+      const res = await api.adminListSubmissions(filter);
       setSubmissions(res);
     } catch (err) {
       setError(err.message);
     }
   }
 
-  async function handleReview(sub, status) {
-    setBusyId(sub._id);
+  async function handleReview(s, status) {
+    setBusyId(s._id);
     try {
-      await api.adminReviewSubmission(sub._id, status, `Marked ${status} via admin panel`);
+      await api.adminReviewSubmission(s._id, status, `Marked as ${status} via admin panel`);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)' }}>
+        {['unreviewed', 'flagged', 'cleared'].map(st => (
+          <button
+            key={st}
+            onClick={() => setFilter(st)}
+            style={{ ...styles.actionBtn, ...(filter === st ? styles.tabActive : {}) }}
+          >
+            {st.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {error && <div style={styles.error}>{error}</div>}
+
+      {submissions.length === 0 ? (
+        <div style={styles.empty}>No {filter} submissions found.</div>
+      ) : (
+        <div style={styles.table} className="admin-table-scroll">
+          <div className="admin-table-inner">
+            <div style={styles.tableHeader}>
+              <span style={{ ...styles.col, flex: 2 }}>USER</span>
+              <span style={{ ...styles.col, flex: 2 }}>CONTEST / PROBLEM</span>
+              <span style={{ ...styles.col, width: '90px' }}>POINTS</span>
+              <span style={{ ...styles.col, width: '160px' }}>ACTIONS</span>
+            </div>
+
+            {submissions.map(s => {
+              const u = s.userId || {};
+              return (
+                <div key={s._id} style={styles.tableRow}>
+                  <div style={{ flex: 2 }}>
+                    <div style={{ fontWeight: 600 }}>{u.name || 'Unknown'}</div>
+                    <div style={styles.subtext}>{u.usn} ({u.cfHandle})</div>
+                  </div>
+
+                  <div style={{ flex: 2 }}>
+                    <div>Contest {s.contestId}</div>
+                    <div style={styles.subtext}>Prob {s.problemIndex} · Sub #{s.submissionId}</div>
+                  </div>
+
+                  <div style={{ width: '90px' }}>
+                    <span style={styles.pillGreen}>+{s.points} pts</span>
+                  </div>
+
+                  <div style={{ width: '160px', display: 'flex', gap: '6px' }}>
+                    <button
+                      style={styles.actionBtnGreen}
+                      disabled={busyId === s._id}
+                      onClick={() => handleReview(s, 'cleared')}
+                    >
+                      Clear
+                    </button>
+                    <button
+                      style={styles.actionBtnRedOutline}
+                      disabled={busyId === s._id}
+                      onClick={() => handleReview(s, 'flagged')}
+                    >
+                      Flag Plag
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- User Suggestions Tab (Admin Only) ---------------- */
+
+function SuggestionsTab() {
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [busyId, setBusyId] = useState(null);
+
+  useEffect(() => { load(); }, []);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const res = await api.adminListSuggestions();
+      setSuggestions(res);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(s) {
+    setBusyId(s._id);
+    try {
+      await api.adminDeleteSuggestion(s._id);
       await load();
     } catch (err) {
       setError(err.message);
@@ -212,34 +346,54 @@ function ReviewTab() {
   return (
     <div>
       {error && <div style={styles.error}>{error}</div>}
-      {submissions.length === 0 ? (
-        <div style={styles.empty}>Queue is empty — nothing pending review.</div>
+
+      {loading ? (
+        <div style={styles.empty}>Loading suggestions...</div>
+      ) : suggestions.length === 0 ? (
+        <div style={styles.empty}>No user suggestions received yet.</div>
       ) : (
         <div style={styles.table} className="admin-table-scroll">
           <div className="admin-table-inner">
             <div style={styles.tableHeader}>
-              <span style={{ ...styles.col, flex: 1 }}>USER</span>
-              <span style={{ ...styles.col, flex: 1 }}>PROBLEM</span>
-              <span style={{ ...styles.col, width: '80px' }}>RATING</span>
-              <span style={{ ...styles.col, width: '80px' }}>POINTS</span>
-              <span style={{ ...styles.col, width: '180px' }}>ACTIONS</span>
+              <span style={{ ...styles.col, flex: 2 }}>SUBMITTED BY</span>
+              <span style={{ ...styles.col, flex: 4 }}>SUGGESTION DETAILS</span>
+              <span style={{ ...styles.col, flex: 2 }}>DATE &amp; TIME</span>
+              <span style={{ ...styles.col, width: '100px', textAlign: 'right' }}>ACTION</span>
             </div>
-            {submissions.map((s) => (
-              <div key={s._id} style={styles.tableRow} className="row-hover">
-                <span style={{ flex: 1 }}>{s.userId?.name || 'Unknown'}</span>
-                <span style={{ flex: 1 }} className="mono">{s.problemId}</span>
-                <span style={{ width: '80px' }} className="mono">{s.problemRating}</span>
-                <span style={{ width: '80px' }} className="mono">{s.points}</span>
-                <span style={{ width: '180px', display: 'flex', gap: '6px' }}>
-                  <button style={styles.actionBtnGreen} disabled={busyId === s._id} onClick={() => handleReview(s, 'cleared')}>
-                    Clear
-                  </button>
-                  <button style={styles.actionBtnRed} disabled={busyId === s._id} onClick={() => handleReview(s, 'flagged')}>
-                    Flag
-                  </button>
-                </span>
-              </div>
-            ))}
+
+            {suggestions.map(s => {
+              const u = s.userId || {};
+              return (
+                <div key={s._id} style={{ ...styles.tableRow, alignItems: 'flex-start', padding: '14px 16px' }}>
+                  <div style={{ flex: 2 }}>
+                    <div style={{ fontWeight: 600, color: 'var(--text)' }}>{u.name || 'User'}</div>
+                    <div style={styles.subtext}>{u.usn ? `USN: ${u.usn}` : ''}</div>
+                    <div style={styles.subtext}>{u.email || ''}</div>
+                  </div>
+
+                  <div style={{ flex: 4, whiteSpace: 'pre-wrap', color: 'var(--text)', lineHeight: '1.5', fontFamily: 'inherit' }}>
+                    {s.text}
+                  </div>
+
+                  <div style={{ flex: 2, fontSize: '11px', color: 'var(--text-dim)' }}>
+                    {new Date(s.createdAt).toLocaleString('en-US', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short'
+                    })}
+                  </div>
+
+                  <div style={{ width: '100px', textAlign: 'right' }}>
+                    <button
+                      style={styles.actionBtnRedOutline}
+                      disabled={busyId === s._id}
+                      onClick={() => handleDelete(s)}
+                    >
+                      {busyId === s._id ? 'Dismissing...' : 'Dismiss'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -247,33 +401,43 @@ function ReviewTab() {
   );
 }
 
-/* ---------------- Audit Tab ---------------- */
+/* ---------------- Audit Log Tab ---------------- */
 
 function AuditTab() {
   const [actions, setActions] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.adminAuditLog().then(setActions).catch((err) => setError(err.message));
+    api.adminAuditLog()
+      .then(res => setActions(res))
+      .catch(err => setError(err.message));
   }, []);
 
   return (
     <div>
       {error && <div style={styles.error}>{error}</div>}
+
       <div style={styles.table} className="admin-table-scroll">
         <div className="admin-table-inner">
           <div style={styles.tableHeader}>
-            <span style={{ ...styles.col, width: '120px' }}>ACTION</span>
-            <span style={{ ...styles.col, flex: 1 }}>TARGET</span>
-            <span style={{ ...styles.col, flex: 1 }}>REASON</span>
-            <span style={{ ...styles.col, width: '190px' }}>WHEN</span>
+            <span style={{ ...styles.col, flex: 2 }}>TIMESTAMP</span>
+            <span style={{ ...styles.col, flex: 1.5 }}>ACTION</span>
+            <span style={{ ...styles.col, flex: 2 }}>REASON</span>
           </div>
-          {actions.map((a) => (
+
+          {actions.map(a => (
             <div key={a._id} style={styles.tableRow}>
-              <span style={{ width: '120px' }}><ActionPill action={a.action} /></span>
-              <span style={{ flex: 1 }} className="mono">{a.targetUserSnapshot?.name || '—'}</span>
-              <span style={{ flex: 1, color: 'var(--text-dim)' }}>{a.reason || '—'}</span>
-              <span style={{ width: '190px', whiteSpace: 'nowrap' }} className="mono">{new Date(a.createdAt).toLocaleString()}</span>
+              <div style={{ flex: 2, fontSize: '12px' }}>
+                {new Date(a.createdAt).toLocaleString()}
+              </div>
+              <div style={{ flex: 1.5 }}>
+                <span style={a.action.includes('remove') || a.action.includes('flag') ? styles.pillRed : styles.pillGreen}>
+                  {a.action}
+                </span>
+              </div>
+              <div style={{ flex: 2, color: 'var(--text-dim)' }}>
+                {a.reason || '—'}
+              </div>
             </div>
           ))}
         </div>
@@ -282,19 +446,8 @@ function AuditTab() {
   );
 }
 
-function ActionPill({ action }) {
-  const colorMap = {
-    soft_remove: 'var(--accent-red)',
-    reactivate: 'var(--accent-green)',
-    hard_delete: 'var(--accent-red)',
-    flag_submission: 'var(--accent-red)',
-    clear_flag: 'var(--accent-green)'
-  };
-  return <span className="mono" style={{ color: colorMap[action] || 'var(--text-dim)', fontSize: '11px' }}>{action}</span>;
-}
-
 const styles = {
-  page: { minHeight: '100vh' },
+  page: { minHeight: '100vh', background: 'var(--bg)' },
   header: {
     display: 'flex',
     alignItems: 'center',
@@ -304,15 +457,15 @@ const styles = {
   },
   backBtn: {
     background: 'transparent', border: 'none', color: 'var(--text-dim)',
-    fontSize: '13px', fontFamily: "'Orbitron', sans-serif"
+    fontSize: '13px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
   },
   headerTitle: {
     fontFamily: "'Orbitron', sans-serif",
     fontSize: '13px', fontWeight: 700, color: 'var(--accent-gold)', letterSpacing: '3px',
     userSelect: 'none'
   },
-  main: { maxWidth: '960px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
-  tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' },
+  main: { maxWidth: '1040px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
+  tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' },
   tab: {
     background: 'var(--surface)',
     border: '1px solid var(--border)',
@@ -322,7 +475,8 @@ const styles = {
     fontFamily: "'Orbitron', sans-serif",
     fontSize: '12px',
     letterSpacing: '0.5px',
-    userSelect: 'none'
+    userSelect: 'none',
+    cursor: 'pointer'
   },
   tabActive: { borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' },
   table: { border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' },
@@ -361,19 +515,19 @@ const styles = {
   },
   actionBtn: {
     background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '4px',
-    color: 'var(--text)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif"
+    color: 'var(--text)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
   },
   actionBtnGreen: {
     background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)', borderRadius: '4px',
-    color: 'var(--accent-green)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif"
+    color: 'var(--accent-green)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
   },
   actionBtnRed: {
     background: 'var(--accent-red)', border: 'none', borderRadius: '4px',
-    color: '#2A0A08', padding: '6px 10px', fontSize: '11px', fontWeight: 600, fontFamily: "'Orbitron', sans-serif"
+    color: '#2A0A08', padding: '6px 10px', fontSize: '11px', fontWeight: 600, fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
   },
   actionBtnRedOutline: {
     background: 'transparent', border: '1px solid var(--accent-red)', borderRadius: '4px',
-    color: 'var(--accent-red)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif"
+    color: 'var(--accent-red)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
   },
   error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' },
   infoMsg: { color: 'var(--accent-gold)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '12px' },
