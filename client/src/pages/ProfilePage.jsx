@@ -832,26 +832,27 @@ const styles = {
     main: {
         maxWidth: "760px",
         margin: "0 auto",
-        padding: "var(--space-5) var(--space-4)"
+        padding: "var(--space-4) var(--space-3)"
     },
 
     card: {
         background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: "var(--radius)",
-        padding: "var(--space-5)"
+        padding: "var(--space-4)"
     },
 
     nameRow: {
         display: "flex",
         alignItems: "center",
-        gap: "12px"
+        gap: "12px",
+        flexWrap: "wrap"
     },
 
     name: {
         margin: 0,
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: "28px",
+        fontSize: "clamp(20px, 5vw, 28px)",
         fontWeight: 700,
         letterSpacing: "0.5px"
     },
@@ -867,33 +868,37 @@ const styles = {
     },
 
     statRow: {
-        display: "flex",
-        gap: "28px",
-        flexWrap: "wrap",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+        gap: "16px",
         marginTop: "22px"
     },
 
     stat: {
-        minWidth: "120px"
+        minWidth: "120px",
+        background: "var(--surface-raised)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius-sm)",
+        padding: "12px 14px"
     },
 
     statLabel: {
         fontFamily: "'Orbitron', sans-serif",
         fontSize: "10px",
         color: "var(--text-dim)",
-        letterSpacing: "1.5px"
-        ,
+        letterSpacing: "1.5px",
         marginBottom: "5px"
     },
 
     statValue: {
-        fontSize: "18px",
+        fontSize: "16px",
         fontWeight: 700,
-        fontFamily: "'Orbitron', sans-serif"
+        fontFamily: "'Orbitron', sans-serif",
+        wordBreak: "break-all"
     },
 
     privateBlock: {
-        marginTop: "28px",
+        marginTop: "24px",
         paddingTop: "20px",
         borderTop: "1px solid var(--border)",
         fontFamily: "'Orbitron', sans-serif"
@@ -903,7 +908,8 @@ const styles = {
         fontFamily: "'Orbitron', sans-serif",
         fontSize: "13px",
         marginBottom: "10px",
-        lineHeight: 1.6
+        lineHeight: 1.6,
+        wordBreak: "break-word"
     },
 
     dim: {
@@ -920,11 +926,11 @@ const styles = {
         marginLeft: "8px",
         textDecoration: "underline",
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: "11px"
+        fontSize: "12px"
     },
 
     cfConnect: {
-        marginTop: "30px",
+        marginTop: "24px",
         paddingTop: "20px",
         borderTop: "1px solid var(--border)"
     },
@@ -945,14 +951,15 @@ const styles = {
 
     input: {
         flex: 1,
-        minWidth: "220px",
+        minWidth: "180px",
         background: "var(--surface-raised)",
         color: "var(--text)",
         border: "1px solid var(--border)",
         borderRadius: "var(--radius-sm)",
         padding: "11px 14px",
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: "13px"
+        fontSize: "13px",
+        minHeight: "44px"
     },
 
     smallBtn: {
@@ -964,7 +971,11 @@ const styles = {
         cursor: "pointer",
         fontWeight: 600,
         fontSize: "13px",
-        fontFamily: "'Orbitron', sans-serif"
+        fontFamily: "'Orbitron', sans-serif",
+        minHeight: "44px",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center"
     },
 
     instructions: {

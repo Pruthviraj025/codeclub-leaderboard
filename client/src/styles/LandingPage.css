@@ -389,6 +389,32 @@
 .join-btn-redesign:active {
   transform: translateY(0);
 }
+
+@media (max-width: 520px) {
+  .ring-wrap {
+    width: 220px;
+    height: 220px;
+  }
+  .stage {
+    width: 220px;
+  }
+  .join-btn-redesign {
+    padding: 12px 36px;
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+  .landing-quote {
+    font-size: 10px !important;
+    bottom: var(--space-2) !important;
+  }
+  .landing-boot-line {
+    font-size: 10px !important;
+  }
+  .form-overlay-wrap {
+    padding: 12px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ring-light,
   .ring-logo,

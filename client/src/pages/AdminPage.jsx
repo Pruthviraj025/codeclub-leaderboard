@@ -451,32 +451,34 @@ const styles = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    gap: 'var(--space-4)',
-    padding: 'var(--space-3) var(--space-5)',
+    justifyContent: 'space-between',
+    gap: 'var(--space-3)',
+    padding: '14px 16px',
     borderBottom: '1px solid var(--border)'
   },
   backBtn: {
-    background: 'transparent', border: 'none', color: 'var(--text-dim)',
-    fontSize: '13px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
+    background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-dim)',
+    fontSize: '12px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', padding: '6px 12px', borderRadius: '4px'
   },
   headerTitle: {
     fontFamily: "'Orbitron', sans-serif",
-    fontSize: '13px', fontWeight: 700, color: 'var(--accent-gold)', letterSpacing: '3px',
+    fontSize: '13px', fontWeight: 700, color: 'var(--accent-gold)', letterSpacing: '2px',
     userSelect: 'none'
   },
-  main: { maxWidth: '1040px', margin: '0 auto', padding: 'var(--space-5) var(--space-4)' },
+  main: { maxWidth: '1040px', margin: '0 auto', padding: 'var(--space-4) var(--space-3)' },
   tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' },
   tab: {
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius-sm)',
     color: 'var(--text-dim)',
-    padding: '8px 16px',
+    padding: '10px 16px',
     fontFamily: "'Orbitron', sans-serif",
     fontSize: '12px',
     letterSpacing: '0.5px',
     userSelect: 'none',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    minHeight: '40px'
   },
   tabActive: { borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' },
   table: { border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' },
@@ -515,19 +517,19 @@ const styles = {
   },
   actionBtn: {
     background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '4px',
-    color: 'var(--text)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
+    color: 'var(--text)', padding: '8px 12px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
   },
   actionBtnGreen: {
     background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)', borderRadius: '4px',
-    color: 'var(--accent-green)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
+    color: 'var(--accent-green)', padding: '8px 12px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
   },
   actionBtnRed: {
     background: 'var(--accent-red)', border: 'none', borderRadius: '4px',
-    color: '#2A0A08', padding: '6px 10px', fontSize: '11px', fontWeight: 600, fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
+    color: '#2A0A08', padding: '8px 12px', fontSize: '11px', fontWeight: 600, fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
   },
   actionBtnRedOutline: {
     background: 'transparent', border: '1px solid var(--accent-red)', borderRadius: '4px',
-    color: 'var(--accent-red)', padding: '6px 10px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer'
+    color: 'var(--accent-red)', padding: '8px 12px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
   },
   error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' },
   infoMsg: { color: 'var(--accent-gold)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '12px' },

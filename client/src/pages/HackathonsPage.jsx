@@ -114,7 +114,7 @@ export default function HackathonsPage() {
         </div>
 
         {/* Stats Row */}
-        <div style={styles.statsRow}>
+        <div style={styles.statsRow} className="mobile-grid-2">
           <div
             style={{ ...styles.statCard, cursor: 'pointer' }}
             onClick={() => setPlatform('all')}
@@ -124,7 +124,7 @@ export default function HackathonsPage() {
             </div>
             <div>
               <div style={styles.statValue}>{loading ? '-' : stats.total}</div>
-              <div style={styles.statLabel}>Active Opportunities</div>
+              <div style={styles.statLabel}>Active Builds</div>
             </div>
           </div>
 
@@ -141,7 +141,7 @@ export default function HackathonsPage() {
             </div>
             <div>
               <div style={styles.statValue}>{loading ? '-' : stats.unstopCount}</div>
-              <div style={styles.statLabel}>Unstop Hackathons</div>
+              <div style={styles.statLabel}>Unstop</div>
             </div>
           </div>
 
@@ -158,7 +158,7 @@ export default function HackathonsPage() {
             </div>
             <div>
               <div style={styles.statValue}>{loading ? '-' : stats.devfolioCount}</div>
-              <div style={styles.statLabel}>Devfolio Hackathons</div>
+              <div style={styles.statLabel}>Devfolio</div>
             </div>
           </div>
 
@@ -181,9 +181,9 @@ export default function HackathonsPage() {
         </div>
 
         {/* Controls Bar: Tabs, Search, Filters */}
-        <div style={styles.controlsBar}>
+        <div style={styles.controlsBar} className="mobile-stack">
           {/* Platform Tabs */}
-          <div style={styles.tabsContainer}>
+          <div style={styles.tabsContainer} className="scroll-x-touch mobile-full-width">
             <button
               style={{ ...styles.tab, ...(platform === 'all' ? styles.tabActive : {}) }}
               onClick={() => setPlatform('all')}
@@ -214,12 +214,12 @@ export default function HackathonsPage() {
           </div>
 
           {/* Search & Select */}
-          <div style={styles.searchAndFilters}>
-            <div style={styles.searchWrapper}>
+          <div style={styles.searchAndFilters} className="mobile-stack">
+            <div style={styles.searchWrapper} className="mobile-full-width">
               <Search size={16} style={styles.searchIcon} />
               <input
                 type="text"
-                placeholder="Search hackathons, tags, location..."
+                placeholder="Search hackathons..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 style={styles.searchInput}
@@ -230,6 +230,7 @@ export default function HackathonsPage() {
               value={mode}
               onChange={e => setMode(e.target.value)}
               style={styles.selectFilter}
+              className="mobile-full-width"
             >
               <option value="all">All Formats</option>
               <option value="online">Online Only</option>
@@ -240,6 +241,7 @@ export default function HackathonsPage() {
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
               style={styles.selectFilter}
+              className="mobile-full-width"
             >
               <option value="relevant">Most Relevant</option>
               <option value="participants">Most Popular</option>
@@ -461,7 +463,7 @@ const styles = {
   },
   title: {
     fontFamily: "'Orbitron', sans-serif",
-    fontSize: '32px',
+    fontSize: 'clamp(22px, 5vw, 32px)',
     fontWeight: 700,
     margin: 0,
     letterSpacing: '1px',
@@ -488,23 +490,23 @@ const styles = {
   },
   statsRow: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '16px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
+    gap: '12px',
     marginBottom: '24px'
   },
   statCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '14px',
+    gap: '12px',
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
-    padding: '16px',
+    padding: '14px',
     transition: 'all 0.2s ease'
   },
   statIconWrapper: {
-    width: '42px',
-    height: '42px',
+    width: '38px',
+    height: '38px',
     borderRadius: '10px',
     background: 'rgba(16, 185, 129, 0.15)',
     display: 'flex',
@@ -514,12 +516,12 @@ const styles = {
   },
   statValue: {
     fontFamily: "'Orbitron', sans-serif",
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 700,
     color: '#FFF'
   },
   statLabel: {
-    fontSize: '12px',
+    fontSize: '11px',
     color: 'var(--text-dim)',
     marginTop: '2px'
   },
@@ -538,15 +540,17 @@ const styles = {
     borderRadius: 'var(--radius)',
     padding: '4px',
     gap: '4px',
-    flexWrap: 'wrap'
+    whiteSpace: 'nowrap'
   },
   tab: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
     background: 'transparent',
     border: 'none',
     color: 'var(--text-dim)',
-    padding: '7px 16px',
+    padding: '8px 14px',
     borderRadius: '6px',
     fontSize: '13px',
     fontWeight: 500,
@@ -584,7 +588,7 @@ const styles = {
   },
   searchWrapper: {
     position: 'relative',
-    minWidth: '240px',
+    minWidth: '200px',
     flex: 1,
     maxWidth: '360px'
   },
@@ -617,8 +621,8 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '20px'
+    gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+    gap: '16px'
   },
   card: {
     background: 'var(--surface)',

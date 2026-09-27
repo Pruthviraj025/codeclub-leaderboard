@@ -170,7 +170,9 @@ const styles = {
   formFooter: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    gap: '12px',
+    flexWrap: 'wrap'
   },
   charCount: {
     fontSize: '12px',
@@ -179,15 +181,18 @@ const styles = {
   submitBtn: {
     display: 'inline-flex',
     alignItems: 'center',
+    justifyContent: 'center',
     background: 'rgba(16, 185, 129, 0.15)',
     border: '1px solid var(--accent-green)',
     color: 'var(--accent-green)',
     borderRadius: 'var(--radius-sm)',
-    padding: '10px 20px',
+    padding: '12px 24px',
     fontSize: '13px',
     fontWeight: 600,
     fontFamily: "'Orbitron', sans-serif",
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s ease',
+    minHeight: '44px',
+    cursor: 'pointer'
   },
   notice: {
     marginTop: '16px',

@@ -75,8 +75,8 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div style={styles.controls}>
-        <div style={styles.tabRow}>
+      <div style={styles.controls} className="mobile-stack">
+        <div style={styles.tabRow} className="mobile-full-width">
           {MODES.map(m => (
             <button
               key={m.key}
@@ -91,6 +91,7 @@ export default function AnalyticsPage() {
         {mode === 'day' && (
           <select
             style={styles.select}
+            className="mobile-full-width"
             value={selectedDay}
             onChange={(e) => setSelectedDay(e.target.value)}
           >
@@ -101,7 +102,7 @@ export default function AnalyticsPage() {
         )}
 
         {mode === 'range' && expiringToday !== null && (
-          <div style={styles.expireBadge}>
+          <div style={styles.expireBadge} className="mobile-full-width">
             Points to expire today: <span style={styles.expireValue}>{expiringToday}</span>
           </div>
         )}
@@ -115,23 +116,23 @@ export default function AnalyticsPage() {
         ) : chartData.length === 0 || chartData.every(d => d.value === 0) ? (
           <div style={styles.empty}>Nothing solved in this window yet.</div>
         ) : (
-          <ResponsiveContainer width="100%" height={360}>
-            <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="label"
-                tick={{ fill: 'var(--text-dim)', fontSize: 12 }}
-                label={{ value: xLabel, position: 'insideBottom', offset: -10, fill: 'var(--text-dim)', fontSize: 12 }}
+                tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                label={{ value: xLabel, position: 'insideBottom', offset: -10, fill: 'var(--text-dim)', fontSize: 11 }}
               />
               <YAxis
-                tick={{ fill: 'var(--text-dim)', fontSize: 12 }}
-                label={{ value: yLabel, angle: -90, position: 'insideLeft', fill: 'var(--text-dim)', fontSize: 12 }}
+                tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                label={{ value: yLabel, angle: -90, position: 'insideLeft', fill: 'var(--text-dim)', fontSize: 11 }}
                 allowDecimals={false}
               />
 
               <Tooltip
                 cursor={{ fill: 'var(--surface-raised)', opacity: 0.5 }}
-                contentStyle={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)' }}
+                contentStyle={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)', fontSize: 12 }}
                 formatter={(value) => [value, yLabel]}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>

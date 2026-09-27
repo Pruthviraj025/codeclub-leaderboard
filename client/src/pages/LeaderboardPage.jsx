@@ -83,7 +83,7 @@ export default function LeaderboardPage() {
             </button>
           </div>
         </div>
-        <div style={styles.refreshBtnGroup}>
+        <div style={styles.refreshBtnGroup} className="refresh-btn-group">
           <button style={styles.refreshBtnCf} className="refresh-btn" onClick={handleRefreshCf} disabled={refreshingCf}>
             {refreshingCf ? 'Checking…' : '↻ Refresh CF'}
           </button>
@@ -440,12 +440,12 @@ const styles = {
   },
   ratingGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
     gap: '6px'
   },
   lcGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))',
     gap: '10px'
   },
   ratingCell: {
@@ -481,26 +481,35 @@ const styles = {
   refreshBtnGroup: {
     display: 'flex',
     gap: '10px',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    flex: 1
   },
   refreshBtnCf: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
     background: 'var(--surface-raised)',
     border: '1px solid var(--accent-green)',
     color: 'var(--accent-green)',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 16px',
     fontSize: '13px',
-    letterSpacing: '3.5px',
+    letterSpacing: '2px',
     fontFamily: "'Orbitron', sans-serif"
   },
   refreshBtnLc: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
     background: 'var(--surface-raised)',
     border: '1px solid #FFA116',
     color: '#FFA116',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 16px',
     fontSize: '13px',
-    letterSpacing: '3.5px',
+    letterSpacing: '2px',
     fontFamily: "'Orbitron', sans-serif"
   },
   refreshMsg: {

@@ -92,7 +92,7 @@ export default function ContestsPage() {
         </div>
 
         {/* Stats Row */}
-        <div style={styles.statsRow}>
+        <div style={styles.statsRow} className="mobile-grid-2">
           <div style={{ ...styles.statCard, cursor: 'pointer' }} onClick={() => setPlatform('all')}>
             <div style={styles.statIconWrapper}>
               <CalendarDays size={18} color="#10B981" />
@@ -143,7 +143,7 @@ export default function ContestsPage() {
             </div>
             <div>
               <div style={styles.statValue}>
-                {loading ? '-' : `${stats.upcomingCount} Upcoming / ${stats.liveCount} Live`}
+                {loading ? '-' : `${stats.upcomingCount} Up / ${stats.liveCount} Live`}
               </div>
               <div style={styles.statLabel}>Active Contests</div>
             </div>
@@ -151,8 +151,8 @@ export default function ContestsPage() {
         </div>
 
         {/* Controls Bar: Tabs, Search, Filters */}
-        <div style={styles.controlsBar}>
-          <div style={styles.tabsContainer}>
+        <div style={styles.controlsBar} className="mobile-stack">
+          <div style={styles.tabsContainer} className="scroll-x-touch mobile-full-width">
             <button
               style={{ ...styles.tab, ...(platform === 'all' ? styles.tabActive : {}) }}
               onClick={() => setPlatform('all')}
@@ -175,8 +175,8 @@ export default function ContestsPage() {
             </button>
           </div>
 
-          <div style={styles.searchAndFilters}>
-            <div style={styles.searchWrapper}>
+          <div style={styles.searchAndFilters} className="mobile-stack">
+            <div style={styles.searchWrapper} className="mobile-full-width">
               <Search size={16} style={styles.searchIcon} />
               <input
                 type="text"
@@ -191,6 +191,7 @@ export default function ContestsPage() {
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
               style={styles.selectFilter}
+              className="mobile-full-width"
             >
               <option value="all">All Phases</option>
               <option value="upcoming">Upcoming Only</option>
@@ -376,7 +377,7 @@ const styles = {
   },
   title: {
     fontFamily: "'Orbitron', sans-serif",
-    fontSize: '32px',
+    fontSize: 'clamp(22px, 5vw, 32px)',
     fontWeight: 700,
     margin: 0,
     letterSpacing: '1px',
@@ -403,23 +404,23 @@ const styles = {
   },
   statsRow: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '16px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
+    gap: '12px',
     marginBottom: '24px'
   },
   statCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '14px',
+    gap: '12px',
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
-    padding: '16px',
+    padding: '14px',
     transition: 'all 0.2s ease'
   },
   statIconWrapper: {
-    width: '42px',
-    height: '42px',
+    width: '38px',
+    height: '38px',
     borderRadius: '10px',
     background: 'rgba(16, 185, 129, 0.15)',
     display: 'flex',
@@ -429,12 +430,12 @@ const styles = {
   },
   statValue: {
     fontFamily: "'Orbitron', sans-serif",
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 700,
     color: '#FFF'
   },
   statLabel: {
-    fontSize: '12px',
+    fontSize: '11px',
     color: 'var(--text-dim)',
     marginTop: '2px'
   },
@@ -457,10 +458,13 @@ const styles = {
   tab: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    whiteSpace: 'nowrap',
     background: 'transparent',
     border: 'none',
     color: 'var(--text-dim)',
-    padding: '7px 16px',
+    padding: '8px 14px',
     borderRadius: '6px',
     fontSize: '13px',
     fontWeight: 500,
@@ -492,7 +496,7 @@ const styles = {
   },
   searchWrapper: {
     position: 'relative',
-    minWidth: '220px',
+    minWidth: '200px',
     flex: 1,
     maxWidth: '320px'
   },
@@ -547,7 +551,7 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
     gap: '14px'
   },
   card: {

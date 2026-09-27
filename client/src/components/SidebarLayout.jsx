@@ -86,18 +86,18 @@ export default function SidebarLayout({ active, children }) {
     <div style={styles.shell} className="sidebar-shell">
       <aside style={styles.sidebar} className="app-sidebar">
         <div style={styles.sidebarTop} className="app-sidebar-top">
+          <div style={styles.logoMark} onClick={() => go('/leaderboard')}>
+            {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+          </div>
+
           <button
             style={styles.hamburgerBtn}
             className="mobile-menu-btn"
             aria-label="Open menu"
             onClick={() => setMobileOpen(true)}
           >
-            <Menu size={20} />
+            <Menu size={22} />
           </button>
-
-          <div style={styles.logoMark}>
-            {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
-          </div>
         </div>
 
         <nav style={styles.nav} className="app-nav-desktop">
@@ -116,16 +116,18 @@ export default function SidebarLayout({ active, children }) {
               {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
             </div>
             <button
-              style={styles.hamburgerBtn}
+              style={{ ...styles.hamburgerBtn, display: 'flex' }}
               aria-label="Close menu"
               onClick={() => setMobileOpen(false)}
             >
               <X size={22} />
             </button>
           </div>
+
           <nav style={styles.mobileMenuNav}>
             {renderNavItems()}
           </nav>
+
           <div style={styles.mobileMenuBottom}>
             {renderSuggestionBtn()}
           </div>
@@ -156,8 +158,7 @@ const styles = {
     padding: 'var(--space-4) var(--space-3)',
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--space-5)',
-    minHeight: '100vh'
+    gap: 'var(--space-5)'
   },
   sidebarTop: {
     display: 'flex',
@@ -166,22 +167,24 @@ const styles = {
   },
   hamburgerBtn: {
     display: 'none',
-    background: 'transparent',
+    background: 'var(--surface-raised)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius-sm)',
     color: 'var(--text)',
-    padding: '6px',
+    padding: '8px',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    cursor: 'pointer'
   },
   logoMark: {
     fontFamily: "'Orbitron', sans-serif",
     fontWeight: 700,
-    fontSize: '15px',
+    fontSize: '16px',
     color: '#fff',
     padding: '0 var(--space-2)',
     letterSpacing: '1px',
-    userSelect: 'none'
+    userSelect: 'none',
+    cursor: 'pointer'
   },
   nav: {
     display: 'flex',
@@ -204,43 +207,48 @@ const styles = {
     color: 'var(--text-dim)',
     border: '1px dashed var(--border)',
     borderRadius: 'var(--radius-sm)',
-    padding: '10px 12px',
+    padding: '12px 14px',
     fontSize: '13px',
     width: '100%',
     justifyContent: 'flex-start',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    minHeight: '44px'
   },
   mobileMenuPage: {
     display: 'none',
     position: 'fixed',
     inset: 0,
-    zIndex: 200,
-    background: 'var(--bg)',
+    zIndex: 999,
+    background: 'rgba(16, 20, 28, 0.98)',
+    backdropFilter: 'blur(16px)',
     flexDirection: 'column'
   },
   mobileMenuHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 'var(--space-3) var(--space-4)',
-    borderBottom: '1px solid var(--border)'
+    padding: '14px 16px',
+    borderBottom: '1px solid var(--border)',
+    background: 'var(--surface)'
   },
   mobileMenuNav: {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-2)',
-    padding: 'var(--space-4)'
+    padding: 'var(--space-4)',
+    overflowY: 'auto'
   },
   adminBtn: {
     display: 'flex', alignItems: 'center', gap: '8px',
     background: 'var(--accent-gold-dim)', color: 'var(--accent-gold)',
     border: '1px solid var(--accent-gold)', borderRadius: 'var(--radius-sm)',
-    padding: '10px 12px',
+    padding: '12px 14px',
     fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px', fontWeight: 600, letterSpacing: '0.5px',
+    fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px',
     userSelect: 'none',
     width: '100%',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    minHeight: '44px'
   },
   contentCol: {
     flex: 1,

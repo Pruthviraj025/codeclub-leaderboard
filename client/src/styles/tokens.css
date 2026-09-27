@@ -190,87 +190,163 @@ input:focus { border-color: var(--accent-green) !important; }
 }
 
 /* ============================================================
-   Mobile breakpoints
-   Inline styles win over plain CSS, so these use !important
-   to override layout-critical properties only (never colors/
-   type — those stay inline and are already responsive-safe).
+   Mobile Breakpoints & Layout Utilities
    ============================================================ */
-@media (max-width: 640px) {
-  .site-header {
-    flex-wrap: wrap !important;
-    gap: var(--space-2) !important;
+
+/* Scrollbar utility for horizontally scrolling tabs/tables */
+.scroll-x-touch {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none; /* Firefox */
+}
+.scroll-x-touch::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+@keyframes drawerFade {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .page-main {
     padding: var(--space-3) var(--space-3) !important;
   }
-  .site-header .header-right {
-    width: 100% !important;
-    justify-content: flex-start !important;
-    flex-wrap: wrap !important;
-  }
-  .page-main {
-    padding: var(--space-4) var(--space-3) !important;
-  }
+
+  /* Responsive Title Header */
   .title-row {
     flex-direction: column !important;
-    align-items: flex-start !important;
+    align-items: stretch !important;
     gap: var(--space-3) !important;
   }
+  .title-row .refresh-btn-group,
   .title-row .refresh-btn {
     width: 100% !important;
+    justify-content: center !important;
   }
+
+  /* Standing Queue Columns */
   .queue-col-points {
-    width: 90px !important;
+    width: 80px !important;
   }
   .queue-col-rank {
-    width: 50px !important;
+    width: 44px !important;
   }
   .queue-col-cf,
   .queue-col-lc {
     display: none !important;
   }
 
-  .cf-form {
-    flex-wrap: wrap !important;
+  /* Sidebar shell & mobile navbar */
+  .sidebar-shell {
+    flex-direction: column !important;
   }
-  .cf-form input {
+  .app-sidebar {
     width: 100% !important;
+    min-height: auto !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    padding: 12px 16px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: rgba(23, 27, 36, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
   }
+  .app-sidebar-top {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .mobile-menu-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 10px !important;
+    min-height: 40px !important;
+    min-width: 40px !important;
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--border) !important;
+    background: var(--surface-raised) !important;
+    color: var(--text) !important;
+  }
+  .app-nav-desktop,
+  .app-sidebar-bottom {
+    display: none !important;
+  }
+
+  /* Full screen Mobile Drawer Page */
+  .mobile-nav-page {
+    display: flex !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999 !important;
+    background: rgba(16, 20, 28, 0.98) !important;
+    backdrop-filter: blur(16px) !important;
+    flex-direction: column !important;
+    opacity: 1 !important;
+    animation: drawerFade 0.2s var(--ease) forwards !important;
+    padding: 0 !important;
+  }
+
+  /* Profile & Form Adjustments */
+  .cf-form {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .cf-form input,
   .cf-form button {
     width: 100% !important;
   }
+
+  /* Admin Console Mobile Styles */
   .admin-tab-row {
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
   }
   .admin-tab-row button {
-    flex: 1 1 auto !important;
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 10px 8px !important;
   }
   .admin-table-scroll {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
   .admin-table-inner {
-    min-width: 640px !important;
+    min-width: 600px !important;
   }
-  .sidebar-shell {
+
+  /* Controls & Search Rows */
+  .mobile-stack {
     flex-direction: column !important;
-  }
-  .app-sidebar {
+    align-items: stretch !important;
     width: 100% !important;
-    padding: var(--space-3) !important;
   }
-  .mobile-menu-btn {
-    display: inline-flex !important;
-  }
-  .app-nav-desktop {
-    display: none !important;
-  }
-  .mobile-nav-page {
-    display: flex !important;
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
-@media (max-width: 640px) {
-  .sidebar-bottom {
-    margin-top: 0 !important;
-    flex-direction: row !important;
-    gap: var(--space-2) !important;
+
+/* Extra small mobile adjustments (< 480px) */
+@media (max-width: 480px) {
+  .page-main {
+    padding: 12px 10px !important;
+  }
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
   }
 }
+
