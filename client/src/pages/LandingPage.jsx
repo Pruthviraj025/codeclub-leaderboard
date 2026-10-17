@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { api, warmUpServer } from "../api";
 import { useAuth } from "../context/AuthContext";
 import ccLogo from '../assets/cc-logo-white.png';
@@ -298,6 +298,7 @@ export default function LandingPage() {
               <button style={styles.submitBtn} type="submit" disabled={loading}>
                 {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
               </button>
+              <Link to="/forgot-password" style={styles.backLink}>Forgot password?</Link>
             </form>
             </div>
           )}
