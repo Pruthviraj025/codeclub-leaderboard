@@ -71,7 +71,8 @@ router.post('/forgot-password', async (req, res) => {
     user.resetOtpAttempts = 0;
     await user.save();
 
-    await sendOtpEmail(user.email, otp);
+    // Send OTP email without blocking the response; log any errors
+    sendOtpEmail(user.email, otp).catch(err => console.error('Failed to send OTP email:', err));
 
     res.json({ message: 'If that email is registered, an OTP has been sent.' });
   } catch (err) {
