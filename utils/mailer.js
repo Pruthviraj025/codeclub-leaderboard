@@ -3,11 +3,13 @@ const nodemailer = require('nodemailer');
 /**
  * Verify required SMTP environment variables.
  */
+// Ensure SMTP credentials exist; if not, use fallback values.
 if (!process.env.SMTP_USER) {
-  throw new Error('SMTP_USER is not defined in .env');
+  console.warn('SMTP_USER not set; using placeholder sender');
+  process.env.SMTP_USER = 'no-reply@example.com';
 }
 if (!process.env.SMTP_PASS) {
-  throw new Error('SMTP_PASS is not defined in .env');
+  console.warn('SMTP_PASS not set; email sending will likely fail');
 }
 
 /**
