@@ -16,6 +16,7 @@ const SuggestionSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
   adminReply: { type: String, trim: true, maxlength: 2000, default: '' },
   repliedAt: { type: Date, default: null },
+  replyUpdatedAt: { type: Date, default: null },
   reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
 
   createdAt: { type: Date, default: Date.now }

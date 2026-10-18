@@ -162,8 +162,17 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
 
     if (status !== undefined) suggestion.status = status;
     if (replyText !== undefined && replyText !== suggestion.adminReply) {
+      const hadReply = !!suggestion.adminReply;
       suggestion.adminReply = replyText;
-      suggestion.repliedAt = replyText ? new Date() : null;
+      if (!replyText) {
+        suggestion.repliedAt = null;
+        suggestion.replyUpdatedAt = null;
+      } else if (hadReply) {
+        suggestion.replyUpdatedAt = new Date(); // edited existing reply
+      } else {
+        suggestion.repliedAt = new Date();      // first reply
+        suggestion.replyUpdatedAt = null;
+      }
     }
     suggestion.reviewedBy = req.user._id;
     await suggestion.save();

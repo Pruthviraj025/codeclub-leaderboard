@@ -271,6 +271,11 @@ export default function SuggestionsPage() {
                     <div style={styles.replyHead}>
                       <Shield size={12} style={{ marginRight: '6px', color: 'var(--accent-gold)' }} />
                       Admin reply{s.repliedAt && <span style={{ marginLeft: '6px' }}>· {fmt(s.repliedAt)}</span>}
+                      {s.replyUpdatedAt && (
+                        <span style={{ marginLeft: '6px', fontStyle: 'italic' }} title={fmt(s.replyUpdatedAt)}>
+                          · updated {fmt(s.replyUpdatedAt)}
+                        </span>
+                      )}
                     </div>
                     <p style={{ ...styles.body, fontSize: '13px' }}>{s.adminReply}</p>
                   </div>
