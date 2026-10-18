@@ -75,6 +75,8 @@ export const api = {
     mySuggestions: () => request("/suggestions/mine"),
     editSuggestion: (id, text) => request(`/suggestions/${id}`, { method: "PATCH", body: JSON.stringify({ text }) }),
     addToSuggestion: (id, text) => request(`/suggestions/${id}/additions`, { method: "POST", body: JSON.stringify({ text }) }),
+    editAddition: (id, additionId, text) => request(`/suggestions/${id}/additions/${additionId}`, { method: "PATCH", body: JSON.stringify({ text }) }),
+    adminReviewSuggestion: (id, body) => request(`/admin/suggestions/${id}/review`, { method: "PATCH", body: JSON.stringify(body) }),
     discussList: (params = {}) => {
         const query = new URLSearchParams(params).toString();
         return request(`/discuss${query ? `?${query}` : ''}`);

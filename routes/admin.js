@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const User = require('../models/User');
 const AdminAction = require('../models/AdminAction');
@@ -136,6 +137,39 @@ router.get('/suggestions', async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(200);
     res.json(suggestions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/admin/suggestions/:suggestionId/review — set status + reply
+router.patch('/suggestions/:suggestionId/review', async (req, res) => {
+  try {
+    const { status, reply } = req.body;
+    if (!mongoose.isValidObjectId(req.params.suggestionId)) {
+      return res.status(400).json({ error: 'Invalid suggestion id' });
+    }
+    if (status !== undefined && !['pending', 'accepted', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Status must be pending, accepted or rejected' });
+    }
+    const replyText = typeof reply === 'string' ? reply.trim() : undefined;
+    if (replyText !== undefined && replyText.length > 2000) {
+      return res.status(400).json({ error: 'Reply must be under 2000 characters' });
+    }
+
+    const suggestion = await Suggestion.findById(req.params.suggestionId);
+    if (!suggestion) return res.status(404).json({ error: 'Suggestion not found' });
+
+    if (status !== undefined) suggestion.status = status;
+    if (replyText !== undefined && replyText !== suggestion.adminReply) {
+      suggestion.adminReply = replyText;
+      suggestion.repliedAt = replyText ? new Date() : null;
+    }
+    suggestion.reviewedBy = req.user._id;
+    await suggestion.save();
+
+    await suggestion.populate('userId', 'name usn email');
+    res.json({ suggestion });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

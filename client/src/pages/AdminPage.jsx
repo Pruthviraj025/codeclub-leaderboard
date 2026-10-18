@@ -311,11 +311,22 @@ function ReviewTab() {
 
 /* ---------------- User Suggestions Tab (Admin Only) ---------------- */
 
+const SUGGESTION_STATUS = {
+  pending: { label: 'PENDING', color: 'var(--text-dim)', border: 'var(--border)' },
+  accepted: { label: 'ACCEPTED', color: 'var(--accent-green)', border: 'var(--accent-green)' },
+  rejected: { label: 'REJECTED', color: 'var(--accent-red)', border: 'var(--accent-red)' }
+};
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
 function SuggestionsTab() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
+  const [replyDrafts, setReplyDrafts] = useState({}); // { [id]: string }
 
   useEffect(() => { load(); }, []);
 
@@ -343,6 +354,29 @@ function SuggestionsTab() {
     }
   }
 
+  function draftFor(s) {
+    return replyDrafts[s._id] !== undefined ? replyDrafts[s._id] : (s.adminReply || '');
+  }
+
+  // body: { status?, reply? }
+  async function handleReview(s, body) {
+    setBusyId(s._id);
+    setError('');
+    try {
+      const { suggestion } = await api.adminReviewSuggestion(s._id, body);
+      setSuggestions(prev => prev.map(x => (x._id === suggestion._id ? suggestion : x)));
+      setReplyDrafts(prev => {
+        const next = { ...prev };
+        delete next[s._id];
+        return next;
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div>
       {error && <div style={styles.error}>{error}</div>}
@@ -363,6 +397,12 @@ function SuggestionsTab() {
 
             {suggestions.map(s => {
               const u = s.userId || {};
+              const status = s.status || 'pending';
+              const meta = SUGGESTION_STATUS[status] || SUGGESTION_STATUS.pending;
+              const busy = busyId === s._id;
+              const draft = draftFor(s);
+              const replyChanged = draft.trim() !== (s.adminReply || '');
+
               return (
                 <div key={s._id} style={{ ...styles.tableRow, alignItems: 'flex-start', padding: '14px 16px' }}>
                   <div style={{ flex: 2 }}>
@@ -372,36 +412,95 @@ function SuggestionsTab() {
                   </div>
 
                   <div style={{ flex: 4, color: 'var(--text)', lineHeight: '1.5', fontFamily: 'inherit' }}>
+                    <div style={{ marginBottom: '6px' }}>
+                      <span style={{
+                        color: meta.color, border: `1px solid ${meta.border}`, borderRadius: '4px',
+                        padding: '2px 8px', fontSize: '10px', letterSpacing: '1px',
+                        fontFamily: "'Orbitron', sans-serif"
+                      }}>
+                        {meta.label}
+                      </span>
+                    </div>
+
                     <div style={{ whiteSpace: 'pre-wrap' }}>{s.text}</div>
                     {s.editedAt && (
                       <div style={{ ...styles.subtext, fontStyle: 'italic', marginTop: '4px' }}>
-                        Edited {new Date(s.editedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                        Edited {fmtDate(s.editedAt)}
                       </div>
                     )}
                     {(s.additions || []).map(a => (
                       <div key={a._id} style={{ marginTop: '8px', paddingLeft: '10px', borderLeft: '2px solid var(--border-hover)' }}>
                         <div style={styles.subtext}>
-                          Added {new Date(a.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                          Added {fmtDate(a.createdAt)}
+                          {a.editedAt && <span style={{ fontStyle: 'italic' }}> · edited {fmtDate(a.editedAt)}</span>}
                         </div>
                         <div style={{ whiteSpace: 'pre-wrap', fontSize: '13px' }}>{a.text}</div>
                       </div>
                     ))}
+
+                    <div style={{ marginTop: '12px' }}>
+                      <textarea
+                        style={{
+                          width: '100%', boxSizing: 'border-box', background: 'var(--bg)',
+                          border: '1px solid var(--border-hover)', borderRadius: '4px',
+                          color: 'var(--text)', padding: '8px 10px', fontSize: '13px',
+                          fontFamily: 'inherit', resize: 'vertical', outline: 'none', lineHeight: '1.5'
+                        }}
+                        rows={2}
+                        maxLength={2000}
+                        placeholder="Write a reply for the user…"
+                        value={draft}
+                        onChange={e => setReplyDrafts(prev => ({ ...prev, [s._id]: e.target.value }))}
+                      />
+                      {s.repliedAt && s.adminReply && (
+                        <div style={{ ...styles.subtext, marginTop: '2px' }}>Replied {fmtDate(s.repliedAt)}</div>
+                      )}
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
+                        <button
+                          style={{ ...styles.actionBtn, opacity: busy || !replyChanged ? 0.5 : 1 }}
+                          disabled={busy || !replyChanged}
+                          onClick={() => handleReview(s, { reply: draft })}
+                        >
+                          {busy ? 'Saving...' : 'Save reply'}
+                        </button>
+                        <button
+                          style={{ ...styles.actionBtnGreen, opacity: busy || status === 'accepted' ? 0.5 : 1 }}
+                          disabled={busy || status === 'accepted'}
+                          onClick={() => handleReview(s, { status: 'accepted', reply: draft })}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          style={{ ...styles.actionBtnRedOutline, opacity: busy || status === 'rejected' ? 0.5 : 1 }}
+                          disabled={busy || status === 'rejected'}
+                          onClick={() => handleReview(s, { status: 'rejected', reply: draft })}
+                        >
+                          Reject
+                        </button>
+                        {status !== 'pending' && (
+                          <button
+                            style={styles.actionBtn}
+                            disabled={busy}
+                            onClick={() => handleReview(s, { status: 'pending' })}
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <div style={{ flex: 2, fontSize: '11px', color: 'var(--text-dim)' }}>
-                    {new Date(s.createdAt).toLocaleString('en-US', {
-                      dateStyle: 'medium',
-                      timeStyle: 'short'
-                    })}
+                    {fmtDate(s.createdAt)}
                   </div>
 
                   <div style={{ width: '100px', textAlign: 'right' }}>
                     <button
                       style={styles.actionBtnRedOutline}
-                      disabled={busyId === s._id}
+                      disabled={busy}
                       onClick={() => handleDelete(s)}
                     >
-                      {busyId === s._id ? 'Dismissing...' : 'Dismiss'}
+                      {busy ? 'Working...' : 'Dismiss'}
                     </button>
                   </div>
                 </div>

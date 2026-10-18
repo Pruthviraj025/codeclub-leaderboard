@@ -103,4 +103,32 @@ router.post('/:id/additions', requireAuth, async (req, res) => {
   }
 });
 
+// PATCH /api/suggestions/:id/additions/:additionId — edit one of your follow-ups
+router.patch('/:id/additions/:additionId', requireAuth, async (req, res) => {
+  try {
+    const { text, error } = validateText(req.body.text);
+    if (error) return res.status(400).json({ error });
+
+    if (!mongoose.isValidObjectId(req.params.additionId)) {
+      return res.status(400).json({ error: 'Invalid follow-up id' });
+    }
+
+    const suggestion = await findOwned(req, res);
+    if (!suggestion) return;
+
+    const addition = suggestion.additions.id(req.params.additionId);
+    if (!addition) return res.status(404).json({ error: 'Follow-up not found' });
+
+    if (addition.text !== text) {
+      addition.text = text;
+      addition.editedAt = new Date();
+      await suggestion.save();
+    }
+
+    res.json({ suggestion });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

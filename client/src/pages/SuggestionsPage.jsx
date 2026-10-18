@@ -6,6 +6,12 @@ import SidebarLayout from '../components/SidebarLayout';
 
 const MAX_LEN = 2000;
 
+const STATUS_META = {
+  pending: { label: 'Pending', color: 'var(--text-dim)', bg: 'transparent', border: 'var(--border)' },
+  accepted: { label: 'Accepted', color: 'var(--accent-green)', bg: 'rgba(16, 185, 129, 0.12)', border: 'var(--accent-green)' },
+  rejected: { label: 'Rejected', color: '#ff6b6b', bg: 'rgba(255, 107, 107, 0.1)', border: '#ff6b6b' }
+};
+
 function fmt(iso) {
   return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 }
@@ -19,7 +25,7 @@ export default function SuggestionsPage() {
   const [mine, setMine] = useState([]);
   const [loadingMine, setLoadingMine] = useState(true);
 
-  // panel = which card has an open editor: { id, mode: 'edit' | 'add' }
+  // panel = which card has an open editor: { id, mode: 'edit' | 'add' | 'editAddition', additionId? }
   const [panel, setPanel] = useState(null);
   const [draft, setDraft] = useState('');
   const [savingPanel, setSavingPanel] = useState(false);
@@ -59,9 +65,9 @@ export default function SuggestionsPage() {
     }
   }
 
-  function openPanel(s, mode) {
-    setPanel({ id: s._id, mode });
-    setDraft(mode === 'edit' ? s.text : '');
+  function openPanel(s, mode, addition) {
+    setPanel({ id: s._id, mode, additionId: addition ? addition._id : null });
+    setDraft(mode === 'edit' ? s.text : mode === 'editAddition' ? addition.text : '');
     setPanelError('');
   }
 
@@ -75,13 +81,19 @@ export default function SuggestionsPage() {
     const trimmed = draft.trim();
     if (!trimmed || savingPanel) return;
     if (panel.mode === 'edit' && trimmed === s.text) return closePanel();
+    if (panel.mode === 'editAddition') {
+      const current = (s.additions || []).find(a => a._id === panel.additionId);
+      if (current && current.text === trimmed) return closePanel();
+    }
 
     setSavingPanel(true);
     setPanelError('');
     try {
-      const { suggestion } = panel.mode === 'edit'
-        ? await api.editSuggestion(s._id, trimmed)
-        : await api.addToSuggestion(s._id, trimmed);
+      let res;
+      if (panel.mode === 'edit') res = await api.editSuggestion(s._id, trimmed);
+      else if (panel.mode === 'editAddition') res = await api.editAddition(s._id, panel.additionId, trimmed);
+      else res = await api.addToSuggestion(s._id, trimmed);
+      const { suggestion } = res;
       setMine(prev => prev.map(x => (x._id === suggestion._id ? suggestion : x)));
       closePanel();
     } catch (err) {
@@ -175,6 +187,7 @@ export default function SuggestionsPage() {
           {mine.map(s => {
             const open = panel && panel.id === s._id;
             const additions = s.additions || [];
+            const meta = STATUS_META[s.status] || STATUS_META.pending;
 
             return (
               <div key={s._id} style={styles.card}>
@@ -184,6 +197,9 @@ export default function SuggestionsPage() {
                     {s.editedAt && (
                       <span style={styles.edited} title={fmt(s.editedAt)}> · edited</span>
                     )}
+                    <span style={{ ...styles.badge, color: meta.color, background: meta.bg, borderColor: meta.border }}>
+                      {meta.label}
+                    </span>
                   </span>
 
                   {!open && (
@@ -215,12 +231,48 @@ export default function SuggestionsPage() {
 
                 {additions.length > 0 && (
                   <div style={styles.additions}>
-                    {additions.map(a => (
-                      <div key={a._id} style={styles.addition}>
-                        <div style={styles.additionTime}>Added {fmt(a.createdAt)}</div>
-                        <p style={{ ...styles.body, fontSize: '13px' }}>{a.text}</p>
-                      </div>
-                    ))}
+                    {additions.map(a => {
+                      const editingThis = open && panel.mode === 'editAddition' && panel.additionId === a._id;
+                      return (
+                        <div key={a._id} style={styles.addition}>
+                          <div style={{ ...styles.additionTime, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span>
+                              Added {fmt(a.createdAt)}
+                              {a.editedAt && <span style={styles.edited} title={fmt(a.editedAt)}> · edited</span>}
+                            </span>
+                            {!open && (
+                              <button style={styles.linkBtn} onClick={() => openPanel(s, 'editAddition', a)}>
+                                <Pencil size={11} style={{ marginRight: '4px' }} /> Edit
+                              </button>
+                            )}
+                          </div>
+                          {editingThis ? (
+                            <PanelEditor
+                              label="Edit your follow-up"
+                              draft={draft}
+                              setDraft={setDraft}
+                              onKeyDown={e => handlePanelKeyDown(e, s)}
+                              onCancel={closePanel}
+                              onSave={() => savePanel(s)}
+                              saving={savingPanel}
+                              error={panelError}
+                            />
+                          ) : (
+                            <p style={{ ...styles.body, fontSize: '13px' }}>{a.text}</p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {s.adminReply && (
+                  <div style={{ ...styles.reply, borderColor: meta.border }}>
+                    <div style={styles.replyHead}>
+                      <Shield size={12} style={{ marginRight: '6px', color: 'var(--accent-gold)' }} />
+                      Admin reply{s.repliedAt && <span style={{ marginLeft: '6px' }}>· {fmt(s.repliedAt)}</span>}
+                    </div>
+                    <p style={{ ...styles.body, fontSize: '13px' }}>{s.adminReply}</p>
                   </div>
                 )}
 
@@ -419,6 +471,29 @@ const styles = {
   },
   time: { fontSize: '12px', color: 'var(--text-dim)' },
   edited: { fontStyle: 'italic' },
+  badge: {
+    marginLeft: '10px',
+    border: '1px solid',
+    borderRadius: '4px',
+    padding: '1px 8px',
+    fontSize: '11px',
+    fontWeight: 600
+  },
+  reply: {
+    marginTop: '12px',
+    background: 'var(--bg)',
+    border: '1px solid',
+    borderRadius: 'var(--radius-sm)',
+    padding: '10px 12px'
+  },
+  replyHead: {
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '11px',
+    color: 'var(--accent-gold)',
+    fontWeight: 600,
+    marginBottom: '4px'
+  },
   actions: { display: 'flex', gap: '4px' },
   linkBtn: {
     display: 'inline-flex',
