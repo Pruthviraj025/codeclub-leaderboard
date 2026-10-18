@@ -318,6 +318,13 @@ const SUGGESTION_STATUS = {
   rejected: { label: 'REJECTED', color: 'var(--accent-red)', border: 'var(--accent-red)' }
 };
 
+const REPLY_EDIT_WINDOW_MS = 5 * 60 * 1000;
+
+function canEditReply(s) {
+  if (!s.adminReply || !s.repliedAt) return true; // no reply yet
+  return Date.now() - new Date(s.repliedAt).getTime() <= REPLY_EDIT_WINDOW_MS;
+}
+
 function fmtDate(iso) {
   return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 }
@@ -329,6 +336,12 @@ function SuggestionsTab() {
   const [busyId, setBusyId] = useState(null);
   const [replyDrafts, setReplyDrafts] = useState({}); // { [id]: string }
   const [rowError, setRowError] = useState({ id: null, msg: '' });
+  const [, setTick] = useState(0); // re-render so reply lock kicks in after 5 min
+
+  useEffect(() => {
+    const t = setInterval(() => setTick(n => n + 1), 15000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => { load(); }, []);
 
@@ -404,7 +417,8 @@ function SuggestionsTab() {
               const meta = SUGGESTION_STATUS[status] || SUGGESTION_STATUS.pending;
               const busy = busyId === s._id;
               const draft = draftFor(s);
-              const replyChanged = draft.trim() !== (s.adminReply || '');
+              const editable = canEditReply(s);
+              const replyChanged = editable && draft.trim() !== (s.adminReply || '');
 
               return (
                 <div key={s._id} style={{ ...styles.tableRow, alignItems: 'flex-start', padding: '14px 16px' }}>
@@ -451,12 +465,16 @@ function SuggestionsTab() {
                         }}
                         rows={2}
                         maxLength={2000}
+                        readOnly={!editable}
                         placeholder="Write a reply for the user…"
                         value={draft}
                         onChange={e => setReplyDrafts(prev => ({ ...prev, [s._id]: e.target.value }))}
                       />
                       {s.repliedAt && s.adminReply && (
-                        <div style={{ ...styles.subtext, marginTop: '2px' }}>Replied {fmtDate(s.repliedAt)}</div>
+                        <div style={{ ...styles.subtext, marginTop: '2px' }}>
+                          Replied {fmtDate(s.repliedAt)}
+                          {s.replyUpdatedAt && <span style={{ fontStyle: 'italic' }}> · updated {fmtDate(s.replyUpdatedAt)}</span>}
+                        </div>
                       )}
                       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
                         <button
@@ -475,14 +493,14 @@ function SuggestionsTab() {
                         <button
                           style={{ ...styles.actionBtnGreen, opacity: busy || status === 'accepted' ? 0.5 : 1 }}
                           disabled={busy || status === 'accepted'}
-                          onClick={() => handleReview(s, { status: 'accepted', reply: draft })}
+                          onClick={() => handleReview(s, editable ? { status: 'accepted', reply: draft } : { status: 'accepted' })}
                         >
                           Accept
                         </button>
                         <button
                           style={{ ...styles.actionBtnRedOutline, opacity: busy || status === 'rejected' ? 0.5 : 1 }}
                           disabled={busy || status === 'rejected'}
-                          onClick={() => handleReview(s, { status: 'rejected', reply: draft })}
+                          onClick={() => handleReview(s, editable ? { status: 'rejected', reply: draft } : { status: 'rejected' })}
                         >
                           Reject
                         </button>
@@ -496,6 +514,9 @@ function SuggestionsTab() {
                           </button>
                         )}
                       </div>
+                      {s.adminReply && !editable && (
+                        <div style={{ ...styles.subtext, marginTop: '6px' }}>Reply locked. Edits allowed only within 5 minutes of sending.</div>
+                      )}
                       {rowError.id === s._id && (
                         <div style={{ ...styles.error, marginTop: '8px', marginBottom: 0, fontSize: '12px' }}>{rowError.msg}</div>
                       )}

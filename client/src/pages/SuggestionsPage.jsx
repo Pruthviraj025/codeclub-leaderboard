@@ -5,6 +5,11 @@ import { api, getSessionUser } from '../api';
 import SidebarLayout from '../components/SidebarLayout';
 
 const MAX_LEN = 2000;
+const EDIT_WINDOW_MS = 5 * 60 * 1000; // edits allowed only within 5 min of sending
+
+function canEdit(iso) {
+  return Date.now() - new Date(iso).getTime() <= EDIT_WINDOW_MS;
+}
 
 const STATUS_META = {
   pending: { label: 'Pending', color: 'var(--text-dim)', bg: 'transparent', border: 'var(--border)' },
@@ -31,8 +36,15 @@ export default function SuggestionsPage() {
   const [savingPanel, setSavingPanel] = useState(false);
   const [panelError, setPanelError] = useState('');
 
+  const [, setTick] = useState(0); // re-render so Edit buttons vanish when window closes
+
   const user = getSessionUser();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const t = setInterval(() => setTick(n => n + 1), 15000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -118,7 +130,7 @@ export default function SuggestionsPage() {
           </p>
           <div style={styles.privacyNote}>
             <Lock size={13} style={{ marginRight: '6px', color: 'var(--accent-green)' }} />
-            <span>Suggestions are strictly private &amp; visible to admins only.</span>
+            <span>Suggestions are private. Edits allowed within 5 minutes of sending.</span>
           </div>
         </div>
 
@@ -204,9 +216,11 @@ export default function SuggestionsPage() {
 
                   {!open && (
                     <div style={styles.actions}>
-                      <button style={styles.linkBtn} onClick={() => openPanel(s, 'edit')}>
-                        <Pencil size={13} style={{ marginRight: '4px' }} /> Edit
-                      </button>
+                      {canEdit(s.createdAt) && (
+                        <button style={styles.linkBtn} onClick={() => openPanel(s, 'edit')}>
+                          <Pencil size={13} style={{ marginRight: '4px' }} /> Edit
+                        </button>
+                      )}
                       <button style={styles.linkBtn} onClick={() => openPanel(s, 'add')}>
                         <PlusCircle size={13} style={{ marginRight: '4px' }} /> Add more
                       </button>
@@ -240,7 +254,7 @@ export default function SuggestionsPage() {
                               Added {fmt(a.createdAt)}
                               {a.editedAt && <span style={styles.edited} title={fmt(a.editedAt)}> · edited</span>}
                             </span>
-                            {!open && (
+                            {!open && canEdit(a.createdAt) && (
                               <button style={styles.linkBtn} onClick={() => openPanel(s, 'editAddition', a)}>
                                 <Pencil size={11} style={{ marginRight: '4px' }} /> Edit
                               </button>

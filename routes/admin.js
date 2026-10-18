@@ -163,6 +163,10 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
     if (status !== undefined) suggestion.status = status;
     if (replyText !== undefined && replyText !== suggestion.adminReply) {
       const hadReply = !!suggestion.adminReply;
+      if (hadReply && suggestion.repliedAt &&
+          Date.now() - new Date(suggestion.repliedAt).getTime() > 5 * 60 * 1000) {
+        return res.status(403).json({ error: 'Edit window closed. Replies can only be changed within 5 minutes of sending.' });
+      }
       suggestion.adminReply = replyText;
       if (!replyText) {
         suggestion.repliedAt = null;

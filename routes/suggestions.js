@@ -7,6 +7,12 @@ const router = express.Router();
 
 const MAX_LEN = 2000;
 const MAX_ADDITIONS = 20;
+const EDIT_WINDOW_MS = 5 * 60 * 1000; // edits allowed only within 5 min of sending
+
+function editExpired(createdAt) {
+  return Date.now() - new Date(createdAt).getTime() > EDIT_WINDOW_MS;
+}
+const EXPIRED_MSG = 'Edit window closed. You can only edit within 5 minutes of sending.';
 
 function validateText(raw) {
   const text = (raw || '').trim();
@@ -70,6 +76,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
     if (!suggestion) return;
 
     if (suggestion.text !== text) {
+      if (editExpired(suggestion.createdAt)) return res.status(403).json({ error: EXPIRED_MSG });
       suggestion.text = text;
       suggestion.editedAt = new Date();
       await suggestion.save();
@@ -120,6 +127,7 @@ router.patch('/:id/additions/:additionId', requireAuth, async (req, res) => {
     if (!addition) return res.status(404).json({ error: 'Follow-up not found' });
 
     if (addition.text !== text) {
+      if (editExpired(addition.createdAt)) return res.status(403).json({ error: EXPIRED_MSG });
       addition.text = text;
       addition.editedAt = new Date();
       await suggestion.save();
