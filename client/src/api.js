@@ -73,6 +73,15 @@ export const api = {
     adminDeleteSuggestion: suggestionId => request(`/admin/suggestions/${suggestionId}`, { method: "DELETE" }),
     submitSuggestion: text => request("/suggestions", { method: "POST", body: JSON.stringify({ text }) }),
     mySuggestions: () => request("/suggestions/mine"),
+    editSuggestion: (id, text) => request(`/suggestions/${id}`, { method: "PATCH", body: JSON.stringify({ text }) }),
+    addToSuggestion: (id, text) => request(`/suggestions/${id}/additions`, { method: "POST", body: JSON.stringify({ text }) }),
+    discussList: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return request(`/discuss${query ? `?${query}` : ''}`);
+    },
+    discussPost: text => request("/discuss", { method: "POST", body: JSON.stringify({ text }) }),
+    discussEdit: (id, text) => request(`/discuss/${id}`, { method: "PATCH", body: JSON.stringify({ text }) }),
+    discussDelete: id => request(`/discuss/${id}`, { method: "DELETE" }),
     hackathons: (params = {}) => {
         const query = new URLSearchParams(params).toString();
         return request(`/hackathons${query ? `?${query}` : ''}`);
@@ -95,5 +104,5 @@ export function clearSession() {
 }
 
 export function warmUpServer() {
-    fetch(`${BASE_URL}/health`).catch(() => {});
+    fetch(`${BASE_URL}/health`).catch(() => { });
 }

@@ -15,6 +15,7 @@ const analyticsRoutes = require('./routes/analytics');
 const contestsRoutes = require('./routes/contests');
 const suggestionsRoutes = require('./routes/suggestions');
 const hackathonsRoutes = require('./routes/hackathons');
+const discussRoutes = require('./routes/discuss');
 const { startLeaderboardSync } = require('./jobs/leaderboardSync');
 
 const app = express();
@@ -31,7 +32,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/contests', contestsRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/hackathons', hackathonsRoutes);
-
+app.use('/api/discuss', discussRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 5000;

@@ -80,6 +80,33 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
+// POST /api/auth/resend-otp
+router.post('/resend-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'email is required' });
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user || !user.isActive) {
+      // Generic response to avoid email enumeration
+      return res.json({ message: 'If that email is registered, an OTP has been sent.' });
+    }
+
+    // Generate a fresh OTP (overwrites any previous one)
+    const otp = generateOtp();
+    user.resetOtpHash = await bcrypt.hash(otp, 10);
+    user.resetOtpExpiry = new Date(Date.now() + OTP_EXPIRY_MS);
+    user.resetOtpAttempts = 0;
+    await user.save();
+
+    // Fire‑and‑forget email send; log any errors
+    sendOtpEmail(user.email, otp).catch(err => console.error('Failed to resend OTP email:', err));
+    return res.json({ message: 'If that email is registered, an OTP has been sent.' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/auth/verify-otp
 router.post('/verify-otp', async (req, res) => {
   try {

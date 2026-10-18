@@ -9,7 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import SuggestionsPage from "./pages/SuggestionsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import DiscussPage from "./pages/DiscussPage";
 export default function App() {
     return (
         <BrowserRouter>
@@ -23,6 +23,7 @@ export default function App() {
                 <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
                 <Route path="/suggestions" element={<ProtectedRoute><SuggestionsPage /></ProtectedRoute>} />
+                <Route path="/discuss" element={<ProtectedRoute><DiscussPage /></ProtectedRoute>} />
             </Routes>
         </BrowserRouter>
     );

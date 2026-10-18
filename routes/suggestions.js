@@ -1,20 +1,40 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { requireAuth } = require('../middleware/auth');
 const Suggestion = require('../models/Suggestion');
 
 const router = express.Router();
 
+const MAX_LEN = 2000;
+const MAX_ADDITIONS = 20;
+
+function validateText(raw) {
+  const text = (raw || '').trim();
+  if (!text) return { error: 'Suggestion text is required' };
+  if (text.length > MAX_LEN) return { error: `Keep it under ${MAX_LEN} characters` };
+  return { text };
+}
+
+// Load suggestion only if current user owns it.
+// Others' suggestions look "not found" so ids can't be probed.
+async function findOwned(req, res) {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).json({ error: 'Invalid suggestion id' });
+    return null;
+  }
+  const suggestion = await Suggestion.findOne({ _id: req.params.id, userId: req.user._id });
+  if (!suggestion) {
+    res.status(404).json({ error: 'Suggestion not found' });
+    return null;
+  }
+  return suggestion;
+}
+
 // POST /api/suggestions — submit a new suggestion
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const text = (req.body.text || '').trim();
-
-    if (!text) {
-      return res.status(400).json({ error: 'Suggestion text is required' });
-    }
-    if (text.length > 2000) {
-      return res.status(400).json({ error: 'Keep it under 2000 characters' });
-    }
+    const { text, error } = validateText(req.body.text);
+    if (error) return res.status(400).json({ error });
 
     const suggestion = await Suggestion.create({
       userId: req.user._id,
@@ -27,7 +47,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/suggestions/mine — the current user's own suggestions, newest first
+// GET /api/suggestions/mine — current user's own suggestions, newest first
 router.get('/mine', requireAuth, async (req, res) => {
   try {
     const suggestions = await Suggestion.find({ userId: req.user._id })
@@ -35,6 +55,49 @@ router.get('/mine', requireAuth, async (req, res) => {
       .lean();
 
     res.json({ suggestions });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/suggestions/:id — edit text of your own suggestion
+router.patch('/:id', requireAuth, async (req, res) => {
+  try {
+    const { text, error } = validateText(req.body.text);
+    if (error) return res.status(400).json({ error });
+
+    const suggestion = await findOwned(req, res);
+    if (!suggestion) return;
+
+    if (suggestion.text !== text) {
+      suggestion.text = text;
+      suggestion.editedAt = new Date();
+      await suggestion.save();
+    }
+
+    res.json({ suggestion });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/suggestions/:id/additions — add follow-up note to your own suggestion
+router.post('/:id/additions', requireAuth, async (req, res) => {
+  try {
+    const { text, error } = validateText(req.body.text);
+    if (error) return res.status(400).json({ error });
+
+    const suggestion = await findOwned(req, res);
+    if (!suggestion) return;
+
+    if (suggestion.additions.length >= MAX_ADDITIONS) {
+      return res.status(400).json({ error: `You can add up to ${MAX_ADDITIONS} follow-ups per suggestion` });
+    }
+
+    suggestion.additions.push({ text });
+    await suggestion.save();
+
+    res.status(201).json({ suggestion });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

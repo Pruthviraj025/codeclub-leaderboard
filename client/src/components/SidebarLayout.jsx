@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, CalendarDays, BarChart3, Rocket, Shield, User, LogOut, Menu, X, MessageSquarePlus } from 'lucide-react';
+import { Trophy, CalendarDays, BarChart3, Rocket, Shield, User, LogOut, Menu, X, MessageSquarePlus, MessageCircle } from 'lucide-react';
 import { getSessionUser, clearSession } from '../api';
 
 const NAV_ITEMS = [
   { key: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
   { key: 'contests', label: 'Contests', icon: CalendarDays, path: '/contests' },
   { key: 'hackathons', label: 'Hackathons', icon: Rocket, path: '/hackathons' },
-  { key: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' }
+  { key: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { key: 'discuss', label: 'Discuss', icon: MessageCircle, path: '/discuss' }
 ];
 
 
@@ -150,16 +151,21 @@ const styles = {
     minHeight: '100vh',
     background: 'var(--bg)'
   },
-  sidebar: {
-    width: '220px',
-    flexShrink: 0,
-    borderRight: '1px solid var(--border)',
-    background: 'var(--surface)',
-    padding: 'var(--space-4) var(--space-3)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-5)'
-  },
+sidebar: {
+  width: '220px',
+  flexShrink: 0,
+  borderRight: '1px solid var(--border)',
+  background: 'var(--surface)',
+  padding: 'var(--space-4) var(--space-3)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--space-5)',
+  position: 'sticky',
+  top: 0,
+  height: '100vh',
+  alignSelf: 'flex-start',
+  boxSizing: 'border-box'
+},
   sidebarTop: {
     display: 'flex',
     alignItems: 'center',
@@ -186,12 +192,14 @@ const styles = {
     userSelect: 'none',
     cursor: 'pointer'
   },
-  nav: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--space-1)',
-    flex: 1
-  },
+nav: {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--space-1)',
+  flex: 1,
+  overflowY: 'auto',
+  minHeight: 0
+},
   sidebarBottom: {
     borderTop: '1px solid var(--border)',
     paddingTop: 'var(--space-3)'

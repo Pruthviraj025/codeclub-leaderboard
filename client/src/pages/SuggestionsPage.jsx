@@ -1,16 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Send, CheckCircle2, Lock } from 'lucide-react';
+import { Shield, Send, CheckCircle2, Lock, Pencil, PlusCircle, Check, X } from 'lucide-react';
 import { api, getSessionUser } from '../api';
 import SidebarLayout from '../components/SidebarLayout';
+
+const MAX_LEN = 2000;
+
+function fmt(iso) {
+  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
 
 export default function SuggestionsPage() {
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+
+  const [mine, setMine] = useState([]);
+  const [loadingMine, setLoadingMine] = useState(true);
+
+  // panel = which card has an open editor: { id, mode: 'edit' | 'add' }
+  const [panel, setPanel] = useState(null);
+  const [draft, setDraft] = useState('');
+  const [savingPanel, setSavingPanel] = useState(false);
+  const [panelError, setPanelError] = useState('');
+
   const user = getSessionUser();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let cancelled = false;
+    api.mySuggestions()
+      .then(data => { if (!cancelled) setMine(data.suggestions); })
+      .catch(err => { if (!cancelled) setError(err.message || 'Failed to load your suggestions.'); })
+      .finally(() => { if (!cancelled) setLoadingMine(false); });
+    return () => { cancelled = true; };
+  }, []);
 
   if (!user) return null;
 
@@ -23,7 +48,8 @@ export default function SuggestionsPage() {
     setError('');
     setNotice('');
     try {
-      await api.submitSuggestion(trimmed);
+      const { suggestion } = await api.submitSuggestion(trimmed);
+      setMine(prev => [suggestion, ...prev]);
       setText('');
       setNotice('Thank you! Your suggestion has been submitted privately to the admin team.');
     } catch (err) {
@@ -31,6 +57,43 @@ export default function SuggestionsPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function openPanel(s, mode) {
+    setPanel({ id: s._id, mode });
+    setDraft(mode === 'edit' ? s.text : '');
+    setPanelError('');
+  }
+
+  function closePanel() {
+    setPanel(null);
+    setDraft('');
+    setPanelError('');
+  }
+
+  async function savePanel(s) {
+    const trimmed = draft.trim();
+    if (!trimmed || savingPanel) return;
+    if (panel.mode === 'edit' && trimmed === s.text) return closePanel();
+
+    setSavingPanel(true);
+    setPanelError('');
+    try {
+      const { suggestion } = panel.mode === 'edit'
+        ? await api.editSuggestion(s._id, trimmed)
+        : await api.addToSuggestion(s._id, trimmed);
+      setMine(prev => prev.map(x => (x._id === suggestion._id ? suggestion : x)));
+      closePanel();
+    } catch (err) {
+      setPanelError(err.message || 'Failed to save.');
+    } finally {
+      setSavingPanel(false);
+    }
+  }
+
+  function handlePanelKeyDown(e, s) {
+    if (e.key === 'Escape') closePanel();
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) savePanel(s);
   }
 
   return (
@@ -70,11 +133,11 @@ export default function SuggestionsPage() {
             placeholder="What should we build, fix, or improve?"
             value={text}
             onChange={e => setText(e.target.value)}
-            maxLength={2000}
+            maxLength={MAX_LEN}
             rows={6}
           />
           <div style={styles.formFooter}>
-            <span style={styles.charCount}>{text.length}/2000</span>
+            <span style={styles.charCount}>{text.length}/{MAX_LEN}</span>
             <button
               type="submit"
               style={{
@@ -97,20 +160,133 @@ export default function SuggestionsPage() {
           </div>
         )}
         {error && <div style={styles.error}>{error}</div>}
+
+        <div style={styles.mineHeader}>
+          <h2 style={styles.mineTitle}>My suggestions</h2>
+          {!loadingMine && <span style={styles.charCount}>{mine.length}</span>}
+        </div>
+
+        {loadingMine && <div style={styles.empty}>Loading your suggestions…</div>}
+        {!loadingMine && mine.length === 0 && (
+          <div style={styles.empty}>You haven&apos;t sent any suggestions yet.</div>
+        )}
+
+        <div style={styles.list}>
+          {mine.map(s => {
+            const open = panel && panel.id === s._id;
+            const additions = s.additions || [];
+
+            return (
+              <div key={s._id} style={styles.card}>
+                <div style={styles.cardHead}>
+                  <span style={styles.time}>
+                    {fmt(s.createdAt)}
+                    {s.editedAt && (
+                      <span style={styles.edited} title={fmt(s.editedAt)}> · edited</span>
+                    )}
+                  </span>
+
+                  {!open && (
+                    <div style={styles.actions}>
+                      <button style={styles.linkBtn} onClick={() => openPanel(s, 'edit')}>
+                        <Pencil size={13} style={{ marginRight: '4px' }} /> Edit
+                      </button>
+                      <button style={styles.linkBtn} onClick={() => openPanel(s, 'add')}>
+                        <PlusCircle size={13} style={{ marginRight: '4px' }} /> Add more
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {open && panel.mode === 'edit' ? (
+                  <PanelEditor
+                    label="Edit your suggestion"
+                    draft={draft}
+                    setDraft={setDraft}
+                    onKeyDown={e => handlePanelKeyDown(e, s)}
+                    onCancel={closePanel}
+                    onSave={() => savePanel(s)}
+                    saving={savingPanel}
+                    error={panelError}
+                  />
+                ) : (
+                  <p style={styles.body}>{s.text}</p>
+                )}
+
+                {additions.length > 0 && (
+                  <div style={styles.additions}>
+                    {additions.map(a => (
+                      <div key={a._id} style={styles.addition}>
+                        <div style={styles.additionTime}>Added {fmt(a.createdAt)}</div>
+                        <p style={{ ...styles.body, fontSize: '13px' }}>{a.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {open && panel.mode === 'add' && (
+                  <PanelEditor
+                    label="Add more details"
+                    draft={draft}
+                    setDraft={setDraft}
+                    onKeyDown={e => handlePanelKeyDown(e, s)}
+                    onCancel={closePanel}
+                    onSave={() => savePanel(s)}
+                    saving={savingPanel}
+                    error={panelError}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </SidebarLayout>
   );
 }
 
+function PanelEditor({ label, draft, setDraft, onKeyDown, onCancel, onSave, saving, error }) {
+  return (
+    <div style={{ marginTop: '8px' }}>
+      <textarea
+        style={styles.editTextarea}
+        aria-label={label}
+        placeholder={label}
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onKeyDown={onKeyDown}
+        maxLength={MAX_LEN}
+        rows={4}
+        autoFocus
+      />
+      {error && <div style={{ ...styles.error, marginTop: '8px' }}>{error}</div>}
+      <div style={styles.editFooter}>
+        <span style={styles.charCount}>{draft.length}/{MAX_LEN}</span>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button style={styles.cancelBtn} onClick={onCancel} disabled={saving}>
+            <X size={13} style={{ marginRight: '4px' }} /> Cancel
+          </button>
+          <button
+            style={{
+              ...styles.saveBtn,
+              opacity: saving || !draft.trim() ? 0.6 : 1,
+              cursor: saving || !draft.trim() ? 'not-allowed' : 'pointer'
+            }}
+            onClick={onSave}
+            disabled={saving || !draft.trim()}
+          >
+            <Check size={13} style={{ marginRight: '4px' }} />
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const styles = {
-  wrap: {
-    maxWidth: '680px',
-    margin: '0 auto',
-    paddingBottom: '40px'
-  },
-  header: {
-    marginBottom: '20px'
-  },
+  wrap: { maxWidth: '680px', margin: '0 auto', paddingBottom: '40px' },
+  header: { marginBottom: '20px' },
   title: {
     fontFamily: "'Orbitron', sans-serif",
     fontSize: '24px',
@@ -118,11 +294,7 @@ const styles = {
     color: 'var(--text)',
     margin: '0 0 6px'
   },
-  subtitle: {
-    color: 'var(--text-dim)',
-    fontSize: '14px',
-    margin: '0 0 10px'
-  },
+  subtitle: { color: 'var(--text-dim)', fontSize: '14px', margin: '0 0 10px' },
   privacyNote: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -150,11 +322,7 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer'
   },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
+  form: { display: 'flex', flexDirection: 'column', gap: '10px' },
   textarea: {
     background: 'var(--surface)',
     border: '1px solid var(--border)',
@@ -174,10 +342,7 @@ const styles = {
     gap: '12px',
     flexWrap: 'wrap'
   },
-  charCount: {
-    fontSize: '12px',
-    color: 'var(--text-dim)'
-  },
+  charCount: { fontSize: '12px', color: 'var(--text-dim)' },
   submitBtn: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -213,5 +378,119 @@ const styles = {
     padding: '12px 16px',
     borderRadius: 'var(--radius-sm)',
     fontSize: '13px'
+  },
+  mineHeader: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '10px',
+    margin: '32px 0 12px',
+    paddingTop: '20px',
+    borderTop: '1px solid var(--border)'
+  },
+  mineTitle: {
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '16px',
+    fontWeight: 700,
+    color: 'var(--text)',
+    margin: 0
+  },
+  empty: {
+    color: 'var(--text-dim)',
+    fontSize: '13px',
+    padding: '24px 0',
+    textAlign: 'center',
+    border: '1px dashed var(--border)',
+    borderRadius: 'var(--radius)'
+  },
+  list: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  card: {
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius)',
+    padding: '12px 14px'
+  },
+  cardHead: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    flexWrap: 'wrap',
+    marginBottom: '6px'
+  },
+  time: { fontSize: '12px', color: 'var(--text-dim)' },
+  edited: { fontStyle: 'italic' },
+  actions: { display: 'flex', gap: '4px' },
+  linkBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    background: 'transparent',
+    border: '1px solid transparent',
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text-dim)',
+    padding: '4px 8px',
+    fontSize: '12px',
+    cursor: 'pointer'
+  },
+  body: {
+    margin: 0,
+    fontSize: '14px',
+    lineHeight: '1.55',
+    color: 'var(--text)',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere'
+  },
+  additions: {
+    marginTop: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    borderLeft: '2px solid var(--border-hover)',
+    paddingLeft: '12px'
+  },
+  addition: {},
+  additionTime: { fontSize: '11px', color: 'var(--text-dim)', marginBottom: '2px' },
+  editTextarea: {
+    width: '100%',
+    boxSizing: 'border-box',
+    background: 'var(--bg)',
+    border: '1px solid var(--border-hover)',
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text)',
+    padding: '10px 12px',
+    fontSize: '14px',
+    fontFamily: 'inherit',
+    resize: 'vertical',
+    outline: 'none',
+    lineHeight: '1.5'
+  },
+  editFooter: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    marginTop: '8px',
+    flexWrap: 'wrap'
+  },
+  cancelBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    background: 'transparent',
+    border: '1px solid var(--border)',
+    color: 'var(--text-dim)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '6px 12px',
+    fontSize: '12px',
+    cursor: 'pointer'
+  },
+  saveBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    background: 'rgba(16, 185, 129, 0.15)',
+    border: '1px solid var(--accent-green)',
+    color: 'var(--accent-green)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '6px 12px',
+    fontSize: '12px',
+    fontWeight: 600
   }
 };

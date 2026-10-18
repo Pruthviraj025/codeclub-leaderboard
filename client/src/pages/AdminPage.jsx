@@ -371,8 +371,21 @@ function SuggestionsTab() {
                     <div style={styles.subtext}>{u.email || ''}</div>
                   </div>
 
-                  <div style={{ flex: 4, whiteSpace: 'pre-wrap', color: 'var(--text)', lineHeight: '1.5', fontFamily: 'inherit' }}>
-                    {s.text}
+                  <div style={{ flex: 4, color: 'var(--text)', lineHeight: '1.5', fontFamily: 'inherit' }}>
+                    <div style={{ whiteSpace: 'pre-wrap' }}>{s.text}</div>
+                    {s.editedAt && (
+                      <div style={{ ...styles.subtext, fontStyle: 'italic', marginTop: '4px' }}>
+                        Edited {new Date(s.editedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </div>
+                    )}
+                    {(s.additions || []).map(a => (
+                      <div key={a._id} style={{ marginTop: '8px', paddingLeft: '10px', borderLeft: '2px solid var(--border-hover)' }}>
+                        <div style={styles.subtext}>
+                          Added {new Date(a.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                        </div>
+                        <div style={{ whiteSpace: 'pre-wrap', fontSize: '13px' }}>{a.text}</div>
+                      </div>
+                    ))}
                   </div>
 
                   <div style={{ flex: 2, fontSize: '11px', color: 'var(--text-dim)' }}>

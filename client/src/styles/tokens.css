@@ -242,6 +242,7 @@ input:focus { border-color: var(--accent-green) !important; }
     flex-direction: column !important;
   }
   .app-sidebar {
+    height: auto !important;
     width: 100% !important;
     min-height: auto !important;
     position: sticky !important;
