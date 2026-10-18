@@ -153,6 +153,9 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
       return res.status(400).json({ error: 'Status must be pending, accepted or rejected' });
     }
     const replyText = typeof reply === 'string' ? reply.trim() : undefined;
+    if (reply !== undefined && !replyText) {
+      return res.status(400).json({ error: 'Reply cannot be empty' });
+    }
     if (replyText !== undefined && replyText.length > 2000) {
       return res.status(400).json({ error: 'Reply must be under 2000 characters' });
     }
@@ -160,7 +163,11 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
     const suggestion = await Suggestion.findById(req.params.suggestionId);
     if (!suggestion) return res.status(404).json({ error: 'Suggestion not found' });
 
-    if (status !== undefined) suggestion.status = status;
+    // Accept / reject only after a reply exists (already sent, or sent in this request)
+    if ((status === 'accepted' || status === 'rejected') && !suggestion.adminReply && !replyText) {
+      return res.status(400).json({ error: 'Send a reply before accepting or rejecting' });
+    }
+
     if (replyText !== undefined && replyText !== suggestion.adminReply) {
       const hadReply = !!suggestion.adminReply;
       if (hadReply && suggestion.repliedAt &&
@@ -168,16 +175,14 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
         return res.status(403).json({ error: 'Edit window closed. Replies can only be changed within 5 minutes of sending.' });
       }
       suggestion.adminReply = replyText;
-      if (!replyText) {
-        suggestion.repliedAt = null;
-        suggestion.replyUpdatedAt = null;
-      } else if (hadReply) {
+      if (hadReply) {
         suggestion.replyUpdatedAt = new Date(); // edited existing reply
       } else {
         suggestion.repliedAt = new Date();      // first reply
         suggestion.replyUpdatedAt = null;
       }
     }
+    if (status !== undefined) suggestion.status = status;
     suggestion.reviewedBy = req.user._id;
     await suggestion.save();
 
