@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Send } from 'lucide-react';
 import { api, getSessionUser } from '../api';
 
 export default function AdminPage() {
@@ -327,6 +328,7 @@ function SuggestionsTab() {
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [replyDrafts, setReplyDrafts] = useState({}); // { [id]: string }
+  const [rowError, setRowError] = useState({ id: null, msg: '' });
 
   useEffect(() => { load(); }, []);
 
@@ -362,6 +364,7 @@ function SuggestionsTab() {
   async function handleReview(s, body) {
     setBusyId(s._id);
     setError('');
+    setRowError({ id: null, msg: '' });
     try {
       const { suggestion } = await api.adminReviewSuggestion(s._id, body);
       setSuggestions(prev => prev.map(x => (x._id === suggestion._id ? suggestion : x)));
@@ -371,7 +374,7 @@ function SuggestionsTab() {
         return next;
       });
     } catch (err) {
-      setError(err.message);
+      setRowError({ id: s._id, msg: err.message || 'Failed to save review.' });
     } finally {
       setBusyId(null);
     }
@@ -457,11 +460,17 @@ function SuggestionsTab() {
                       )}
                       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
                         <button
-                          style={{ ...styles.actionBtn, opacity: busy || !replyChanged ? 0.5 : 1 }}
-                          disabled={busy || !replyChanged}
+                          style={{
+                            ...styles.actionBtnGreen,
+                            display: 'inline-flex', alignItems: 'center', gap: '6px',
+                            opacity: busy || !draft.trim() || !replyChanged ? 0.5 : 1,
+                            cursor: busy || !draft.trim() || !replyChanged ? 'not-allowed' : 'pointer'
+                          }}
+                          disabled={busy || !draft.trim() || !replyChanged}
                           onClick={() => handleReview(s, { reply: draft })}
                         >
-                          {busy ? 'Saving...' : 'Save reply'}
+                          <Send size={12} />
+                          {busy ? 'Sending...' : s.adminReply ? 'Update reply' : 'Send reply'}
                         </button>
                         <button
                           style={{ ...styles.actionBtnGreen, opacity: busy || status === 'accepted' ? 0.5 : 1 }}
@@ -487,6 +496,9 @@ function SuggestionsTab() {
                           </button>
                         )}
                       </div>
+                      {rowError.id === s._id && (
+                        <div style={{ ...styles.error, marginTop: '8px', marginBottom: 0, fontSize: '12px' }}>{rowError.msg}</div>
+                      )}
                     </div>
                   </div>
 
