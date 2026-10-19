@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send } from 'lucide-react';
+import { Send, EllipsisVertical, Pencil, Check, X } from 'lucide-react';
 import { api, getSessionUser } from '../api';
 
 export default function AdminPage() {
@@ -336,12 +336,21 @@ function SuggestionsTab() {
   const [busyId, setBusyId] = useState(null);
   const [replyDrafts, setReplyDrafts] = useState({}); // { [id]: string }
   const [rowError, setRowError] = useState({ id: null, msg: '' });
-  const [, setTick] = useState(0); // re-render so reply lock kicks in after 5 min
+  const [editingId, setEditingId] = useState(null); // suggestion whose reply is being edited
+  const [menuId, setMenuId] = useState(null);         // suggestion whose 3-dot menu is open
+  const [, setTick] = useState(0); // re-render so the 3-dot menu disappears after 5 min
 
   useEffect(() => {
     const t = setInterval(() => setTick(n => n + 1), 15000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    if (!menuId) return;
+    const close = () => setMenuId(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [menuId]);
 
   useEffect(() => { load(); }, []);
 
@@ -370,7 +379,23 @@ function SuggestionsTab() {
   }
 
   function draftFor(s) {
-    return replyDrafts[s._id] !== undefined ? replyDrafts[s._id] : (s.adminReply || '');
+    return replyDrafts[s._id] !== undefined ? replyDrafts[s._id] : '';
+  }
+
+  function startEdit(s) {
+    setMenuId(null);
+    setRowError({ id: null, msg: '' });
+    setReplyDrafts(prev => ({ ...prev, [s._id]: s.adminReply || '' }));
+    setEditingId(s._id);
+  }
+
+  function cancelEdit(s) {
+    setEditingId(null);
+    setReplyDrafts(prev => {
+      const next = { ...prev };
+      delete next[s._id];
+      return next;
+    });
   }
 
   // body: { status?, reply? }
@@ -386,6 +411,7 @@ function SuggestionsTab() {
         delete next[s._id];
         return next;
       });
+      setEditingId(null);
     } catch (err) {
       setRowError({ id: s._id, msg: err.message || 'Failed to save review.' });
     } finally {
@@ -417,8 +443,9 @@ function SuggestionsTab() {
               const meta = SUGGESTION_STATUS[status] || SUGGESTION_STATUS.pending;
               const busy = busyId === s._id;
               const draft = draftFor(s);
-              const editable = canEditReply(s);
-              const replyChanged = editable && draft.trim() !== (s.adminReply || '');
+              const hasReply = !!s.adminReply;
+              const editable = hasReply && canEditReply(s);
+              const editing = editingId === s._id;
 
               return (
                 <div key={s._id} style={{ ...styles.tableRow, alignItems: 'flex-start', padding: '14px 16px' }}>
@@ -456,51 +483,111 @@ function SuggestionsTab() {
                     ))}
 
                     <div style={{ marginTop: '12px' }}>
-                      <textarea
-                        style={{
-                          width: '100%', boxSizing: 'border-box', background: 'var(--bg)',
-                          border: '1px solid var(--border-hover)', borderRadius: '4px',
-                          color: 'var(--text)', padding: '8px 10px', fontSize: '13px',
-                          fontFamily: 'inherit', resize: 'vertical', outline: 'none', lineHeight: '1.5'
-                        }}
-                        rows={2}
-                        maxLength={2000}
-                        readOnly={!editable}
-                        placeholder="Write a reply for the user…"
-                        value={draft}
-                        onChange={e => setReplyDrafts(prev => ({ ...prev, [s._id]: e.target.value }))}
-                      />
-                      {s.repliedAt && s.adminReply && (
-                        <div style={{ ...styles.subtext, marginTop: '2px' }}>
-                          Replied {fmtDate(s.repliedAt)}
-                          {s.replyUpdatedAt && <span style={{ fontStyle: 'italic' }}> · updated {fmtDate(s.replyUpdatedAt)}</span>}
+                      {hasReply && !editing ? (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                            <div style={{
+                              flex: 1, background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)',
+                              borderRadius: '8px', padding: '8px 12px', fontSize: '13px',
+                              whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', lineHeight: '1.5'
+                            }}>
+                              {s.adminReply}
+                            </div>
+                            {editable && (
+                              <div style={{ position: 'relative' }}>
+                                <button
+                                  aria-label="Reply options"
+                                  style={{
+                                    background: 'transparent', border: 'none', color: 'var(--text-dim)',
+                                    cursor: 'pointer', padding: '6px 2px', display: 'flex'
+                                  }}
+                                  onClick={e => { e.stopPropagation(); setMenuId(menuId === s._id ? null : s._id); }}
+                                >
+                                  <EllipsisVertical size={16} />
+                                </button>
+                                {menuId === s._id && (
+                                  <div
+                                    style={{
+                                      position: 'absolute', right: 0, top: '100%', zIndex: 5,
+                                      background: 'var(--surface-raised)', border: '1px solid var(--border)',
+                                      borderRadius: '4px', minWidth: '90px'
+                                    }}
+                                    onClick={e => e.stopPropagation()}
+                                  >
+                                    <button
+                                      style={{
+                                        display: 'flex', alignItems: 'center', gap: '6px', width: '100%',
+                                        background: 'transparent', border: 'none', color: 'var(--text)',
+                                        padding: '8px 12px', fontSize: '12px', cursor: 'pointer'
+                                      }}
+                                      onClick={() => startEdit(s)}
+                                    >
+                                      <Pencil size={12} /> Edit
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ ...styles.subtext, marginTop: '4px', color: 'var(--accent-green)' }}>
+                            <Check size={11} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                            Sent {fmtDate(s.repliedAt)}
+                            {s.replyUpdatedAt && <span style={{ fontStyle: 'italic' }}> · updated {fmtDate(s.replyUpdatedAt)}</span>}
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <textarea
+                            style={{
+                              width: '100%', boxSizing: 'border-box', background: 'var(--bg)',
+                              border: '1px solid var(--border-hover)', borderRadius: '4px',
+                              color: 'var(--text)', padding: '8px 10px', fontSize: '13px',
+                              fontFamily: 'inherit', resize: 'vertical', outline: 'none', lineHeight: '1.5'
+                            }}
+                            rows={2}
+                            maxLength={2000}
+                            autoFocus={editing}
+                            placeholder="Write a reply for the user…"
+                            value={draft}
+                            onChange={e => setReplyDrafts(prev => ({ ...prev, [s._id]: e.target.value }))}
+                          />
+                          <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                            <button
+                              style={{
+                                ...styles.actionBtnGreen,
+                                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                opacity: busy || !draft.trim() || (editing && draft.trim() === s.adminReply) ? 0.5 : 1,
+                                cursor: busy || !draft.trim() || (editing && draft.trim() === s.adminReply) ? 'not-allowed' : 'pointer'
+                              }}
+                              disabled={busy || !draft.trim() || (editing && draft.trim() === s.adminReply)}
+                              onClick={() => handleReview(s, { reply: draft })}
+                            >
+                              <Send size={12} />
+                              {busy ? 'Sending...' : editing ? 'Update' : 'Send'}
+                            </button>
+                            {editing && (
+                              <button style={styles.actionBtn} disabled={busy} onClick={() => cancelEdit(s)}>
+                                <X size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />Cancel
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
+
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
                         <button
-                          style={{
-                            ...styles.actionBtnGreen,
-                            display: 'inline-flex', alignItems: 'center', gap: '6px',
-                            opacity: busy || !draft.trim() || !replyChanged ? 0.5 : 1,
-                            cursor: busy || !draft.trim() || !replyChanged ? 'not-allowed' : 'pointer'
-                          }}
-                          disabled={busy || !draft.trim() || !replyChanged}
-                          onClick={() => handleReview(s, { reply: draft })}
-                        >
-                          <Send size={12} />
-                          {busy ? 'Sending...' : s.adminReply ? 'Update reply' : 'Send reply'}
-                        </button>
-                        <button
-                          style={{ ...styles.actionBtnGreen, opacity: busy || status === 'accepted' ? 0.5 : 1 }}
-                          disabled={busy || status === 'accepted'}
-                          onClick={() => handleReview(s, editable ? { status: 'accepted', reply: draft } : { status: 'accepted' })}
+                          style={{ ...styles.actionBtnGreen, opacity: busy || !hasReply || status === 'accepted' ? 0.5 : 1 }}
+                          disabled={busy || !hasReply || status === 'accepted'}
+                          title={hasReply ? '' : 'Send a reply first'}
+                          onClick={() => handleReview(s, { status: 'accepted' })}
                         >
                           Accept
                         </button>
                         <button
-                          style={{ ...styles.actionBtnRedOutline, opacity: busy || status === 'rejected' ? 0.5 : 1 }}
-                          disabled={busy || status === 'rejected'}
-                          onClick={() => handleReview(s, editable ? { status: 'rejected', reply: draft } : { status: 'rejected' })}
+                          style={{ ...styles.actionBtnRedOutline, opacity: busy || !hasReply || status === 'rejected' ? 0.5 : 1 }}
+                          disabled={busy || !hasReply || status === 'rejected'}
+                          title={hasReply ? '' : 'Send a reply first'}
+                          onClick={() => handleReview(s, { status: 'rejected' })}
                         >
                           Reject
                         </button>
@@ -514,9 +601,7 @@ function SuggestionsTab() {
                           </button>
                         )}
                       </div>
-                      {s.adminReply && !editable && (
-                        <div style={{ ...styles.subtext, marginTop: '6px' }}>Reply locked. Edits allowed only within 5 minutes of sending.</div>
-                      )}
+
                       {rowError.id === s._id && (
                         <div style={{ ...styles.error, marginTop: '8px', marginBottom: 0, fontSize: '12px' }}>{rowError.msg}</div>
                       )}
