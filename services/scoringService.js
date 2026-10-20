@@ -13,6 +13,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// contestId missing for problemset-only problems (e.g. acmsguru).
+// Keeps the normal "1234A" form whenever contestId exists.
+function cfProblemId(problem) {
+    const prefix =
+        problem.contestId != null
+            ? problem.contestId
+            : (problem.problemsetName || "ps");
+    return `${prefix}${problem.index}`;
+}
+
 async function fetchCFSubmissions(handle) {
 
     let lastError;
@@ -78,14 +88,52 @@ async function refreshCodeforcesScore(user) {
             user.cfConnectedAt.getTime() / 1000
         );
 
-    const candidates = submissions.filter(sub =>
+    const watermark =
+        user.lastCheckedSubmissionId || 0;
 
+    // Unrated solves at/below the watermark may have been skipped by an
+    // older build (before unrated scoring existed) and never retried.
+    // Re-check them every refresh; unique index + pre-query dedupe keep
+    // it safe and cheap.
+    const isOld = sub => sub.id <= watermark;
+    const isUnrated = sub => sub.problem.rating == null;
+
+    const baseOk = submissions.filter(sub =>
         sub.verdict === "OK" &&
-        sub.creationTimeSeconds >= connectedAt &&
-        (!user.lastCheckedSubmissionId ||
-            sub.id > user.lastCheckedSubmissionId)
-
+        sub.creationTimeSeconds >= connectedAt
     );
+
+    const fresh = baseOk.filter(sub => !isOld(sub));
+
+    const oldUnrated = baseOk.filter(sub =>
+        isOld(sub) && isUnrated(sub)
+    );
+
+    let missedUnrated = oldUnrated;
+
+    if (oldUnrated.length > 0) {
+
+        const existing =
+            await ScoredSubmission.find({
+                userId: user._id,
+                platform: "codeforces",
+                problemId: {
+                    $in: oldUnrated.map(s =>
+                        cfProblemId(s.problem)
+                    )
+                }
+            }).select("problemId").lean();
+
+        const have =
+            new Set(existing.map(e => e.problemId));
+
+        missedUnrated = oldUnrated.filter(s =>
+            !have.has(cfProblemId(s.problem))
+        );
+
+    }
+
+    const candidates = [...fresh, ...missedUnrated];
 
     let highestSubmissionId =
         user.lastCheckedSubmissionId || 0;
@@ -111,7 +159,7 @@ async function refreshCodeforcesScore(user) {
             continue;
 
         const problemId =
-            `${submission.problem.contestId}${submission.problem.index}`;
+            cfProblemId(submission.problem);
 
         try {
 
