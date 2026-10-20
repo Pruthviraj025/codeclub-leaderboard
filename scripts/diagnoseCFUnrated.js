@@ -97,12 +97,34 @@ async function run() {
 
   const targetHandle = process.argv[2];
 
+  // CF handles are case-insensitive and verification stores them raw, so match
+  // ignoring case and surrounding whitespace.
+  const escaped = targetHandle
+    ? targetHandle.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    : null;
+
   const query = targetHandle
-    ? { cfHandle: targetHandle }
+    ? { cfHandle: new RegExp(`^\\s*${escaped}\\s*$`, 'i') }
     : { cfConnected: true, isActive: true };
+
+  const dbName = mongoose.connection.name;
+  const totalUsers = await User.countDocuments({});
+  console.log(`DB: "${dbName}" — ${totalUsers} total user doc(s).`);
 
   const users = await User.find(query);
   console.log(`Checking ${users.length} user(s).`);
+
+  if (targetHandle && users.length === 0) {
+    const similar = await User.find(
+      { cfHandle: new RegExp(escaped.slice(0, 5), 'i') },
+      'name usn cfHandle cfConnected isActive'
+    ).limit(10);
+    console.log(`No exact match. Handles starting like "${escaped.slice(0, 5)}":`);
+    for (const u of similar) {
+      console.log(`  - name="${u.name}" cfHandle=${JSON.stringify(u.cfHandle)} cfConnected=${u.cfConnected} isActive=${u.isActive}`);
+    }
+    if (similar.length === 0) console.log('  (none)');
+  }
 
   for (const user of users) {
     await diagnoseUser(user);
