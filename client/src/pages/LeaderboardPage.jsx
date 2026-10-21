@@ -10,8 +10,6 @@ export default function LeaderboardPage() {
   const [error, setError] = useState('');
   const [refreshingCf, setRefreshingCf] = useState(false);
   const [refreshingLc, setRefreshingLc] = useState(false);
-  const [disconnectingCf, setDisconnectingCf] = useState(false);
-  const [currentUserProfile, setCurrentUserProfile] = useState(null);
   const [cfMsg, setCfMsg] = useState('');
   const [lcMsg, setLcMsg] = useState('');
   const [showInfo, setShowInfo] = useState(false);
@@ -26,14 +24,8 @@ export default function LeaderboardPage() {
   async function loadLeaderboard() {
     try {
       setLoadingBoard(true);
-      const [boardRes, profileRes] = await Promise.all([
-        api.currentLeaderboard(),
-        user?.id ? api.profile(user.id).catch(() => null) : Promise.resolve(null)
-      ]);
-      setData(boardRes);
-      if (profileRes) {
-        setCurrentUserProfile(profileRes);
-      }
+      const res = await api.currentLeaderboard();
+      setData(res);
       setError('');
     } catch (err) {
       setError(err.message || 'Failed to load leaderboard.');
@@ -72,31 +64,6 @@ export default function LeaderboardPage() {
     }
   }
 
-  async function handleDisconnectCf(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    const handleName = currentUserProfile?.cfHandle || 'your Codeforces account';
-    if (!window.confirm(`Disconnect Codeforces account (${handleName})?`)) {
-      return;
-    }
-
-    setDisconnectingCf(true);
-    setCfMsg('');
-    try {
-      await api.disconnectCf();
-      const sessionUser = getSessionUser();
-      if (sessionUser) {
-        sessionUser.cfConnected = false;
-        localStorage.setItem('user', JSON.stringify(sessionUser));
-      }
-      setCfMsg('Codeforces account disconnected.');
-      await loadLeaderboard();
-    } catch (err) {
-      setCfMsg(`CF: ${err.message}`);
-    } finally {
-      setDisconnectingCf(false);
-    }
-  }
-
   if (!user) return null;
 
   return (
@@ -117,23 +84,12 @@ export default function LeaderboardPage() {
           </div>
         </div>
         <div style={styles.refreshBtnGroup} className="refresh-btn-group">
-          <button style={styles.refreshBtnCf} className="refresh-btn" onClick={handleRefreshCf} disabled={refreshingCf || disconnectingCf}>
+          <button style={styles.refreshBtnCf} className="refresh-btn" onClick={handleRefreshCf} disabled={refreshingCf}>
             {refreshingCf ? 'Checking…' : '↻ Refresh CF'}
           </button>
-          <button style={styles.refreshBtnLc} className="refresh-btn" onClick={handleRefreshLc} disabled={refreshingLc || disconnectingCf}>
+          <button style={styles.refreshBtnLc} className="refresh-btn" onClick={handleRefreshLc} disabled={refreshingLc}>
             {refreshingLc ? 'Checking…' : '↻ Refresh LC'}
           </button>
-          {currentUserProfile?.cfConnected && (
-            <button
-              style={styles.disconnectBtnCf}
-              className="refresh-btn disconnect-cf-btn"
-              onClick={handleDisconnectCf}
-              disabled={disconnectingCf || refreshingCf}
-              title={`Disconnect Codeforces (${currentUserProfile.cfHandle})`}
-            >
-              {disconnectingCf ? 'Disconnecting…' : '✕ Disconnect CF'}
-            </button>
-          )}
         </div>
       </div>
 
@@ -200,17 +156,6 @@ export default function LeaderboardPage() {
                 >
                   {row.cfHandle || row.lcUsername || row.name}
                 </span>
-                {row.userId === user.id && (row.cfHandle || currentUserProfile?.cfConnected) && (
-                  <button
-                    style={styles.rowDisconnectBtn}
-                    className="row-disconnect-btn"
-                    onClick={handleDisconnectCf}
-                    disabled={disconnectingCf}
-                    title={`Disconnect Codeforces (${row.cfHandle || currentUserProfile?.cfHandle || 'account'})`}
-                  >
-                    {disconnectingCf ? '...' : 'Disconnect CF'}
-                  </button>
-                )}
               </span>
 
               <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cf">
@@ -566,36 +511,6 @@ const styles = {
     fontSize: '13px',
     letterSpacing: '2px',
     fontFamily: "'Orbitron', sans-serif"
-  },
-  disconnectBtnCf: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    background: 'transparent',
-    border: '1px solid var(--accent-red)',
-    color: 'var(--accent-red)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 16px',
-    fontSize: '13px',
-    letterSpacing: '2px',
-    fontFamily: "'Orbitron', sans-serif",
-    cursor: 'pointer',
-    transition: 'all 0.15s ease'
-  },
-  rowDisconnectBtn: {
-    background: 'transparent',
-    border: '1px solid rgba(239, 68, 68, 0.45)',
-    color: 'var(--accent-red)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '2px 8px',
-    fontSize: '11px',
-    fontFamily: "'Orbitron', sans-serif",
-    letterSpacing: '1px',
-    cursor: 'pointer',
-    marginLeft: '6px',
-    transition: 'all 0.15s ease',
-    flexShrink: 0
   },
   refreshMsg: {
     fontFamily: "'Orbitron', sans-serif",
