@@ -19,7 +19,7 @@ const VERIFICATION_WINDOW_MS = 5 * 60 * 1000; // 5 minutes to submit after reque
 async function generateVerificationCode(userId, cfHandle) {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');
-  if (user.cfConnected) throw new Error('CF account already connected — contact admin to change it');
+  if (user.cfConnected) throw new Error('CF account already connected — disconnect your existing account first');
 
   user.cfHandle = cfHandle;
   user.cfVerification = { method: 'compile_error', verificationCode: null, verifiedAt: null };

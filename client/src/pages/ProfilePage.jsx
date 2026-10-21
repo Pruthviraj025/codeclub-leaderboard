@@ -240,6 +240,23 @@ export default function ProfilePage() {
 
     }
 
+    async function handleDisconnectCodeforces() {
+        if (!window.confirm("Disconnect Codeforces?")) return;
+
+        try {
+            await api.disconnectCf();
+            const sessionUser = getSessionUser();
+            if (sessionUser) {
+                sessionUser.cfConnected = false;
+                localStorage.setItem("user", JSON.stringify(sessionUser));
+            }
+            setVerifyMsg("Disconnected.");
+            await load();
+        } catch (err) {
+            setVerifyMsg(err.message);
+        }
+    }
+
     async function handleDisconnectLeetCode() {
 
         if (
@@ -598,6 +615,19 @@ export default function ProfilePage() {
                                 {profile.cfHandle}
                             </strong>
 
+                        </div>
+
+                        <div style={{ marginTop: 14 }}>
+                            <button
+                                style={{
+                                    ...styles.smallBtn,
+                                    background: "var(--accent-red)",
+                                    color: "#fff"
+                                }}
+                                onClick={handleDisconnectCodeforces}
+                            >
+                                Disconnect
+                            </button>
                         </div>
 
                     </div>

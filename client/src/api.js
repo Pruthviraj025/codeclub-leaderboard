@@ -53,6 +53,7 @@ export const api = {
     updateEmail: email => request("/profile/me/email", { method: "PATCH", body: JSON.stringify({ email }) }),
     startCfVerification: cfHandle => request("/cf/start-verification", { method: "POST", body: JSON.stringify({ cfHandle }) }),
     checkCfVerification: () => request("/cf/verify", { method: "POST" }),
+    disconnectCf: () => request("/cf/disconnect", { method: "DELETE" }),
     startLcVerification: lcUsername => request("/lc/start-verification", { method: "POST", body: JSON.stringify({ username: lcUsername }) }),
     verifyLc: () => request("/lc/verify", { method: "POST" }),
     lcStatus: () => request("/lc/status"),
