@@ -50,12 +50,11 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
-/* ---------------- Users Tab ---------------- */
 
 function UsersTab() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState(null); // userId pending confirmation
+  const [confirmDelete, setConfirmDelete] = useState(null); 
   const [busyId, setBusyId] = useState(null);
   const [msg, setMsg] = useState('');
 
@@ -207,7 +206,6 @@ function UsersTab() {
   );
 }
 
-/* ---------------- Review Queue Tab ---------------- */
 
 function ReviewTab() {
   const [submissions, setSubmissions] = useState([]);
@@ -310,7 +308,6 @@ function ReviewTab() {
   );
 }
 
-/* ---------------- User Suggestions Tab (Admin Only) ---------------- */
 
 const SUGGESTION_STATUS = {
   pending: { label: 'PENDING', color: 'var(--text-dim)', border: 'var(--border)' },
@@ -321,7 +318,7 @@ const SUGGESTION_STATUS = {
 const REPLY_EDIT_WINDOW_MS = 5 * 60 * 1000;
 
 function canEditReply(s) {
-  if (!s.adminReply || !s.repliedAt) return true; // no reply yet
+  if (!s.adminReply || !s.repliedAt) return true; 
   return Date.now() - new Date(s.repliedAt).getTime() <= REPLY_EDIT_WINDOW_MS;
 }
 
@@ -334,11 +331,11 @@ function SuggestionsTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
-  const [replyDrafts, setReplyDrafts] = useState({}); // { [id]: string }
+  const [replyDrafts, setReplyDrafts] = useState({}); 
   const [rowError, setRowError] = useState({ id: null, msg: '' });
-  const [editingId, setEditingId] = useState(null); // suggestion whose reply is being edited
-  const [menuId, setMenuId] = useState(null);         // suggestion whose 3-dot menu is open
-  const [, setTick] = useState(0); // re-render so the 3-dot menu disappears after 5 min
+  const [editingId, setEditingId] = useState(null); 
+  const [menuId, setMenuId] = useState(null);         
+  const [, setTick] = useState(0); 
 
   useEffect(() => {
     const t = setInterval(() => setTick(n => n + 1), 15000);
@@ -398,7 +395,6 @@ function SuggestionsTab() {
     });
   }
 
-  // body: { status?, reply? }
   async function handleReview(s, body) {
     setBusyId(s._id);
     setError('');
@@ -631,7 +627,6 @@ function SuggestionsTab() {
   );
 }
 
-/* ---------------- Audit Log Tab ---------------- */
 
 function AuditTab() {
   const [actions, setActions] = useState([]);

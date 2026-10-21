@@ -14,7 +14,6 @@ function generateOtp() {
   return crypto.randomInt(100000, 999999).toString();
 }
 
-// POST /api/auth/signup
 router.post('/signup', async (req, res) => {
   try {
     const { name, usn, email, password } = req.body;
@@ -35,7 +34,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -52,7 +50,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/forgot-password
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -60,7 +57,6 @@ router.post('/forgot-password', async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
 
-    // Always respond generic - don't leak whether email is registered
     if (!user || !user.isActive) {
       return res.json({ message: 'If that email is registered, an OTP has been sent.' });
     }
@@ -71,7 +67,6 @@ router.post('/forgot-password', async (req, res) => {
     user.resetOtpAttempts = 0;
     await user.save();
 
-    // Send OTP email without blocking the response; log any errors
     sendOtpEmail(user.email, otp).catch(err => console.error('Failed to send OTP email:', err));
 
     res.json({ message: 'If that email is registered, an OTP has been sent.' });
@@ -80,7 +75,6 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-// POST /api/auth/resend-otp
 router.post('/resend-otp', async (req, res) => {
   try {
     const { email } = req.body;
@@ -88,18 +82,15 @@ router.post('/resend-otp', async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user || !user.isActive) {
-      // Generic response to avoid email enumeration
       return res.json({ message: 'If that email is registered, an OTP has been sent.' });
     }
 
-    // Generate a fresh OTP (overwrites any previous one)
     const otp = generateOtp();
     user.resetOtpHash = await bcrypt.hash(otp, 10);
     user.resetOtpExpiry = new Date(Date.now() + OTP_EXPIRY_MS);
     user.resetOtpAttempts = 0;
     await user.save();
 
-    // Fire‑and‑forget email send; log any errors
     sendOtpEmail(user.email, otp).catch(err => console.error('Failed to resend OTP email:', err));
     return res.json({ message: 'If that email is registered, an OTP has been sent.' });
   } catch (err) {
@@ -107,7 +98,6 @@ router.post('/resend-otp', async (req, res) => {
   }
 });
 
-// POST /api/auth/verify-otp
 router.post('/verify-otp', async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -145,7 +135,6 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-// POST /api/auth/reset-password
 router.post('/reset-password', async (req, res) => {
   try {
     const { resetToken, newPassword } = req.body;

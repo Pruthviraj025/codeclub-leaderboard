@@ -11,8 +11,8 @@ export default function ContestsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [platform, setPlatform] = useState('all'); // 'all', 'codeforces', 'leetcode'
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'upcoming', 'live'
+  const [platform, setPlatform] = useState('all'); 
+  const [statusFilter, setStatusFilter] = useState('all'); 
   const [search, setSearch] = useState('');
 
   const user = getSessionUser();
@@ -67,7 +67,6 @@ export default function ContestsPage() {
   return (
     <SidebarLayout active="contests">
       <div style={styles.container}>
-        {/* Title Header */}
         <div style={styles.headerRow}>
           <div>
             <div style={styles.eyebrow}>
@@ -91,7 +90,6 @@ export default function ContestsPage() {
           </button>
         </div>
 
-        {/* Stats Row */}
         <div style={styles.statsRow} className="mobile-grid-2">
           <div style={{ ...styles.statCard, cursor: 'pointer' }} onClick={() => setPlatform('all')}>
             <div style={styles.statIconWrapper}>
@@ -150,7 +148,6 @@ export default function ContestsPage() {
           </div>
         </div>
 
-        {/* Controls Bar: Tabs, Search, Filters */}
         <div style={styles.controlsBar} className="mobile-stack">
           <div style={styles.tabsContainer} className="scroll-x-touch mobile-full-width">
             <button
@@ -203,7 +200,6 @@ export default function ContestsPage() {
         {error && <div style={styles.error}>{error}</div>}
         {loading && <div style={styles.empty}>Loading contests...</div>}
 
-        {/* Codeforces Section */}
         {!loading && (platform === 'all' || platform === 'codeforces') && (
           <div style={{ marginBottom: '40px' }}>
             <div style={styles.platformHeader}>
@@ -267,7 +263,6 @@ export default function ContestsPage() {
           </div>
         )}
 
-        {/* LeetCode Section */}
         {!loading && (platform === 'all' || platform === 'leetcode') && (
           <div style={{ marginBottom: '40px' }}>
             <div style={styles.platformHeader}>

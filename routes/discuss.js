@@ -31,7 +31,6 @@ function validateText(raw) {
   return { text };
 }
 
-// GET /api/discuss?before=<ISO date>&limit=50
 router.get('/', requireAuth, async (req, res) => {
   try {
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || PAGE_SIZE, 1), MAX_PAGE_SIZE);
@@ -60,7 +59,6 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/discuss
 router.post('/', requireAuth, async (req, res) => {
   try {
     const { text, error } = validateText(req.body.text);
@@ -83,7 +81,6 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-// PATCH /api/discuss/:id — owner only
 router.patch('/:id', requireAuth, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -113,7 +110,6 @@ router.patch('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// DELETE /api/discuss/:id — owner or admin
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {

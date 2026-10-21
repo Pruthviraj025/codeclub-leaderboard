@@ -13,26 +13,17 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
 
-    // -------------------------
-    // Email
-    // -------------------------
 
     const [editingEmail, setEditingEmail] = useState(false);
     const [newEmail, setNewEmail] = useState("");
     const [emailMsg, setEmailMsg] = useState("");
     const [savingEmail, setSavingEmail] = useState(false);
 
-    // -------------------------
-    // Codeforces
-    // -------------------------
 
     const [cfHandle, setCfHandle] = useState("");
     const [verifyInfo, setVerifyInfo] = useState(null);
     const [verifyMsg, setVerifyMsg] = useState("");
 
-    // -------------------------
-    // LeetCode
-    // -------------------------
 
     const [lcUsername, setLcUsername] =
         useState("");
@@ -76,7 +67,6 @@ export default function ProfilePage() {
 
                 } catch {
 
-                    // ignore
 
                 }
 
@@ -481,9 +471,6 @@ export default function ProfilePage() {
 
                 )}
 
-                {/* -----------------------------
-                    CODEFORCES
-                ------------------------------ */}
 
                 {isOwner &&
                     !profile.cfConnected && (
@@ -634,9 +621,6 @@ export default function ProfilePage() {
 
                 )}
 
-                {/* -------------------------
-                    LEETCODE
-                -------------------------- */}
 
                 {isOwner && (
 

@@ -1,23 +1,10 @@
-// READ-ONLY diagnostic — makes no writes to the DB. Run this to figure out
-// why scripts/backfillUnratedCF.js found 0 candidates.
-//
-// For each CF-connected user it prints:
-//  - total OK submissions returned by the CF API
-//  - how many have problem.rating === undefined (true "unrated")
-//  - how many of those pass the sub.creationTimeSeconds >= cfConnectedAt filter
-//  - how many of those are already recorded in ScoredSubmission
-//  - a sample of a few raw "unrated-looking" submissions so we can see the
-//    actual shape of the data (rating field, verdict, problem fields)
-//
-// Run with: node scripts/diagnoseCFUnrated.js [cfHandle]
-// Pass a specific cfHandle to only check that one user; omit to check all.
 
 require('dotenv').config();
 const mongoose = require('mongoose');
 
 const User = require('../models/User');
 const ScoredSubmission = require('../models/ScoredSubmission');
-const { fetchCFSubmissions } = require('../services/scoringService');
+const { fetchCFSubmissions, cfProblemId } = require('../services/scoringService');
 
 async function diagnoseUser(user) {
   console.log(`\n=== ${user.cfHandle} ===`);
@@ -43,7 +30,6 @@ async function diagnoseUser(user) {
   const okSubs = submissions.filter(s => s.verdict === 'OK');
   console.log(`  OK (accepted) submissions: ${okSubs.length}`);
 
-  // Distinct verdict values seen, in case "OK" isn't the only accepted-looking one
   const verdictCounts = {};
   for (const s of submissions) {
     verdictCounts[s.verdict] = (verdictCounts[s.verdict] || 0) + 1;
@@ -65,7 +51,7 @@ async function diagnoseUser(user) {
       const existing = await ScoredSubmission.find({
         userId: user._id,
         platform: 'codeforces',
-        problemId: { $in: afterConnect.map(s => `${s.problem.contestId}${s.problem.index}`) }
+        problemId: { $in: afterConnect.map(s => cfProblemId(s.problem)) }
       });
       console.log(`  ...of those, already in ScoredSubmission: ${existing.length}`);
 
@@ -81,9 +67,6 @@ async function diagnoseUser(user) {
     console.log('  cfConnectedAt is null — cannot check date filter.');
   }
 
-  // Also show a couple of arbitrary OK submissions so we can see the real
-  // shape of problem.rating (number vs string vs missing) for problems that
-  // clearly DO have a rating, as a sanity check.
   const rated = okSubs.filter(s => typeof s.problem.rating === 'number');
   if (rated.length > 0) {
     const s = rated[0];
@@ -97,8 +80,6 @@ async function run() {
 
   const targetHandle = process.argv[2];
 
-  // CF handles are case-insensitive and verification stores them raw, so match
-  // ignoring case and surrounding whitespace.
   const escaped = targetHandle
     ? targetHandle.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     : null;

@@ -1,8 +1,3 @@
-// Prints stored LeetCodeQuestion cache + matching ScoredSubmission points
-// side by side, trailing 7 days only. For manual sanity check against
-// real leetcode.com/problems/<slug> acceptance rate.
-//
-// Run with: node scripts/dumpLeetCodeData.js
 
 require('dotenv').config();
 const mongoose = require('mongoose');

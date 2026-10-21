@@ -1,8 +1,6 @@
 const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
 
-// Primary: Resend over HTTPS (port 443, works on Render).
-// Fallback: Gmail SMTP via nodemailer (Render may block/throttle SMTP ports).
 const resend = process.env.RESEND_API_KEY && process.env.RESEND_FROM
   ? new Resend(process.env.RESEND_API_KEY)
   : null;

@@ -75,7 +75,6 @@ export default function DiscussPage() {
         mergeHead(data.messages);
         setHasMore(prev => prev || data.hasMore);
       } catch {
-        // silent: failed background poll shows no banner
       }
     }, POLL_MS);
     return () => clearInterval(id);

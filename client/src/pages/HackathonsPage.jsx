@@ -57,7 +57,6 @@ export default function HackathonsPage() {
 
   if (!user) return null;
 
-  // Safe filtering & sorting
   const filteredHackathons = hackathons
     .filter(h => {
       if (!search.trim()) return true;
@@ -83,13 +82,12 @@ export default function HackathonsPage() {
       if (sortBy === 'title') {
         return String(a.title || '').localeCompare(String(b.title || ''));
       }
-      return 0; // default relevant order from API
+      return 0; 
     });
 
   return (
     <SidebarLayout active="hackathons">
       <div style={styles.container}>
-        {/* Top Header */}
         <div style={styles.headerRow}>
           <div>
             <div style={styles.eyebrow}>
@@ -113,7 +111,6 @@ export default function HackathonsPage() {
           </button>
         </div>
 
-        {/* Stats Row */}
         <div style={styles.statsRow} className="mobile-grid-2">
           <div
             style={{ ...styles.statCard, cursor: 'pointer' }}
@@ -180,9 +177,7 @@ export default function HackathonsPage() {
           </div>
         </div>
 
-        {/* Controls Bar: Tabs, Search, Filters */}
         <div style={styles.controlsBar} className="mobile-stack">
-          {/* Platform Tabs */}
           <div style={styles.tabsContainer} className="scroll-x-touch mobile-full-width">
             <button
               style={{ ...styles.tab, ...(platform === 'all' ? styles.tabActive : {}) }}
@@ -213,7 +208,6 @@ export default function HackathonsPage() {
             </button>
           </div>
 
-          {/* Search & Select */}
           <div style={styles.searchAndFilters} className="mobile-stack">
             <div style={styles.searchWrapper} className="mobile-full-width">
               <Search size={16} style={styles.searchIcon} />
@@ -250,10 +244,8 @@ export default function HackathonsPage() {
           </div>
         </div>
 
-        {/* Error alert */}
         {error && <div style={styles.errorBox}>{error}</div>}
 
-        {/* Skeleton Loading State */}
         {loading && (
           <div style={styles.grid}>
             {[1, 2, 3, 4, 5, 6].map(i => (
@@ -270,7 +262,6 @@ export default function HackathonsPage() {
           </div>
         )}
 
-        {/* Empty state */}
         {!loading && filteredHackathons.length === 0 && (
           <div style={styles.emptyContainer}>
             <Rocket size={48} color="var(--text-dim)" style={{ marginBottom: '12px', opacity: 0.5 }} />
@@ -281,7 +272,6 @@ export default function HackathonsPage() {
           </div>
         )}
 
-        {/* Hackathon Cards Grid */}
         {!loading && filteredHackathons.length > 0 && (
           <div style={styles.grid}>
             {filteredHackathons.map(h => {
@@ -304,7 +294,6 @@ export default function HackathonsPage() {
 
               return (
                 <div key={h.id} style={styles.card} className="row-hover">
-                  {/* Card Banner */}
                   <div style={styles.cardBannerWrapper}>
                     {h.banner ? (
                       <img
@@ -324,7 +313,6 @@ export default function HackathonsPage() {
                       }}
                     />
 
-                    {/* Platform Badge */}
                     <div
                       style={{
                         ...styles.platformBadge,
@@ -335,7 +323,6 @@ export default function HackathonsPage() {
                       {platformLabel}
                     </div>
 
-                    {/* Mode Badge */}
                     <div
                       style={{
                         ...styles.modeBadge,
@@ -354,7 +341,6 @@ export default function HackathonsPage() {
                     </div>
                   </div>
 
-                  {/* Card Body */}
                   <div style={styles.cardBody}>
                     <div style={styles.organizerRow}>
                       <span style={styles.organizerText} title={organizerStr}>
@@ -372,7 +358,6 @@ export default function HackathonsPage() {
 
                     <p style={styles.cardTagline}>{taglineStr}</p>
 
-                    {/* Tags */}
                     {tagsList.length > 0 && (
                       <div style={styles.tagRow}>
                         {tagsList.slice(0, 3).map((tag, idx) => (
@@ -383,7 +368,6 @@ export default function HackathonsPage() {
                       </div>
                     )}
 
-                    {/* Stats / Highlights Footer */}
                     <div style={styles.cardMetaFooter}>
                       <div style={styles.metaLeft}>
                         {Number(h.participantsCount) > 0 && (

@@ -1,25 +1,3 @@
-// One-time backfill: recovers unrated Codeforces submissions that were
-// silently dropped by a bug in refreshCodeforcesScore().
-//
-// Root cause: that function advances user.lastCheckedSubmissionId for every
-// candidate submission it looks at, even ones it decides not to score. Before
-// utils/ratingMap.js was fixed to award UNRATED_POINTS for unrated problems,
-// resolvePoints() returned null for them, so they were skipped (never
-// inserted into ScoredSubmission) — but lastCheckedSubmissionId had already
-// moved past their submission id. Since incremental refreshes only fetch
-// submissions with id > lastCheckedSubmissionId, those old unrated solves
-// can never be picked up again by the normal refresh path.
-//
-// This script re-fetches each connected user's FULL Codeforces submission
-// history (ignoring the watermark), finds unrated OK submissions solved
-// after cfConnectedAt that aren't already recorded, and inserts them at
-// UNRATED_POINTS. It does NOT touch lastCheckedSubmissionId — that watermark
-// is left exactly as-is so normal incremental refreshes keep working off it.
-//
-// Safe to re-run: existing submissions are skipped via the unique
-// (userId, platform, problemId) index, so nothing gets double-counted.
-//
-// Run with: node scripts/backfillUnratedCF.js
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -27,7 +5,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const ScoredSubmission = require('../models/ScoredSubmission');
 
-const { fetchCFSubmissions } = require('../services/scoringService');
+const { fetchCFSubmissions, cfProblemId } = require('../services/scoringService');
 const { resolvePoints, UNRATED_POINTS } = require('../utils/ratingMap');
 
 async function backfillForUser(user) {
@@ -44,13 +22,15 @@ async function backfillForUser(user) {
     return { checked: 0, inserted: 0, errors: 1 };
   }
 
+  const WINDOW_SECONDS = 7 * 24 * 60 * 60;
+  const sevenDaysAgo = Math.floor(Date.now() / 1000) - WINDOW_SECONDS;
   const connectedAt = Math.floor(user.cfConnectedAt.getTime() / 1000);
+  const eligibleTime = Math.min(connectedAt, sevenDaysAgo);
 
-  // Only unrated, accepted submissions after the user connected CF.
   const unratedCandidates = submissions.filter(sub =>
     sub.verdict === 'OK' &&
-    sub.creationTimeSeconds >= connectedAt &&
-    sub.problem.rating == null
+    sub.creationTimeSeconds >= eligibleTime &&
+    (sub.problem.rating == null || sub.problem.rating === 0)
   );
 
   let checked = 0;
@@ -60,9 +40,9 @@ async function backfillForUser(user) {
   for (const submission of unratedCandidates) {
     checked++;
 
-    const points = resolvePoints(submission.problem.rating); // always UNRATED_POINTS here
+    const points = resolvePoints(submission.problem.rating);
 
-    const problemId = `${submission.problem.contestId}${submission.problem.index}`;
+    const problemId = cfProblemId(submission.problem);
 
     try {
       await ScoredSubmission.create({
@@ -80,8 +60,6 @@ async function backfillForUser(user) {
 
     } catch (err) {
       if (err.code === 11000) {
-        // Already recorded (from a prior run of this script, or a normal
-        // refresh that happened to still catch it) — not an error.
         continue;
       }
       console.error(`  [${user.cfHandle}] Failed to insert ${problemId}: ${err.message}`);

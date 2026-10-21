@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { api } from "../api";
 
 export default function ForgotPasswordPage() {
-  const [step, setStep] = useState('email'); // email -> otp -> password -> done
+  const [step, setStep] = useState('email'); 
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [resetToken, setResetToken] = useState('');

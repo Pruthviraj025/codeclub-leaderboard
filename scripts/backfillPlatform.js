@@ -1,10 +1,3 @@
-// One-time backfill: sets platform: "codeforces" on ScoredSubmission docs
-// created before the LeetCode integration (commit b03eb7e), which had no
-// `platform` field at all. Without this, old CF solves get counted in
-// TOTAL but not in the CF column, and TOTAL != CF + LC.
-//
-// Run with: node scripts/backfillPlatform.js
-// Run this BEFORE rescoreSubmissions.js.
 
 require('dotenv').config();
 const mongoose = require('mongoose');

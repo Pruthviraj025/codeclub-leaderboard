@@ -12,7 +12,6 @@ const SuggestionSchema = new mongoose.Schema({
   editedAt: { type: Date, default: null },
   additions: { type: [AdditionSchema], default: [] },
 
-  // Admin review. Old docs have no status -> treated as 'pending' via default.
   status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
   adminReply: { type: String, trim: true, maxlength: 2000, default: '' },
   repliedAt: { type: Date, default: null },

@@ -5,7 +5,6 @@ const ScoredSubmission = require('../models/ScoredSubmission');
 
 const router = express.Router();
 
-// PATCH /api/profile/me/email — update your own email
 router.patch('/me/email', requireAuth, async (req, res) => {
   try {
     const { email } = req.body;
@@ -26,8 +25,6 @@ router.patch('/me/email', requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/profile/:userId — view own or someone else's profile (public fields only)
-// GET /api/profile/:userId
 router.get('/:userId', requireAuth, async (req, res) => {
   try {
 
@@ -42,9 +39,6 @@ router.get('/:userId', requireAuth, async (req, res) => {
     const isOwner =
       user._id.toString() === req.user._id.toString();
 
-    // ------------------------------------
-    // Aggregate leaderboard points
-    // ------------------------------------
 
     const stats = await ScoredSubmission.aggregate([
       {
@@ -56,7 +50,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
         $group: {
           _id: "$platform",
           points: {
-            $sum: "$pointsAwarded"
+            $sum: "$points"
           }
         }
       }

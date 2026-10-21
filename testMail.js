@@ -1,4 +1,3 @@
-// Run from backend root:  node testMail.js you@example.com
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 

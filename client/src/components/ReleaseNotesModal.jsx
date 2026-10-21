@@ -13,7 +13,6 @@ export default function ReleaseNotesModal() {
         setOpen(true);
       }
     } catch {
-      // Fallback if localStorage is restricted
     }
   }, []);
 
@@ -21,7 +20,6 @@ export default function ReleaseNotesModal() {
     try {
       localStorage.setItem(RELEASE_VERSION_KEY, 'true');
     } catch {
-      // Ignore storage errors
     }
     setOpen(false);
   }

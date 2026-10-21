@@ -16,8 +16,6 @@ const ScoredSubmissionSchema = new mongoose.Schema({
         index: true
     },
 
-    // CF -> 1234A
-    // LC -> two-sum
     problemId: {
         type: String,
         required: true
@@ -28,20 +26,17 @@ const ScoredSubmissionSchema = new mongoose.Schema({
         default: null
     },
 
-    // Codeforces only
     problemRating: {
         type: Number,
         default: null
     },
 
-    // LeetCode only
     difficulty: {
         type: String,
         enum: ["Easy", "Medium", "Hard", null],
         default: null
     },
 
-    // LeetCode only — needed by resolveLeetCodePoints() for rescoring
     acceptanceRate: {
         type: Number,
         default: null
@@ -103,13 +98,7 @@ const ScoredSubmissionSchema = new mongoose.Schema({
     versionKey: false
 });
 
-/*
-|--------------------------------------------------------------------------
-| Indexes
-|--------------------------------------------------------------------------
-*/
 
-// User cannot score the same problem twice on the same platform.
 ScoredSubmissionSchema.index(
     {
         userId: 1,
@@ -121,7 +110,6 @@ ScoredSubmissionSchema.index(
     }
 );
 
-// Leaderboard
 ScoredSubmissionSchema.index({
     solvedAt: -1
 });

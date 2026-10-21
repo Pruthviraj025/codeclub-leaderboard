@@ -13,9 +13,6 @@ function resolveLeetCodePoints(question) {
         totalSubmissions
     } = question;
 
-    //------------------------------------------
-    // Base Points
-    //------------------------------------------
 
     let base;
 
@@ -38,9 +35,6 @@ function resolveLeetCodePoints(question) {
 
     }
 
-    //------------------------------------------
-    // Acceptance Factor
-    //------------------------------------------
 
     let acceptanceFactor = 1;
 
@@ -58,9 +52,6 @@ function resolveLeetCodePoints(question) {
 
     }
 
-    //------------------------------------------
-    // Submission Factor
-    //------------------------------------------
 
     let submissionFactor = 1;
 
@@ -86,25 +77,16 @@ function resolveLeetCodePoints(question) {
 
     }
 
-    //------------------------------------------
-    // Raw Score
-    //------------------------------------------
 
     let score =
         base *
         acceptanceFactor *
         submissionFactor;
 
-    //------------------------------------------
-    // Round to nearest 100
-    //------------------------------------------
 
     score =
         Math.round(score / 100) * 100;
 
-    //------------------------------------------
-    // Clamp by difficulty
-    //------------------------------------------
 
     switch (difficulty) {
 

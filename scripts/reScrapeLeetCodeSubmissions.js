@@ -1,11 +1,3 @@
-// Trailing-7-day LeetCode ScoredSubmission docs currently hold null
-// acceptanceRate/totalSubmissions (broken scraper — see
-// leetcodeScraper.js fetchStats() comment). Re-fetches real stats per
-// unique problem from LeetCode's GraphQL, updates the docs, recomputes
-// points, and refreshes the LeetCodeQuestion cache too.
-//
-// Run AFTER deploying the scraper fix.
-// Run with: node scripts/reScrapeLeetCodeSubmissions.js
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -44,7 +36,6 @@ async function run() {
     } catch (err) {
       console.error(`Failed to fetch stats for ${slug}: ${err.message}`);
     }
-    // be polite to leetcode.com — avoid tripping rate limits
     await sleep(500);
   }
 
@@ -80,8 +71,6 @@ async function run() {
 
     await sub.save();
 
-    // refresh the shared question cache too, so future refreshes
-    // don't need to hit leetcode.com again within QUESTION_CACHE_DAYS
     await LeetCodeQuestion.updateOne(
       { titleSlug: sub.problemId },
       {

@@ -5,7 +5,7 @@ import { api, getSessionUser } from '../api';
 import SidebarLayout from '../components/SidebarLayout';
 
 const MAX_LEN = 2000;
-const EDIT_WINDOW_MS = 5 * 60 * 1000; // edits allowed only within 5 min of sending
+const EDIT_WINDOW_MS = 5 * 60 * 1000; 
 
 function canEdit(iso) {
   return Date.now() - new Date(iso).getTime() <= EDIT_WINDOW_MS;
@@ -30,13 +30,12 @@ export default function SuggestionsPage() {
   const [mine, setMine] = useState([]);
   const [loadingMine, setLoadingMine] = useState(true);
 
-  // panel = which card has an open editor: { id, mode: 'edit' | 'add' | 'editAddition', additionId? }
   const [panel, setPanel] = useState(null);
   const [draft, setDraft] = useState('');
   const [savingPanel, setSavingPanel] = useState(false);
   const [panelError, setPanelError] = useState('');
 
-  const [, setTick] = useState(0); // re-render so Edit buttons vanish when window closes
+  const [, setTick] = useState(0); 
 
   const user = getSessionUser();
   const navigate = useNavigate();

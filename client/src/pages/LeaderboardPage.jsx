@@ -215,7 +215,6 @@ function LeetCodeIcon() {
   );
 }
 
-// Mirrors utils/ratingMap.js on the backend — keep in sync if that ever changes.
 const RATING_MAP = [
   [800, 200], [900, 300], [1000, 600], [1100, 700], [1200, 1000],
   [1300, 1100], [1400, 1400], [1500, 1500], [1600, 1800], [1700, 1900],
@@ -350,7 +349,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     marginBottom: 'var(--space-2)',
-    marginTop: 'var(--space-4)', // add this
+    marginTop: 'var(--space-4)', 
     gap: '16px',
     flexWrap: 'wrap'
   },

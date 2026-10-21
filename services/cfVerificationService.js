@@ -1,21 +1,10 @@
 const axios = require('axios');
 const User = require('../models/User');
 
-// Fixed verification target: every user submits a deliberately broken solution
-// to this exact problem, within a short time window after requesting.
-// CF 4A ("Watermelon") used as an example — pick something rarely touched
-// by accident if you want fewer false positives from unrelated activity.
 const VERIFICATION_CONTEST_ID = 4;
 const VERIFICATION_PROBLEM_INDEX = 'A';
-const VERIFICATION_WINDOW_MS = 5 * 60 * 1000; // 5 minutes to submit after requesting
+const VERIFICATION_WINDOW_MS = 5 * 60 * 1000; 
 
-/**
- * Step 1: user enters their CF handle. We record the request time and tell them
- * exactly which problem to submit deliberately-broken code to, within 5 minutes.
- * The proof of ownership is "you, the account owner, acted on this specific
- * problem within this specific short window right after asking" — no source-code
- * inspection needed, since CF's public API doesn't expose submission source.
- */
 async function generateVerificationCode(userId, cfHandle) {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');
@@ -34,10 +23,6 @@ async function generateVerificationCode(userId, cfHandle) {
   };
 }
 
-/**
- * Step 2: check for a COMPILATION_ERROR submission on the exact assigned problem,
- * timestamped within the window that started when verification was requested.
- */
 async function checkVerification(userId) {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');

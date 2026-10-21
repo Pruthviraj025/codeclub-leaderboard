@@ -8,12 +8,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// alfa-leetcode-api's /select endpoint requests `stats` from LeetCode's
-// GraphQL but its formatQuestionData() never maps it into the response —
-// data.acRate / data.totalSubmission are always undefined there (verified
-// against alfa-leetcode-api source, src/FormatUtils/problemData.ts). So
-// acceptanceRate/totalSubmissions must come from LeetCode's public GraphQL
-// directly instead.
 async function fetchStats(titleSlug) {
 
     const query = `
@@ -69,13 +63,6 @@ async function fetchStats(titleSlug) {
 
 }
 
-/**
- * Fetches problem metadata from alfa-leetcode-api's /select endpoint
- * (difficulty/title), plus acceptanceRate/totalSubmissions straight
- * from LeetCode's own GraphQL (see fetchStats() above for why).
- * Replaces the old Playwright-based scraper, which depended on a
- * local machine's Chrome profile and could never run on Render.
- */
 async function scrapeProblem(titleSlug) {
 
     let lastError;

@@ -13,8 +13,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// contestId missing for problemset-only problems (e.g. acmsguru).
-// Keeps the normal "1234A" form whenever contestId exists.
 function cfProblemId(problem) {
     const prefix =
         problem.contestId != null
@@ -83,24 +81,22 @@ async function refreshCodeforcesScore(user) {
     const submissions =
         await fetchCFSubmissions(user.cfHandle);
 
-    const connectedAt =
-        Math.floor(
-            user.cfConnectedAt.getTime() / 1000
-        );
+    const WINDOW_SECONDS = 7 * 24 * 60 * 60;
+    const sevenDaysAgo = Math.floor(Date.now() / 1000) - WINDOW_SECONDS;
+    const connectedAt = user.cfConnectedAt
+        ? Math.floor(user.cfConnectedAt.getTime() / 1000)
+        : sevenDaysAgo;
+    const eligibleTime = Math.min(connectedAt, sevenDaysAgo);
 
     const watermark =
         user.lastCheckedSubmissionId || 0;
 
-    // Unrated solves at/below the watermark may have been skipped by an
-    // older build (before unrated scoring existed) and never retried.
-    // Re-check them every refresh; unique index + pre-query dedupe keep
-    // it safe and cheap.
     const isOld = sub => sub.id <= watermark;
-    const isUnrated = sub => sub.problem.rating == null;
+    const isUnrated = sub => sub.problem.rating == null || sub.problem.rating === 0;
 
     const baseOk = submissions.filter(sub =>
         sub.verdict === "OK" &&
-        sub.creationTimeSeconds >= connectedAt
+        sub.creationTimeSeconds >= eligibleTime
     );
 
     const fresh = baseOk.filter(sub => !isOld(sub));
@@ -175,7 +171,8 @@ async function refreshCodeforcesScore(user) {
                     problemName:
                         submission.problem.name,
 
-                    problemRating: rating,
+                    problemRating:
+                        rating ?? null,
 
                     points,
 
@@ -218,10 +215,6 @@ async function refreshCodeforcesScore(user) {
 
 }
 
-/**
- * options.ignoreCooldown
- * Used by cron jobs.
- */
 async function refreshUserScore(
     userId,
     options = {}
@@ -331,10 +324,6 @@ async function refreshUserScore(
 
 }
 
-/**
- * Refreshes Codeforces only. Independent cooldown from LeetCode,
- * so checking one platform never blocks the other.
- */
 async function refreshCfOnly(userId, options = {}) {
 
     const user =
@@ -376,10 +365,6 @@ async function refreshCfOnly(userId, options = {}) {
 
 }
 
-/**
- * Refreshes LeetCode only. Independent cooldown from Codeforces,
- * so checking one platform never blocks the other.
- */
 async function refreshLcOnly(userId, options = {}) {
 
     const user =
@@ -431,6 +416,8 @@ module.exports = {
 
     refreshCodeforcesScore,
 
-    fetchCFSubmissions
+    fetchCFSubmissions,
+
+    cfProblemId
 
 };

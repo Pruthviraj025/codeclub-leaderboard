@@ -1,9 +1,3 @@
-// Rescores LeetCode ScoredSubmission docs solved in trailing 7 days only
-// (matches leaderboard's active window in routes/leaderboard.js).
-// Codeforces docs untouched. Docs older than 7 days untouched — dead
-// weight for leaderboard, no need to touch.
-//
-// Run with: node scripts/rescoreLeetCode7Days.js
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -37,7 +31,6 @@ async function run() {
     });
 
     if (newPoints === null) {
-      // missing difficulty/acceptanceRate/totalSubmissions on doc — leave as-is
       skipped++;
       continue;
     }

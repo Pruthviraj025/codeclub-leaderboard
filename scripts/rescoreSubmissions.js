@@ -1,14 +1,3 @@
-// One-time rescore: updates `points` on every existing ScoredSubmission to
-// match the current scoring tables (utils/ratingMap.js for Codeforces,
-// utils/leetcodePoints.js for LeetCode). Run this after changing either
-// point table, and always AFTER scripts/backfillPlatform.js.
-//
-// Run with: node scripts/rescoreSubmissions.js
-//
-// Note: this only touches submissions that were already scored and stored.
-// Problems that were skipped entirely at scoring time (e.g. out-of-range CF
-// rating, or unresolvable LC difficulty) were never recorded, so there's
-// nothing here to backfill for those.
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -39,13 +28,11 @@ async function run() {
         totalSubmissions: sub.totalSubmissions
       });
     } else {
-      // shouldn't happen after backfillPlatform.js, but don't touch unknowns
       skipped++;
       continue;
     }
 
     if (newPoints === null) {
-      // out-of-range rating / unresolvable difficulty — leave as-is
       skipped++;
       continue;
     }

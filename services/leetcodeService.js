@@ -45,13 +45,10 @@ async function fetchRecentAccepted(username) {
 
             const status = err.response && err.response.status;
 
-            // Retry on rate limit, cold-start timeouts, and upstream 5xx —
-            // alfa-leetcode-api sleeps on Render free tier and throws these
-            // instead of 429 when waking up.
             const retryable =
                 status === 429 ||
                 status >= 500 ||
-                !status; // no response = timeout/ECONNRESET/ECONNABORTED
+                !status; 
 
             if (retryable && attempt < MAX_RETRIES) {
 
@@ -82,16 +79,8 @@ async function fetchRecentAccepted(username) {
     throw lastError;
 }
 
-/**
- * Loads all requested questions.
- * Cached questions come from MongoDB.
- * Missing questions are fetched once from the API and cached.
- */
 async function fetchQuestions(titleSlugs) {
 
-    //------------------------------------------
-    // Load cached questions
-    //------------------------------------------
 
     const expiry = new Date(
         Date.now() -
@@ -108,9 +97,6 @@ async function fetchQuestions(titleSlugs) {
             $gte: expiry
         },
 
-        // Rows with null acceptanceRate are from the pre-fix broken
-        // scraper (see leetcodeScraper.js fetchStats() comment) — don't
-        // trust them as "fresh", force a re-scrape instead.
         acceptanceRate: {
             $ne: null
         }
@@ -148,9 +134,6 @@ async function fetchQuestions(titleSlugs) {
 
     });
 
-    //------------------------------------------
-    // Find uncached problems
-    //------------------------------------------
 
     const missing =
         titleSlugs.filter(
@@ -160,16 +143,9 @@ async function fetchQuestions(titleSlugs) {
     if (!missing.length)
         return questionMap;
 
-    //------------------------------------------
-    // Scrape missing problems
-    //------------------------------------------
 
     const documents = [];
 
-    // alfa-leetcode-api is a free-tier service — firing every missing
-    // problem at it simultaneously can overwhelm/rate-limit it and cause
-    // requests to hang far longer than a single 30s timeout would suggest.
-    // Scrape in small concurrent batches instead of all-at-once or one-by-one.
     const SCRAPE_CONCURRENCY = 3;
 
     const scraped = [];
@@ -262,9 +238,6 @@ async function fetchQuestions(titleSlugs) {
 
     }
 
-    //------------------------------------------
-    // Cache newly scraped problems
-    //------------------------------------------
 
     if (documents.length) {
 
@@ -299,9 +272,6 @@ async function fetchQuestions(titleSlugs) {
 
 async function refreshLeetCodeScore(userId) {
 
-    //------------------------------------------
-    // Load user
-    //------------------------------------------
 
     const user = await User.findById(userId);
 
@@ -317,9 +287,6 @@ async function refreshLeetCodeScore(userId) {
 
     }
 
-    //------------------------------------------
-    // Fetch recent accepted submissions
-    //------------------------------------------
 
     const submissions =
         await fetchRecentAccepted(user.lcUsername);
@@ -349,9 +316,6 @@ async function refreshLeetCodeScore(userId) {
 
     }
 
-    //------------------------------------------
-    // Load question metadata
-    //------------------------------------------
 
     const uniqueSlugs = [
 
@@ -368,9 +332,6 @@ async function refreshLeetCodeScore(userId) {
     const questionMap =
         await fetchQuestions(uniqueSlugs);
 
-    //------------------------------------------
-    // Build scored submissions
-    //------------------------------------------
 
     let highestTimestamp =
         user.lcLastSubmissionTimestamp || 0;
@@ -387,9 +348,6 @@ async function refreshLeetCodeScore(userId) {
         if (!question)
             continue;
 
-        //--------------------------------------
-        // Calculate points
-        //--------------------------------------
 
         const points =
             resolveLeetCodePoints({
@@ -459,9 +417,6 @@ async function refreshLeetCodeScore(userId) {
 
     }
 
-    //------------------------------------------
-    // Insert new submissions
-    //------------------------------------------
 
     let inserted = [];
 
@@ -490,18 +445,12 @@ async function refreshLeetCodeScore(userId) {
 
     }
 
-    //------------------------------------------
-    // Update latest timestamp
-    //------------------------------------------
 
     user.lcLastSubmissionTimestamp =
         highestTimestamp;
 
     await user.save();
 
-    //------------------------------------------
-    // Return summary
-    //------------------------------------------
 
     return {
 

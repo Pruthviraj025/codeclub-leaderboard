@@ -10,7 +10,6 @@ const { hardDeleteUser } = require('../services/deletionRecomputeService');
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
 
-// GET /api/admin/users — list all users for the admin panel
 router.get('/users', async (req, res) => {
   try {
     const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected lcUsername lcConnected createdAt')
@@ -21,7 +20,6 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// GET /api/admin/submissions?status=unreviewed — list scored submissions for plagiarism review
 router.get('/submissions', async (req, res) => {
   try {
     const status = req.query.status || 'unreviewed';
@@ -35,7 +33,6 @@ router.get('/submissions', async (req, res) => {
   }
 });
 
-// POST /api/admin/users/:userId/soft-remove
 router.post('/users/:userId/soft-remove', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -58,7 +55,6 @@ router.post('/users/:userId/soft-remove', async (req, res) => {
   }
 });
 
-// POST /api/admin/users/:userId/reactivate
 router.post('/users/:userId/reactivate', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -81,7 +77,6 @@ router.post('/users/:userId/reactivate', async (req, res) => {
   }
 });
 
-// DELETE /api/admin/users/:userId — hard delete (live leaderboard corrects itself, no recompute job needed)
 router.delete('/users/:userId', async (req, res) => {
   try {
     await hardDeleteUser(req.params.userId, req.user._id, req.body.reason);
@@ -91,7 +86,6 @@ router.delete('/users/:userId', async (req, res) => {
   }
 });
 
-// PATCH /api/admin/submissions/:submissionId/review { status: 'cleared' | 'flagged' }
 router.patch('/submissions/:submissionId/review', async (req, res) => {
   try {
     const { status } = req.body;
@@ -119,7 +113,6 @@ router.patch('/submissions/:submissionId/review', async (req, res) => {
   }
 });
 
-// GET /api/admin/audit-log — recent admin actions
 router.get('/audit-log', async (req, res) => {
   try {
     const actions = await AdminAction.find().sort({ createdAt: -1 }).limit(100);
@@ -129,7 +122,6 @@ router.get('/audit-log', async (req, res) => {
   }
 });
 
-// GET /api/admin/suggestions — list all user suggestions (admin only)
 router.get('/suggestions', async (req, res) => {
   try {
     const suggestions = await Suggestion.find()
@@ -142,7 +134,6 @@ router.get('/suggestions', async (req, res) => {
   }
 });
 
-// PATCH /api/admin/suggestions/:suggestionId/review — set status + reply
 router.patch('/suggestions/:suggestionId/review', async (req, res) => {
   try {
     const { status, reply } = req.body;
@@ -163,7 +154,6 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
     const suggestion = await Suggestion.findById(req.params.suggestionId);
     if (!suggestion) return res.status(404).json({ error: 'Suggestion not found' });
 
-    // Accept / reject only after a reply exists (already sent, or sent in this request)
     if ((status === 'accepted' || status === 'rejected') && !suggestion.adminReply && !replyText) {
       return res.status(400).json({ error: 'Send a reply before accepting or rejecting' });
     }
@@ -176,9 +166,9 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
       }
       suggestion.adminReply = replyText;
       if (hadReply) {
-        suggestion.replyUpdatedAt = new Date(); // edited existing reply
+        suggestion.replyUpdatedAt = new Date(); 
       } else {
-        suggestion.repliedAt = new Date();      // first reply
+        suggestion.repliedAt = new Date();      
         suggestion.replyUpdatedAt = null;
       }
     }
@@ -193,7 +183,6 @@ router.patch('/suggestions/:suggestionId/review', async (req, res) => {
   }
 });
 
-// DELETE /api/admin/suggestions/:suggestionId — dismiss/delete a suggestion
 router.delete('/suggestions/:suggestionId', async (req, res) => {
   try {
     await Suggestion.findByIdAndDelete(req.params.suggestionId);

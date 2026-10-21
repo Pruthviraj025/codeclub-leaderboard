@@ -10,11 +10,6 @@ const router = express.Router();
 
 const WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-/*
-|--------------------------------------------------------------------------
-| Refresh leaderboard data
-|--------------------------------------------------------------------------
-*/
 router.post("/refresh", requireAuth, async (req, res) => {
 
     try {
@@ -37,11 +32,6 @@ router.post("/refresh", requireAuth, async (req, res) => {
 
 });
 
-/*
-|--------------------------------------------------------------------------
-| Refresh Codeforces only
-|--------------------------------------------------------------------------
-*/
 router.post("/refresh/cf", requireAuth, async (req, res) => {
 
     try {
@@ -64,11 +54,6 @@ router.post("/refresh/cf", requireAuth, async (req, res) => {
 
 });
 
-/*
-|--------------------------------------------------------------------------
-| Refresh LeetCode only
-|--------------------------------------------------------------------------
-*/
 router.post("/refresh/lc", requireAuth, async (req, res) => {
 
     try {
@@ -91,11 +76,6 @@ router.post("/refresh/lc", requireAuth, async (req, res) => {
 
 });
 
-/*
-|--------------------------------------------------------------------------
-| Current Leaderboard
-|--------------------------------------------------------------------------
-*/
 router.get("/current", requireAuth, async (req, res) => {
 
     try {

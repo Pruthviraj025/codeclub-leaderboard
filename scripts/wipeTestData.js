@@ -1,11 +1,3 @@
-// One-time pre-launch wipe script.
-// Clears all test data accumulated during development, WITHOUT forcing
-// real users to redo CF verification (cfHandle/cfConnected/cfConnectedAt
-// are preserved on User docs — only scoring/audit history is wiped).
-//
-// Run with: node scripts/wipeTestData.js
-// This is DESTRUCTIVE and irreversible. Only run this once, right before
-// real CodeClub members start using the platform for real.
 
 require('dotenv').config();
 const readline = require('readline');
@@ -43,11 +35,9 @@ async function run() {
     process.exit(0);
   }
 
-  // Wipe scoring/history collections entirely
   await ScoredSubmission.deleteMany({});
   await AdminAction.deleteMany({});
 
-  // Reset per-user scoring state, but KEEP account + CF connection
   await User.updateMany({}, {
     $set: { lastCheckedSubmissionId: null, lastRefreshAt: null }
   });

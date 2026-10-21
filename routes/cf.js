@@ -5,7 +5,6 @@ const { generateVerificationCode, checkVerification } = require('../services/cfV
 
 const router = express.Router();
 
-// POST /api/cf/start-verification { cfHandle }
 router.post('/start-verification', requireAuth, async (req, res) => {
   try {
     const { cfHandle } = req.body;
@@ -21,7 +20,6 @@ router.post('/start-verification', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/cf/verify
 router.post('/verify', requireAuth, async (req, res) => {
   try {
     const result = await checkVerification(req.user._id);
@@ -31,7 +29,6 @@ router.post('/verify', requireAuth, async (req, res) => {
   }
 });
 
-// DELETE /api/cf/disconnect
 router.delete('/disconnect', requireAuth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);

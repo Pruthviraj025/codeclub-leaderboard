@@ -1,14 +1,9 @@
-/* ============================================================
-   CodeClub Leaderboard — Design Tokens
-   "Judge Console" aesthetic — borrows from online-judge verdict
-   language (AC/WA badges) since that's the actual visual world
-   this product lives in. Green/red stars map directly onto it.
-   ============================================================ */
+
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap');
 :root {
-  /* Color */
+  
   --bg: #10141C;
   --surface: #171B24;
   --surface-raised: #1E2430;
@@ -17,17 +12,17 @@
   --text: #E7E9EE;
   --text-dim: #8B94A7;
 --accent-green: #56acf3;
---accent-green-dim: #2b3238;/**/
+--accent-green-dim: #2b3238;
   --accent-red: #E5534B;
   --accent-red-dim: #E5534B22;
   --accent-gold: #D4A657;
   --accent-gold-dim: #D4A65722;
 
-  /* Type */
+  
   --font-display: 'Space Grotesk', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Spacing scale */
+  
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 16px;
@@ -60,7 +55,7 @@ body {
 
 a { color: inherit; text-decoration: none; }
 
-/* Focus visibility — accessibility floor, never remove */
+
 :focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
@@ -79,7 +74,7 @@ input { transition: border-color 0.15s var(--ease); }
 input:focus { border-color: var(--accent-green) !important; }
 
 .mono {
-  font-family: 'Orbitron', sans-serif; /* was var(--font-mono) */
+  font-family: 'Orbitron', sans-serif; 
 }
 @keyframes navGlow {
   from { text-shadow: 0 0 0px transparent; }
@@ -137,7 +132,7 @@ input:focus { border-color: var(--accent-green) !important; }
   background: var(--accent-gold);
 }
 
-/* icon gets a tiny lift on active/hover instead of a colored box */
+
 .nav-link svg {
   transition: transform 0.25s var(--ease), color 0.25s var(--ease);
 }
@@ -147,7 +142,7 @@ input:focus { border-color: var(--accent-green) !important; }
   color: var(--accent-gold);
 }
 
-/* mobile: underline should sit at the very bottom of the row instead */
+
 @media (max-width: 640px) {
   .nav-link::after {
     left: 8px;
@@ -189,18 +184,16 @@ input:focus { border-color: var(--accent-green) !important; }
   }
 }
 
-/* ============================================================
-   Mobile Breakpoints & Layout Utilities
-   ============================================================ */
 
-/* Scrollbar utility for horizontally scrolling tabs/tables */
+
+
 .scroll-x-touch {
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch !important;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none; 
 }
 .scroll-x-touch::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none; 
 }
 
 @keyframes drawerFade {
@@ -213,7 +206,7 @@ input:focus { border-color: var(--accent-green) !important; }
     padding: var(--space-3) var(--space-3) !important;
   }
 
-  /* Responsive Title Header */
+  
   .title-row {
     flex-direction: column !important;
     align-items: stretch !important;
@@ -225,7 +218,7 @@ input:focus { border-color: var(--accent-green) !important; }
     justify-content: center !important;
   }
 
-  /* Standing Queue Columns */
+  
   .queue-col-points {
     width: 80px !important;
   }
@@ -237,7 +230,7 @@ input:focus { border-color: var(--accent-green) !important; }
     display: none !important;
   }
 
-  /* Sidebar shell & mobile navbar */
+  
   .sidebar-shell {
     flex-direction: column !important;
   }
@@ -281,7 +274,7 @@ input:focus { border-color: var(--accent-green) !important; }
     display: none !important;
   }
 
-  /* Full screen Mobile Drawer Page */
+  
   .mobile-nav-page {
     display: flex !important;
     position: fixed !important;
@@ -295,7 +288,7 @@ input:focus { border-color: var(--accent-green) !important; }
     padding: 0 !important;
   }
 
-  /* Profile & Form Adjustments */
+  
   .cf-form {
     flex-direction: column !important;
     gap: 10px !important;
@@ -305,7 +298,7 @@ input:focus { border-color: var(--accent-green) !important; }
     width: 100% !important;
   }
 
-  /* Admin Console Mobile Styles */
+  
   .admin-tab-row {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
@@ -325,7 +318,7 @@ input:focus { border-color: var(--accent-green) !important; }
     min-width: 600px !important;
   }
 
-  /* Controls & Search Rows */
+  
   .mobile-stack {
     flex-direction: column !important;
     align-items: stretch !important;
@@ -337,7 +330,7 @@ input:focus { border-color: var(--accent-green) !important; }
   }
 }
 
-/* Extra small mobile adjustments (< 480px) */
+
 @media (max-width: 480px) {
   .page-main {
     padding: 12px 10px !important;

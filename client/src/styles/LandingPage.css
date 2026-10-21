@@ -1,8 +1,6 @@
-/* ==========================================================================
-   CodeClub Landing Page — Refined Ocean Energy & Cinematic Animation
-   ========================================================================== */
 
-/* --- Layer 1: Background Environment & Effects --- */
+
+
 .landing-bg-overlay {
   position: absolute;
   inset: 0;
@@ -80,7 +78,7 @@
   100% { opacity: 0.08; transform: translateY(-32px) scale(0.6); }
 }
 
-/* --- Layer 1.5: Stage wrapper so form can overlap ring (added) --- */
+
 .stage {
   position: relative;
   width: 280px;
@@ -113,7 +111,7 @@
   transition: filter 0.4s ease, opacity 0.4s ease;
 }
 
-/* --- Layer 2: 8-Light Energy Ring (Materialize -> 2s Hold -> Smooth Dissolve) --- */
+
 .ring-wrap {
   position: relative;
   width: 280px;
@@ -134,7 +132,7 @@
 }
 
 @keyframes ringLightFourLoop {
-  /* Loop 1 (0% - 25%): dim, light-colored ignite */
+  
   0% {
     opacity: 0.3;
     transform: translate(-50%, -50%) scale(0.3);
@@ -148,7 +146,7 @@
     box-shadow: 0 0 12px #7dd8ff, 0 0 20px rgba(125, 216, 255, 0.5);
   }
 
-  /* Loop 2 (25% - 50%): ignite brightly — logo fades in during this window */
+  
   25% {
     opacity: 0.9;
     transform: translate(-50%, -50%) scale(1);
@@ -166,7 +164,7 @@
       0 0 55px rgba(23, 111, 168, 0.8);
   }
 
-  /* Loop 3 (50% - 75%): dip then re-ignite */
+  
   50% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -190,25 +188,7 @@
       0 0 48px rgba(23, 111, 168, 0.75);
   }
 
-  /* Loop 4 (75% - 100%): turn off 
-  75% {
-    opacity: 0.85;
-    transform: translate(-50%, -50%) scale(0.95);
-    background: #bde8ff;
-    box-shadow: 0 0 10px rgba(44, 155, 214, 0.5);
-  }
-  90% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(0.6);
-    background: #0b3157;
-    box-shadow: 0 0 4px rgba(23, 111, 168, 0.2);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4);
-    background: #061a35;
-    box-shadow: none;
-  }*/
+  
 }
 
 .ring-logo {
@@ -220,7 +200,7 @@
   opacity: 0;
   filter: drop-shadow(0 0 0px transparent);
   animation: ringLogoMaterialize 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 1.4s; /* = end of loop 1 / start of loop 2 */
+  animation-delay: 1.4s; 
   user-select: none;
   pointer-events: none;
 }
@@ -260,7 +240,7 @@
   animation: subtitleFadeIn 1s ease 1.2s both;
   filter: drop-shadow(0px 3px 6px #5ecee2);
 }
-/* Join click transition — brief energy burst before the form appears */
+
 .ring-burst {
   animation: ringBurst 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -297,7 +277,7 @@
   100% { opacity: 0; transform: scale(1.6); }
 }
 
-/* Looping <CODECLUB/> typing loader — used while waiting on the server */
+
 .codeclub-loader {
   font-family: 'Orbitron', sans-serif;
   font-weight: 700;
@@ -315,7 +295,7 @@
   from { opacity: 0; transform: translateX(-50%) translateY(0px); }
   to { opacity: 0.65; transform: translateX(-50%) translateY(0); }
 }
-/* --- Layer 4: Calming Join Button Entrance & Styling --- */
+
 .fade-in-btn {
   opacity: 0;
   transform: translateY(12px);

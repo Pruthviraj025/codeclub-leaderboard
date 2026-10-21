@@ -8,9 +8,8 @@ let cache = {
   data: null,
   fetchedAt: 0
 };
-const CACHE_MS = 5 * 60 * 1000; // 5 minute cache
+const CACHE_MS = 5 * 60 * 1000; 
 
-// Curated high-quality fallbacks if external APIs fail or timeout
 const FALLBACK_HACKATHONS = [
   {
     id: 'unstop-fallback-1',
@@ -272,13 +271,11 @@ async function getAllHackathons() {
   return combined;
 }
 
-// GET /api/hackathons
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { platform = 'all', search = '', mode = 'all' } = req.query;
     const fullList = await getAllHackathons();
 
-    // Global stats across all platforms
     const stats = {
       total: fullList.length,
       unstopCount: fullList.filter(h => h.platform === 'unstop').length,
@@ -290,12 +287,10 @@ router.get('/', requireAuth, async (req, res) => {
 
     let list = fullList;
 
-    // Filter by platform
     if (platform !== 'all') {
       list = list.filter(h => h.platform.toLowerCase() === platform.toLowerCase());
     }
 
-    // Filter by mode
     if (mode !== 'all') {
       if (mode === 'online') {
         list = list.filter(h => h.mode === 'Online');
@@ -304,7 +299,6 @@ router.get('/', requireAuth, async (req, res) => {
       }
     }
 
-    // Search query filter
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter(h =>

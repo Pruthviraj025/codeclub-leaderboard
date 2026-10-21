@@ -35,7 +35,6 @@ const PARTICLES = Array.from({ length: NUM_PARTICLES }).map(() => ({
   duration: 6 + Math.random() * 6,
 }));
 
-// Loops "<CODECLUB/>" typing forever — used as a loading indicator
 function CodeClubLoader() {
   const [text, setText] = useState('');
 

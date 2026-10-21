@@ -5,7 +5,7 @@ const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
 let cache = { data: null, fetchedAt: 0 };
-const CACHE_MS = 5 * 60 * 1000; // 5 minute cache
+const CACHE_MS = 5 * 60 * 1000; 
 
 const DIVISION_ORDER = ['Div. 1', 'Div. 2', 'Div. 3', 'Div. 4', 'Div. 1 + 2', 'Educational', 'Global', 'Other'];
 const LEETCODE_CATEGORIES = ['Upcoming & Live', 'Weekly Contest', 'Biweekly Contest', 'Past Contests'];
@@ -95,10 +95,10 @@ async function fetchLeetCodeContests() {
 
     const contests = raw
       .filter(c => c && c.title && c.titleSlug && !c.isVirtual)
-      .slice(0, 50) // Recent & upcoming slice
+      .slice(0, 50) 
       .map(c => {
         const start = Number(c.startTime) || 0;
-        const duration = Number(c.duration) || 5400; // default 1.5h
+        const duration = Number(c.duration) || 5400; 
         let phase = 'FINISHED';
 
         if (nowSec < start) {
@@ -135,7 +135,6 @@ async function fetchLeetCodeContests() {
   }
 }
 
-// GET /api/contests — Codeforces & LeetCode contests
 router.get('/', requireAuth, async (req, res) => {
   try {
     if (cache.data && Date.now() - cache.fetchedAt < CACHE_MS) {

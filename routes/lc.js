@@ -13,14 +13,6 @@ const {
 
 const router = express.Router();
 
-/**
- * POST /api/lc/start-verification
- *
- * Body:
- * {
- *    "username": "xstei"
- * }
- */
 router.post("/start-verification", requireAuth, async (req, res) => {
 
     try {
@@ -50,9 +42,6 @@ router.post("/start-verification", requireAuth, async (req, res) => {
 
 });
 
-/**
- * POST /api/lc/verify
- */
 router.post("/verify", requireAuth, async (req, res) => {
 
     try {
@@ -61,7 +50,6 @@ router.post("/verify", requireAuth, async (req, res) => {
 
         if (result.verified) {
 
-            // Immediately pull the user's submissions
             await refreshLeetCodeScore(req.user._id);
 
         }
@@ -78,9 +66,6 @@ router.post("/verify", requireAuth, async (req, res) => {
 
 });
 
-/**
- * GET /api/lc/status
- */
 router.get("/status", requireAuth, async (req, res) => {
 
     try {
@@ -116,9 +101,6 @@ router.get("/status", requireAuth, async (req, res) => {
 
 });
 
-/**
- * DELETE /api/lc/disconnect
- */
 router.delete("/disconnect", requireAuth, async (req, res) => {
 
     try {
