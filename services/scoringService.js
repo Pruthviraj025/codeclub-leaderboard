@@ -83,10 +83,7 @@ async function refreshCodeforcesScore(user) {
 
     const WINDOW_SECONDS = 7 * 24 * 60 * 60;
     const sevenDaysAgo = Math.floor(Date.now() / 1000) - WINDOW_SECONDS;
-    const connectedAt = user.cfConnectedAt
-        ? Math.floor(user.cfConnectedAt.getTime() / 1000)
-        : sevenDaysAgo;
-    const eligibleTime = Math.min(connectedAt, sevenDaysAgo);
+    const eligibleTime = sevenDaysAgo;
 
     const watermark =
         user.lastCheckedSubmissionId || 0;

@@ -253,7 +253,7 @@ function InfoModal({ onClose }) {
           <section style={styles.section}>
             <div style={styles.sectionTitle}>Codeforces scoring</div>
             <ul style={styles.list}>
-              <li>Connect your Codeforces handle on your Profile page first — only submissions made <em>after</em> connecting are counted.</li>
+              <li>Connect your Codeforces handle on your Profile page first — accepted submissions within the trailing 7-day window are counted.</li>
               <li>Only <strong>Accepted (AC)</strong> submissions count.</li>
               <li>Each problem counts once — resubmitting doesn't add points again.</li>
               <li>Unrated problems count too — flat {UNRATED_POINTS} points each.</li>

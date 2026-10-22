@@ -1,6 +1,7 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const User = require('../models/User');
+const ScoredSubmission = require('../models/ScoredSubmission');
 const { generateVerificationCode, checkVerification } = require('../services/cfVerificationService');
 
 const router = express.Router();
@@ -46,6 +47,8 @@ router.delete('/disconnect', requireAuth, async (req, res) => {
     user.cfVerificationRequestedAt = null;
 
     await user.save();
+
+    await ScoredSubmission.deleteMany({ userId: user._id, platform: 'codeforces' });
 
     res.json({
       success: true,

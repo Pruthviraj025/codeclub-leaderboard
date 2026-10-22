@@ -1,5 +1,7 @@
 const axios = require('axios');
 const User = require('../models/User');
+const ScoredSubmission = require('../models/ScoredSubmission');
+const { refreshCodeforcesScore } = require('./scoringService');
 
 const VERIFICATION_CONTEST_ID = 4;
 const VERIFICATION_PROBLEM_INDEX = 'A';
@@ -58,7 +60,16 @@ async function checkVerification(userId) {
   user.cfConnected = true;
   user.cfConnectedAt = new Date();
   user.cfVerification.verifiedAt = new Date();
+  user.lastCheckedSubmissionId = null;
   await user.save();
+
+  await ScoredSubmission.deleteMany({ userId: user._id, platform: 'codeforces' });
+
+  try {
+    await refreshCodeforcesScore(user);
+  } catch (scoreErr) {
+    console.error(`Failed to refresh CF score for user ${user._id} after connecting:`, scoreErr.message);
+  }
 
   return { verified: true };
 }
