@@ -24,10 +24,63 @@ router.get('/submissions', async (req, res) => {
   try {
     const status = req.query.status || 'unreviewed';
     const submissions = await ScoredSubmission.find({ reviewStatus: status })
-      .populate('userId', 'name usn cfHandle')
+      .populate('userId', 'name usn cfHandle lcUsername')
       .sort({ createdAt: -1 })
-      .limit(100);
-    res.json(submissions);
+      .limit(100)
+      .lean();
+
+    const enriched = submissions.map(s => {
+      let contestId = s.contestId || null;
+      let problemIndex = s.problemIndex || null;
+      const submissionId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || null;
+      const isCf = s.platform === 'codeforces' || !s.platform;
+
+      if (isCf && s.problemId) {
+        const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
+        if (m) {
+          contestId = contestId || m[1];
+          problemIndex = problemIndex || m[2].toUpperCase();
+        } else if (!problemIndex) {
+          problemIndex = s.problemId;
+        }
+      } else if (!problemIndex && s.problemId) {
+        problemIndex = s.problemId;
+      }
+
+      let problemUrl = null;
+      let submissionUrl = null;
+
+      if (isCf) {
+        if (contestId && problemIndex) {
+          problemUrl = `https://codeforces.com/contest/${contestId}/problem/${problemIndex}`;
+        } else if (s.problemId) {
+          problemUrl = `https://codeforces.com/problemset/problem/${s.problemId}`;
+        }
+        if (contestId && s.cfSubmissionId) {
+          submissionUrl = `https://codeforces.com/contest/${contestId}/submission/${s.cfSubmissionId}`;
+        } else if (s.cfSubmissionId) {
+          submissionUrl = `https://codeforces.com/submission/${s.cfSubmissionId}`;
+        }
+      } else {
+        if (s.problemId) {
+          problemUrl = `https://leetcode.com/problems/${s.problemId}/`;
+        }
+        if (s.lcSubmissionId) {
+          submissionUrl = `https://leetcode.com/submissions/detail/${s.lcSubmissionId}/`;
+        }
+      }
+
+      return {
+        ...s,
+        contestId,
+        problemIndex,
+        submissionId,
+        problemUrl,
+        submissionUrl
+      };
+    });
+
+    res.json(enriched);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -303,9 +303,10 @@ async function refreshUserScore(
 
     }
 
-    user.lastRefreshAt = new Date();
-
-    await user.save();
+    await User.updateOne(
+        { _id: user._id },
+        { $set: { lastRefreshAt: new Date() } }
+    );
 
     return {
 
@@ -354,9 +355,10 @@ async function refreshCfOnly(userId, options = {}) {
     const result =
         await refreshCodeforcesScore(user);
 
-    user.lastCfRefreshAt = new Date();
-
-    await user.save();
+    await User.updateOne(
+        { _id: user._id },
+        { $set: { lastCfRefreshAt: new Date() } }
+    );
 
     return result;
 
@@ -395,9 +397,10 @@ async function refreshLcOnly(userId, options = {}) {
     const result =
         await refreshLeetCodeScore(user._id);
 
-    user.lastLcRefreshAt = new Date();
-
-    await user.save();
+    await User.updateOne(
+        { _id: user._id },
+        { $set: { lastLcRefreshAt: new Date() } }
+    );
 
     return result;
 

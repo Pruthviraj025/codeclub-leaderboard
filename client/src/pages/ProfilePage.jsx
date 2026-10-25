@@ -771,6 +771,126 @@ export default function ProfilePage() {
 
             </div>
 
+            <div style={{ ...styles.card, marginTop: "24px" }} className="fade-up">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <div style={styles.eyebrow}>SOLVED PROBLEMS ({profile.solvedSubmissions?.length || 0})</div>
+                    <div style={{ ...styles.dim, fontSize: "11px" }}>Trailing Window</div>
+                </div>
+
+                {!profile.solvedSubmissions || profile.solvedSubmissions.length === 0 ? (
+                    <div style={{ color: "var(--text-dim)", fontSize: "13px", padding: "16px 0", fontFamily: "'Orbitron', sans-serif" }}>
+                        No solved problems recorded yet in the trailing scoring window.
+                    </div>
+                ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {profile.solvedSubmissions.map(sub => {
+                            const isCf = sub.platform === "codeforces";
+                            return (
+                                <div
+                                    key={sub._id}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        padding: "10px 14px",
+                                        background: "var(--surface-raised)",
+                                        border: "1px solid var(--border)",
+                                        borderRadius: "var(--radius-sm)",
+                                        gap: "12px",
+                                        flexWrap: "wrap"
+                                    }}
+                                >
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "220px", flexWrap: "wrap" }}>
+                                        <span
+                                            style={{
+                                                fontSize: "10px",
+                                                fontWeight: 700,
+                                                padding: "2px 6px",
+                                                borderRadius: "4px",
+                                                fontFamily: "'Orbitron', sans-serif",
+                                                color: isCf ? "#3182ce" : "#FFA116",
+                                                background: isCf ? "rgba(49, 130, 206, 0.12)" : "rgba(255, 161, 22, 0.12)",
+                                                border: `1px solid ${isCf ? "#3182ce" : "#FFA116"}`
+                                            }}
+                                        >
+                                            {isCf ? "CF" : "LC"}
+                                        </span>
+                                        {sub.problemUrl ? (
+                                            <a
+                                                href={sub.problemUrl}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                style={{
+                                                    color: "var(--text)",
+                                                    textDecoration: "none",
+                                                    fontWeight: 600,
+                                                    fontSize: "13px",
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: "4px"
+                                                }}
+                                                title="Open problem in new tab"
+                                            >
+                                                {sub.problemName} ↗
+                                            </a>
+                                        ) : (
+                                            <span style={{ fontWeight: 600, fontSize: "13px" }}>{sub.problemName}</span>
+                                        )}
+                                        {sub.problemRating != null && (
+                                            <span style={{
+                                                fontSize: "11px",
+                                                color: "var(--accent-gold)",
+                                                background: "rgba(230, 180, 80, 0.12)",
+                                                border: "1px solid rgba(230, 180, 80, 0.3)",
+                                                padding: "1px 6px",
+                                                borderRadius: "3px",
+                                                fontFamily: "'Orbitron', sans-serif"
+                                            }}>
+                                                ★ {sub.problemRating}
+                                            </span>
+                                        )}
+                                        {sub.difficulty && (
+                                            <span style={{
+                                                fontSize: "11px",
+                                                color: "var(--text-dim)",
+                                                background: "var(--surface)",
+                                                border: "1px solid var(--border)",
+                                                padding: "1px 6px",
+                                                borderRadius: "3px",
+                                                fontFamily: "'Orbitron', sans-serif"
+                                            }}>
+                                                {sub.difficulty}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                                        {sub.solvedAt && (
+                                            <span style={{ fontSize: "11px", color: "var(--text-dim)", fontFamily: "'Orbitron', sans-serif" }}>
+                                                {new Date(sub.solvedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                            </span>
+                                        )}
+                                        <span
+                                            style={{
+                                                color: "var(--accent-green)",
+                                                background: "var(--accent-green-dim)",
+                                                border: "1px solid var(--accent-green)",
+                                                borderRadius: "4px",
+                                                padding: "2px 8px",
+                                                fontSize: "11px",
+                                                fontFamily: "'Orbitron', sans-serif"
+                                            }}
+                                        >
+                                            +{sub.points} pts
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
         </div>
 
     </SidebarLayout>

@@ -75,6 +75,58 @@ router.get('/:userId', requireAuth, async (req, res) => {
       codeforcesPoints +
       leetcodePoints;
 
+    const submissions = await ScoredSubmission.find({
+      userId: user._id
+    })
+      .sort({ solvedAt: -1 })
+      .limit(100)
+      .lean();
+
+    const solvedSubmissions = submissions.map(s => {
+      let contestId = s.contestId || null;
+      let problemIndex = s.problemIndex || null;
+      const isCf = s.platform === 'codeforces' || !s.platform;
+
+      if (isCf && s.problemId) {
+        const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
+        if (m) {
+          contestId = m[1];
+          problemIndex = m[2].toUpperCase();
+        } else {
+          problemIndex = s.problemId;
+        }
+      } else {
+        problemIndex = s.problemId;
+      }
+
+      let problemUrl = null;
+      if (isCf) {
+        if (contestId && problemIndex) {
+          problemUrl = `https://codeforces.com/contest/${contestId}/problem/${problemIndex}`;
+        } else if (s.problemId) {
+          problemUrl = `https://codeforces.com/problemset/problem/${s.problemId}`;
+        }
+      } else {
+        if (s.problemId) {
+          problemUrl = `https://leetcode.com/problems/${s.problemId}/`;
+        }
+      }
+
+      return {
+        _id: s._id,
+        platform: s.platform || 'codeforces',
+        problemId: s.problemId,
+        problemName: s.problemName || (isCf && contestId && problemIndex ? `Contest ${contestId}${problemIndex}` : s.problemId),
+        contestId,
+        problemIndex,
+        problemRating: s.problemRating,
+        difficulty: s.difficulty,
+        points: s.points,
+        solvedAt: s.solvedAt,
+        problemUrl
+      };
+    });
+
     const profile = {
 
       id: user._id,
@@ -89,7 +141,8 @@ router.get('/:userId', requireAuth, async (req, res) => {
 
       codeforcesPoints,
       leetcodePoints,
-      totalPoints
+      totalPoints,
+      solvedSubmissions
 
     };
 

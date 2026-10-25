@@ -1,6 +1,7 @@
 const express = require("express");
 const { requireAuth } = require("../middleware/auth");
 const User = require("../models/User");
+const ScoredSubmission = require("../models/ScoredSubmission");
 
 const {
     startVerification,
@@ -50,7 +51,19 @@ router.post("/verify", requireAuth, async (req, res) => {
 
         if (result.verified) {
 
-            await refreshLeetCodeScore(req.user._id);
+            await ScoredSubmission.deleteMany({
+                userId: req.user._id,
+                platform: "leetcode"
+            });
+
+            try {
+                await refreshLeetCodeScore(req.user._id);
+            } catch (scoreErr) {
+                console.error(
+                    `Failed to refresh LC score for user ${req.user._id} after connecting:`,
+                    scoreErr.message
+                );
+            }
 
         }
 
@@ -119,6 +132,11 @@ router.delete("/disconnect", requireAuth, async (req, res) => {
         };
 
         await user.save();
+
+        await ScoredSubmission.deleteMany({
+            userId: user._id,
+            platform: "leetcode"
+        });
 
         res.json({
             success: true,

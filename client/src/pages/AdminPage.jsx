@@ -259,23 +259,116 @@ function ReviewTab() {
           <div className="admin-table-inner">
             <div style={styles.tableHeader}>
               <span style={{ ...styles.col, flex: 2 }}>USER</span>
-              <span style={{ ...styles.col, flex: 2 }}>CONTEST / PROBLEM</span>
+              <span style={{ ...styles.col, flex: 3 }}>CONTEST / PROBLEM</span>
               <span style={{ ...styles.col, width: '90px' }}>POINTS</span>
               <span style={{ ...styles.col, width: '160px' }}>ACTIONS</span>
             </div>
 
             {submissions.map(s => {
               const u = s.userId || {};
+              const isCf = s.platform === 'codeforces' || !s.platform;
+              
+              let contestId = s.contestId;
+              let problemIndex = s.problemIndex;
+              if (isCf && !contestId && s.problemId) {
+                const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
+                if (m) {
+                  contestId = m[1];
+                  problemIndex = problemIndex || m[2].toUpperCase();
+                } else if (!problemIndex) {
+                  problemIndex = s.problemId;
+                }
+              } else if (!problemIndex && s.problemId) {
+                problemIndex = s.problemId;
+              }
+
+              const subId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId;
+              
+              const problemUrl = s.problemUrl || (
+                isCf
+                  ? (contestId && problemIndex ? `https://codeforces.com/contest/${contestId}/problem/${problemIndex}` : (s.problemId ? `https://codeforces.com/problemset/problem/${s.problemId}` : null))
+                  : (s.problemId ? `https://leetcode.com/problems/${s.problemId}/` : null)
+              );
+
+              const submissionUrl = s.submissionUrl || (
+                isCf
+                  ? (contestId && s.cfSubmissionId ? `https://codeforces.com/contest/${contestId}/submission/${s.cfSubmissionId}` : (s.cfSubmissionId ? `https://codeforces.com/submission/${s.cfSubmissionId}` : null))
+                  : (s.lcSubmissionId ? `https://leetcode.com/submissions/detail/${s.lcSubmissionId}/` : null)
+              );
+
+              const problemTitle = s.problemName || (isCf ? (contestId && problemIndex ? `Contest ${contestId} · Prob ${problemIndex}` : s.problemId) : s.problemId) || 'Problem';
+
+              const userPlatformHandle = isCf
+                ? (u.cfHandle ? `CF: ${u.cfHandle}` : null)
+                : (u.lcUsername ? `LC: ${u.lcUsername}` : null);
+
               return (
                 <div key={s._id} style={styles.tableRow}>
                   <div style={{ flex: 2 }}>
                     <div style={{ fontWeight: 600 }}>{u.name || 'Unknown'}</div>
-                    <div style={styles.subtext}>{u.usn} ({u.cfHandle})</div>
+                    <div style={styles.subtext}>
+                      {u.usn ? `${u.usn} ` : ''}
+                      {userPlatformHandle ? `(${userPlatformHandle})` : (u.cfHandle ? `(${u.cfHandle})` : '')}
+                    </div>
                   </div>
 
-                  <div style={{ flex: 2 }}>
-                    <div>Contest {s.contestId}</div>
-                    <div style={styles.subtext}>Prob {s.problemIndex} · Sub #{s.submissionId}</div>
+                  <div style={{ flex: 3 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={isCf ? styles.pillCf : styles.pillLc}>
+                        {isCf ? 'CF' : 'LC'}
+                      </span>
+                      {problemUrl ? (
+                        <a
+                          href={problemUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={styles.problemLink}
+                          title="Open problem on platform"
+                        >
+                          {problemTitle} ↗
+                        </a>
+                      ) : (
+                        <span style={{ fontWeight: 600 }}>{problemTitle}</span>
+                      )}
+                      {s.problemRating != null && (
+                        <span style={styles.ratingBadge}>★ {s.problemRating}</span>
+                      )}
+                      {s.difficulty && (
+                        <span style={styles.difficultyBadge}>{s.difficulty}</span>
+                      )}
+                    </div>
+
+                    <div style={{ ...styles.subtext, marginTop: '4px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      {isCf && contestId && (
+                        <span>Contest {contestId}{problemIndex ? ` · Prob ${problemIndex}` : ''}</span>
+                      )}
+                      {!isCf && s.problemId && (
+                        <span>Problem: {s.problemId}</span>
+                      )}
+                      {subId && (
+                        <span>
+                          · Sub{' '}
+                          {submissionUrl ? (
+                            <a
+                              href={submissionUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={styles.subLink}
+                              title="Inspect submission code on platform"
+                            >
+                              #{subId} ↗
+                            </a>
+                          ) : (
+                            `#${subId}`
+                          )}
+                        </span>
+                      )}
+                      {s.solvedAt && (
+                        <span style={{ opacity: 0.7 }}>
+                          · {new Date(s.solvedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div style={{ width: '90px' }}>
@@ -739,6 +832,31 @@ const styles = {
     color: 'var(--accent-red)', background: 'var(--accent-red-dim)',
     border: '1px solid var(--accent-red)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px',
     fontFamily: "'Orbitron', sans-serif"
+  },
+  pillCf: {
+    color: '#3182ce', background: 'rgba(49, 130, 206, 0.12)',
+    border: '1px solid #3182ce', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
+    fontFamily: "'Orbitron', sans-serif"
+  },
+  pillLc: {
+    color: '#FFA116', background: 'rgba(255, 161, 22, 0.12)',
+    border: '1px solid #FFA116', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
+    fontFamily: "'Orbitron', sans-serif"
+  },
+  problemLink: {
+    color: 'var(--text)', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
+    display: 'inline-flex', alignItems: 'center', gap: '4px'
+  },
+  subLink: {
+    color: 'var(--accent-gold)', textDecoration: 'none', borderBottom: '1px dashed var(--accent-gold)'
+  },
+  ratingBadge: {
+    color: 'var(--accent-gold)', fontSize: '11px', background: 'rgba(230, 180, 80, 0.12)',
+    border: '1px solid rgba(230, 180, 80, 0.3)', padding: '1px 6px', borderRadius: '3px'
+  },
+  difficultyBadge: {
+    color: 'var(--text-dim)', fontSize: '11px', background: 'var(--surface-raised)',
+    border: '1px solid var(--border)', padding: '1px 6px', borderRadius: '3px'
   },
   actionBtn: {
     background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '4px',

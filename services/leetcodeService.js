@@ -195,6 +195,35 @@ async function fetchQuestions(titleSlugs) {
             !data.difficulty
         ) {
 
+            const stale = await LeetCodeQuestion.findOne({
+                titleSlug: slug,
+                difficulty: { $ne: null }
+            });
+
+            if (stale) {
+                console.log(
+                    `Using cached data for ${slug} after scrape failure`
+                );
+                questionMap.set(
+                    slug,
+                    {
+                        questionTitle:
+                            stale.title,
+                        difficulty:
+                            stale.difficulty,
+                        acceptanceRate:
+                            stale.acceptanceRate,
+                        acceptedCount:
+                            stale.acceptedCount,
+                        totalSubmissions:
+                            stale.totalSubmissions,
+                        topicTags:
+                            stale.topicTags || []
+                    }
+                );
+                continue;
+            }
+
             console.log(
                 `Skipping ${slug}`
             );
@@ -295,17 +324,55 @@ async function refreshLeetCodeScore(userId) {
         Math.floor(Date.now() / 1000) -
         WINDOW_SECONDS;
 
-    const candidates =
-        submissions.filter(sub => {
+    const inWindowSubs =
+        (submissions || []).filter(sub => {
 
             const ts = Number(sub.timestamp);
 
             return (
                 ts >= cutoff &&
-                ts > (user.lcLastSubmissionTimestamp || 0)
+                (sub.statusDisplay === "Accepted" || !sub.statusDisplay)
             );
 
         });
+
+    if (!inWindowSubs.length) {
+
+        return {
+            newlyScored: [],
+            pointsAdded: 0
+        };
+
+    }
+
+    const existingScored = await ScoredSubmission.find({
+        userId: user._id,
+        platform: "leetcode",
+        problemId: {
+            $in: inWindowSubs.map(s => s.titleSlug)
+        }
+    }).select("problemId").lean();
+
+    const existingSlugs = new Set(
+        existingScored.map(e => e.problemId)
+    );
+
+    const seenSlugs = new Set();
+    const candidates = [];
+
+    for (const sub of inWindowSubs) {
+
+        if (
+            !existingSlugs.has(sub.titleSlug) &&
+            !seenSlugs.has(sub.titleSlug)
+        ) {
+
+            seenSlugs.add(sub.titleSlug);
+            candidates.push(sub);
+
+        }
+
+    }
 
     if (!candidates.length) {
 
@@ -316,22 +383,11 @@ async function refreshLeetCodeScore(userId) {
 
     }
 
-
-    const uniqueSlugs = [
-
-        ...new Set(
-
-            candidates.map(
-                s => s.titleSlug
-            )
-
-        )
-
-    ];
+    const uniqueSlugs =
+        candidates.map(s => s.titleSlug);
 
     const questionMap =
         await fetchQuestions(uniqueSlugs);
-
 
     let highestTimestamp =
         user.lcLastSubmissionTimestamp || 0;
@@ -348,75 +404,53 @@ async function refreshLeetCodeScore(userId) {
         if (!question)
             continue;
 
-
         const points =
             resolveLeetCodePoints({
-
                 difficulty:
                     question.difficulty,
-
                 acceptanceRate:
                     question.acceptanceRate,
-
                 totalSubmissions:
                     question.totalSubmissions
-
             });
 
         if (points == null)
             continue;
 
         highestTimestamp = Math.max(
-
             highestTimestamp,
-
             Number(submission.timestamp)
-
         );
 
         docs.push({
-
             userId:
                 user._id,
-
             platform:
                 "leetcode",
-
             problemId:
                 submission.titleSlug,
-
             problemName:
                 question.questionTitle,
-
             difficulty:
                 question.difficulty,
-
             acceptanceRate:
                 question.acceptanceRate,
-
             acceptedCount:
                 question.acceptedCount,
-
             totalSubmissions:
                 question.totalSubmissions,
-
             scoringVersion:
                 1,
-
             points,
-
             lcSubmissionId:
                 `${submission.titleSlug}_${submission.timestamp}`,
-
             solvedAt:
                 new Date(
                     Number(submission.timestamp) * 1000
                 )
-
         });
 
     }
-
 
     let inserted = [];
 
@@ -426,13 +460,10 @@ async function refreshLeetCodeScore(userId) {
 
             inserted =
                 await ScoredSubmission.insertMany(
-
                     docs,
-
                     {
                         ordered: false
                     }
-
                 );
 
         }
@@ -445,11 +476,10 @@ async function refreshLeetCodeScore(userId) {
 
     }
 
-
-    user.lcLastSubmissionTimestamp =
-        highestTimestamp;
-
-    await user.save();
+    await User.updateOne(
+        { _id: user._id },
+        { $set: { lcLastSubmissionTimestamp: highestTimestamp } }
+    );
 
 
     return {
