@@ -10,8 +10,10 @@ export default function LeaderboardPage() {
   const [error, setError] = useState('');
   const [refreshingCf, setRefreshingCf] = useState(false);
   const [refreshingLc, setRefreshingLc] = useState(false);
+  const [refreshingCc, setRefreshingCc] = useState(false);
   const [cfMsg, setCfMsg] = useState('');
   const [lcMsg, setLcMsg] = useState('');
+  const [ccMsg, setCcMsg] = useState('');
   const [showInfo, setShowInfo] = useState(false);
   const user = getSessionUser();
   const navigate = useNavigate();
@@ -64,6 +66,21 @@ export default function LeaderboardPage() {
     }
   }
 
+  async function handleRefreshCc() {
+    setRefreshingCc(true);
+    setCcMsg('');
+    try {
+      const res = await api.refreshCc();
+      const added = res.pointsAdded || 0;
+      setCcMsg(added > 0 ? `CC: +${added} points` : 'CC: No new solves found.');
+      await loadLeaderboard();
+    } catch (err) {
+      setCcMsg(`CC: ${err.message}`);
+    } finally {
+      setRefreshingCc(false);
+    }
+  }
+
   if (!user) return null;
 
   return (
@@ -90,20 +107,25 @@ export default function LeaderboardPage() {
           <button style={styles.refreshBtnLc} className="refresh-btn" onClick={handleRefreshLc} disabled={refreshingLc}>
             {refreshingLc ? 'Checking…' : '↻ Refresh LC'}
           </button>
+          <button style={styles.refreshBtnCc} className="refresh-btn" onClick={handleRefreshCc} disabled={refreshingCc}>
+            {refreshingCc ? 'Checking…' : '↻ Refresh CC'}
+          </button>
         </div>
       </div>
 
       {cfMsg && <div style={styles.refreshMsg}>{cfMsg}</div>}
       {lcMsg && <div style={{ ...styles.refreshMsg, color: '#FFA116' }}>{lcMsg}</div>}
+      {ccMsg && <div style={{ ...styles.refreshMsg, color: '#D48843' }}>{ccMsg}</div>}
       {error && <div style={styles.error}>{error}</div>}
 
       <div style={styles.queue}>
         <div style={styles.queueHeader}>
           <span style={{ ...styles.col, width: '48px' }} className="queue-col-rank">RANK</span>
           <span style={{ ...styles.col, flex: 1 }}>USER</span>
-          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-cf">CF</span>
-          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-lc">LC</span>
-          <span style={{ ...styles.col, width: '90px', textAlign: 'right' }} className="queue-col-points">TOTAL</span>
+          <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cf">CF</span>
+          <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-lc">LC</span>
+          <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cc">CC</span>
+          <span style={{ ...styles.col, width: '85px', textAlign: 'right' }} className="queue-col-points">TOTAL</span>
         </div>
 
         {loadingBoard ? (
@@ -149,24 +171,40 @@ export default function LeaderboardPage() {
                     <LeetCodeIcon />
                   </a>
                 )}
+                {row.ccHandle && (
+
+                  <a href={`https://www.codechef.com/users/${row.ccHandle}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={styles.cfIconLink}
+                    title={`Open ${row.ccHandle} on CodeChef`}
+                  >
+                    <CodeChefIcon />
+                  </a>
+                )}
                 <span
                   className="mono"
                   style={styles.nameLink}
                   onClick={(e) => { e.stopPropagation(); navigate(`/profile/${row.userId}`); }}
                 >
-                  {row.cfHandle || row.lcUsername || row.name}
+                  {row.cfHandle || row.lcUsername || row.ccHandle || row.name}
                 </span>
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cf">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cf">
                 {row.codeforcesPoints}
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-lc">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-lc">
                 {row.leetcodePoints}
               </span>
 
-              <span style={{ ...styles.col, width: '90px', textAlign: 'right', fontWeight: 700, color: 'var(--text)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-points">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#D48843', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cc">
+                {row.codechefPoints || 0}
+              </span>
+
+              <span style={{ ...styles.col, width: '85px', textAlign: 'right', fontWeight: 700, color: 'var(--text)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-points">
                 {row.totalPoints}
               </span>
             </div>
@@ -215,6 +253,17 @@ function LeetCodeIcon() {
   );
 }
 
+function CodeChefIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3C8.5 3 6.5 5.5 6.5 8.5C5.5 8.8 4 9.8 4 12C4 14.5 6 15.5 7 15.8V19C7 19.6 7.4 20 8 20H16C16.6 20 17 19.6 17 19V15.8C18 15.5 20 14.5 20 12C20 9.8 18.5 8.8 17.5 8.5C17.5 5.5 15.5 3 12 3Z" fill="#D48843" />
+      <circle cx="9.5" cy="11.5" r="1.3" fill="#1A1815" />
+      <circle cx="14.5" cy="11.5" r="1.3" fill="#1A1815" />
+      <path d="M10 15C11 15.8 13 15.8 14 15" stroke="#1A1815" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const RATING_MAP = [
   [800, 200], [900, 300], [1000, 600], [1100, 700], [1200, 1000],
   [1300, 1100], [1400, 1400], [1500, 1500], [1600, 1800], [1700, 1900],
@@ -231,6 +280,36 @@ const LEETCODE_POINTS = [
   { difficulty: 'Hard', color: '#F44336', range: '1500–2500' }
 ];
 
+const CODECHEF_MAP = [
+  ['< 500 / Unrated', 100],
+  ['500–599', 100],
+  ['600–699', 150],
+  ['700–799', 200],
+  ['800–899', 250],
+  ['900–999', 300],
+  ['1000–1099', 400],
+  ['1100–1199', 500],
+  ['1200–1299', 600],
+  ['1300–1399', 700],
+  ['1400–1499', 900],
+  ['1500–1599', 1100],
+  ['1600–1699', 1300],
+  ['1700–1799', 1500],
+  ['1800–1899', 1800],
+  ['1900–1999', 2000],
+  ['2000–2099', 2300],
+  ['2100–2199', 2600],
+  ['2200–2299', 2900],
+  ['2300–2399', 3200],
+  ['2400–2499', 3500],
+  ['2500–2599', 3800],
+  ['2600–2699', 4100],
+  ['2700–2799', 4400],
+  ['2800–2899', 4700],
+  ['2900–2999', 5000],
+  ['3000+', 5500]
+];
+
 function InfoModal({ onClose }) {
   return (
     <div style={styles.overlay} onClick={onClose}>
@@ -245,18 +324,30 @@ function InfoModal({ onClose }) {
             <div style={styles.sectionTitle}>Supported platforms</div>
             <ul style={styles.list}>
               <li>Codeforces Accepted submissions are scored.</li>
-              <li>LeetCode Accepted submissions are also scored.</li>
-              <li>Both platforms contribute toward your <strong>Total Points</strong>.</li>
+              <li>LeetCode Accepted submissions are scored.</li>
+              <li>CodeChef Accepted submissions are scored.</li>
+              <li>All platforms contribute toward your <strong>Total Points</strong>.</li>
             </ul>
           </section>
 
           <section style={styles.section}>
             <div style={styles.sectionTitle}>Codeforces scoring</div>
             <ul style={styles.list}>
-              <li>Connect your Codeforces handle on your Profile page first — accepted submissions within the trailing 7-day window are counted.</li>
+              <li>Connect your handle on your Profile page — accepted submissions within the trailing 7-day window are counted.</li>
               <li>Only <strong>Accepted (AC)</strong> submissions count.</li>
               <li>Each problem counts once — resubmitting doesn't add points again.</li>
-              <li>Unrated problems count too — flat {UNRATED_POINTS} points each.</li>
+              <li>Points scale according to problem difficulty rating mapped to standard rating brackets.</li>
+              <li>Unrated problems award {UNRATED_POINTS} points.</li>
+            </ul>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>CodeChef scoring</div>
+            <ul style={styles.list}>
+              <li>Connect your CodeChef handle on your Profile page by submitting non-compiling code to problem TEST.</li>
+              <li>Only <strong>Accepted (100 pts)</strong> solutions count.</li>
+              <li>Each problem awards points once within the 7-day rolling window.</li>
+              <li>Points scale based on problem difficulty rating intervals (see table below).</li>
             </ul>
           </section>
 
@@ -290,6 +381,18 @@ function InfoModal({ onClose }) {
                 <div key={rating} style={styles.ratingCell}>
                   <span className="mono" style={styles.ratingNum}>{rating}</span>
                   <span className="mono" style={styles.ratingPts}>{points}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>CodeChef rating → points</div>
+            <div style={styles.ratingGrid}>
+              {CODECHEF_MAP.map(([range, points]) => (
+                <div key={range} style={styles.ratingCell}>
+                  <span className="mono" style={{ ...styles.ratingNum, fontSize: '9px' }}>{range}</span>
+                  <span className="mono" style={{ ...styles.ratingPts, color: '#D48843' }}>{points}</span>
                 </div>
               ))}
             </div>
@@ -505,6 +608,20 @@ const styles = {
     background: 'var(--surface-raised)',
     border: '1px solid #FFA116',
     color: '#FFA116',
+    borderRadius: 'var(--radius-sm)',
+    padding: '10px 16px',
+    fontSize: '13px',
+    letterSpacing: '2px',
+    fontFamily: "'Orbitron', sans-serif"
+  },
+  refreshBtnCc: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    background: 'var(--surface-raised)',
+    border: '1px solid #D48843',
+    color: '#D48843',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 16px',
     fontSize: '13px',

@@ -11,7 +11,7 @@ const ScoredSubmissionSchema = new mongoose.Schema({
 
     platform: {
         type: String,
-        enum: ["codeforces", "leetcode"],
+        enum: ["codeforces", "leetcode", "codechef"],
         required: true,
         index: true
     },
@@ -68,6 +68,11 @@ const ScoredSubmissionSchema = new mongoose.Schema({
     },
 
     lcSubmissionId: {
+        type: String,
+        default: null
+    },
+
+    ccSubmissionId: {
         type: String,
         default: null
     },

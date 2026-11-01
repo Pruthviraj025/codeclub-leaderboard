@@ -84,7 +84,8 @@ function startLeaderboardSync() {
 
                 $or: [
                     { cfConnected: true },
-                    { lcConnected: true }
+                    { lcConnected: true },
+                    { ccConnected: true }
                 ]
 
             });

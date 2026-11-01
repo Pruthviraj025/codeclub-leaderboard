@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { requireAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const ScoredSubmission = require('../models/ScoredSubmission');
@@ -58,6 +59,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
 
     let codeforcesPoints = 0;
     let leetcodePoints = 0;
+    let codechefPoints = 0;
 
     for (const row of stats) {
 
@@ -69,23 +71,29 @@ router.get('/:userId', requireAuth, async (req, res) => {
         leetcodePoints = row.points;
       }
 
+      if (row._id === "codechef") {
+        codechefPoints = row.points;
+      }
+
     }
 
     const totalPoints =
       codeforcesPoints +
-      leetcodePoints;
+      leetcodePoints +
+      codechefPoints;
 
     const submissions = await ScoredSubmission.find({
       userId: user._id
     })
       .sort({ solvedAt: -1 })
-      .limit(100)
+      .limit(5)
       .lean();
 
     const solvedSubmissions = submissions.map(s => {
       let contestId = s.contestId || null;
       let problemIndex = s.problemIndex || null;
       const isCf = s.platform === 'codeforces' || !s.platform;
+      const isCc = s.platform === 'codechef';
 
       if (isCf && s.problemId) {
         const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
@@ -105,6 +113,10 @@ router.get('/:userId', requireAuth, async (req, res) => {
           problemUrl = `https://codeforces.com/contest/${contestId}/problem/${problemIndex}`;
         } else if (s.problemId) {
           problemUrl = `https://codeforces.com/problemset/problem/${s.problemId}`;
+        }
+      } else if (isCc) {
+        if (s.problemId) {
+          problemUrl = `https://www.codechef.com/problems/${s.problemId}`;
         }
       } else {
         if (s.problemId) {
@@ -127,11 +139,49 @@ router.get('/:userId', requireAuth, async (req, res) => {
       };
     });
 
+    const heatmapAgg = await ScoredSubmission.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(user._id)
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$solvedAt" } },
+            platform: "$platform"
+          },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const activityMap = {};
+    for (const row of heatmapAgg) {
+      const d = row._id.date;
+      const plat = row._id.platform || 'codeforces';
+      if (!activityMap[d]) {
+        activityMap[d] = {
+          total: 0,
+          codeforces: 0,
+          leetcode: 0,
+          codechef: 0,
+          platforms: []
+        };
+      }
+      activityMap[d][plat] = (activityMap[d][plat] || 0) + row.count;
+      activityMap[d].total += row.count;
+      if (!activityMap[d].platforms.includes(plat)) {
+        activityMap[d].platforms.push(plat);
+      }
+    }
+
     const profile = {
 
       id: user._id,
 
       name: user.name,
+      createdAt: user.createdAt,
 
       cfHandle: user.cfHandle,
       cfConnected: user.cfConnected,
@@ -139,10 +189,15 @@ router.get('/:userId', requireAuth, async (req, res) => {
       lcUsername: user.lcUsername,
       lcConnected: user.lcConnected,
 
+      ccHandle: user.ccHandle,
+      ccConnected: user.ccConnected,
+
       codeforcesPoints,
       leetcodePoints,
+      codechefPoints,
       totalPoints,
-      solvedSubmissions
+      solvedSubmissions,
+      activityMap
 
     };
 

@@ -1,7 +1,7 @@
 const express = require("express");
 
 const { requireAuth } = require("../middleware/auth");
-const { refreshUserScore, refreshCfOnly, refreshLcOnly } = require("../services/scoringService");
+const { refreshUserScore, refreshCfOnly, refreshLcOnly, refreshCcOnly } = require("../services/scoringService");
 
 const ScoredSubmission = require("../models/ScoredSubmission");
 const User = require("../models/User");
@@ -59,6 +59,28 @@ router.post("/refresh/lc", requireAuth, async (req, res) => {
     try {
 
         const result = await refreshLcOnly(req.user._id);
+
+        res.json({
+            success: true,
+            ...result
+        });
+
+    } catch (err) {
+
+        res.status(400).json({
+            success: false,
+            error: err.message
+        });
+
+    }
+
+});
+
+router.post("/refresh/cc", requireAuth, async (req, res) => {
+
+    try {
+
+        const result = await refreshCcOnly(req.user._id);
 
         res.json({
             success: true,
@@ -151,6 +173,29 @@ router.get("/current", requireAuth, async (req, res) => {
 
                             }
 
+                        },
+
+                        codechefPoints: {
+
+                            $sum: {
+
+                                $cond: [
+
+                                    {
+                                        $eq: [
+                                            "$platform",
+                                            "codechef"
+                                        ]
+                                    },
+
+                                    "$points",
+
+                                    0
+
+                                ]
+
+                            }
+
                         }
 
                     }
@@ -169,7 +214,7 @@ router.get("/current", requireAuth, async (req, res) => {
                     },
                     isActive: true
                 },
-                "name cfHandle lcUsername"
+                "name cfHandle lcUsername ccHandle"
             );
 
         const userMap = new Map(
@@ -230,11 +275,17 @@ router.get("/current", requireAuth, async (req, res) => {
                         lcUsername:
                             user.lcUsername,
 
+                        ccHandle:
+                            user.ccHandle,
+
                         codeforcesPoints:
                             entry.codeforcesPoints,
 
                         leetcodePoints:
                             entry.leetcodePoints,
+
+                        codechefPoints:
+                            entry.codechefPoints,
 
                         totalPoints:
                             entry.totalPoints,

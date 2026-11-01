@@ -26,12 +26,14 @@ export function AuthProvider({
 
     function login(
         token,
-        userData
+        userData,
+        rememberMe = true
     ) {
 
         saveSession(
             token,
-            userData
+            userData,
+            rememberMe
         );
 
         setUser(userData);

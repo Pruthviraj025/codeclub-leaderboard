@@ -118,6 +118,7 @@ function UsersTab() {
             <span style={{ ...styles.col, flex: 2 }}>NAME / USN</span>
             <span style={{ ...styles.col, flex: 1 }}>CF HANDLE</span>
             <span style={{ ...styles.col, flex: 1 }}>LC HANDLE</span>
+            <span style={{ ...styles.col, flex: 1 }}>CC HANDLE</span>
             <span style={{ ...styles.col, width: '90px' }}>STATUS</span>
             <span style={{ ...styles.col, width: '90px' }}>ROLE</span>
             <span style={{ ...styles.col, width: '180px' }}>ACTIONS</span>
@@ -146,6 +147,17 @@ function UsersTab() {
                   <span>
                     {u.lcUsername}
                     {u.lcConnected && <span style={styles.verifiedDot} title="Verified">✓</span>}
+                  </span>
+                ) : (
+                  <span style={styles.dim}>—</span>
+                )}
+              </div>
+
+              <div style={{ flex: 1 }}>
+                {u.ccHandle ? (
+                  <span>
+                    {u.ccHandle}
+                    {u.ccConnected && <span style={styles.verifiedDot} title="Verified">✓</span>}
                   </span>
                 ) : (
                   <span style={styles.dim}>—</span>
@@ -266,7 +278,8 @@ function ReviewTab() {
 
             {submissions.map(s => {
               const u = s.userId || {};
-              const isCf = s.platform === 'codeforces' || !s.platform;
+              const isCf = s.platform === 'codeforces' || (!s.platform && s.cfSubmissionId);
+              const isCc = s.platform === 'codechef';
               
               let contestId = s.contestId;
               let problemIndex = s.problemIndex;
@@ -282,25 +295,25 @@ function ReviewTab() {
                 problemIndex = s.problemId;
               }
 
-              const subId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId;
+              const subId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || s.ccSubmissionId;
               
               const problemUrl = s.problemUrl || (
                 isCf
                   ? (contestId && problemIndex ? `https://codeforces.com/contest/${contestId}/problem/${problemIndex}` : (s.problemId ? `https://codeforces.com/problemset/problem/${s.problemId}` : null))
-                  : (s.problemId ? `https://leetcode.com/problems/${s.problemId}/` : null)
+                  : (isCc ? (s.problemId ? `https://www.codechef.com/problems/${s.problemId}` : null) : (s.problemId ? `https://leetcode.com/problems/${s.problemId}/` : null))
               );
 
               const submissionUrl = s.submissionUrl || (
                 isCf
                   ? (contestId && s.cfSubmissionId ? `https://codeforces.com/contest/${contestId}/submission/${s.cfSubmissionId}` : (s.cfSubmissionId ? `https://codeforces.com/submission/${s.cfSubmissionId}` : null))
-                  : (s.lcSubmissionId ? `https://leetcode.com/submissions/detail/${s.lcSubmissionId}/` : null)
+                  : (isCc ? (s.ccSubmissionId ? `https://www.codechef.com/viewsolution/${s.ccSubmissionId}` : null) : (s.lcSubmissionId ? `https://leetcode.com/submissions/detail/${s.lcSubmissionId}/` : null))
               );
 
               const problemTitle = s.problemName || (isCf ? (contestId && problemIndex ? `Contest ${contestId} · Prob ${problemIndex}` : s.problemId) : s.problemId) || 'Problem';
 
               const userPlatformHandle = isCf
                 ? (u.cfHandle ? `CF: ${u.cfHandle}` : null)
-                : (u.lcUsername ? `LC: ${u.lcUsername}` : null);
+                : (isCc ? (u.ccHandle ? `CC: ${u.ccHandle}` : null) : (u.lcUsername ? `LC: ${u.lcUsername}` : null));
 
               return (
                 <div key={s._id} style={styles.tableRow}>
@@ -314,8 +327,8 @@ function ReviewTab() {
 
                   <div style={{ flex: 3 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={isCf ? styles.pillCf : styles.pillLc}>
-                        {isCf ? 'CF' : 'LC'}
+                      <span style={isCf ? styles.pillCf : (isCc ? styles.pillCc : styles.pillLc)}>
+                        {isCf ? 'CF' : (isCc ? 'CC' : 'LC')}
                       </span>
                       {problemUrl ? (
                         <a
@@ -841,6 +854,11 @@ const styles = {
   pillLc: {
     color: '#FFA116', background: 'rgba(255, 161, 22, 0.12)',
     border: '1px solid #FFA116', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
+    fontFamily: "'Orbitron', sans-serif"
+  },
+  pillCc: {
+    color: '#D48843', background: 'rgba(212, 136, 67, 0.12)',
+    border: '1px solid #D48843', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
     fontFamily: "'Orbitron', sans-serif"
   },
   problemLink: {

@@ -146,6 +146,43 @@ const UserSchema = new mongoose.Schema({
 
     },
 
+    ccHandle: {
+        type: String,
+        default: null,
+        trim: true
+    },
+
+    ccConnected: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+
+    ccConnectedAt: {
+        type: Date,
+        default: null
+    },
+
+    ccVerification: {
+        method: {
+            type: String,
+            default: "compile_error"
+        },
+        verifiedAt: {
+            type: Date,
+            default: null
+        }
+    },
+
+    ccVerificationRequestedAt: {
+        type: Date,
+        default: null
+    },
+
+    lastCheckedCcSubmissionId: {
+        type: String,
+        default: null
+    },
 
     lastRefreshAt: {
         type: Date,
@@ -158,6 +195,11 @@ const UserSchema = new mongoose.Schema({
     },
 
     lastLcRefreshAt: {
+        type: Date,
+        default: null
+    },
+
+    lastCcRefreshAt: {
         type: Date,
         default: null
     },
@@ -180,6 +222,11 @@ UserSchema.index({
 
 UserSchema.index({
     lcConnected: 1,
+    isActive: 1
+});
+
+UserSchema.index({
+    ccConnected: 1,
     isActive: 1
 });
 

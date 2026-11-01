@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api, getSessionUser } from "../api";
 import SidebarLayout from "../components/SidebarLayout";
+import ProfileHeatmap from "../components/ProfileHeatmap";
 
 export default function ProfilePage() {
 
@@ -9,6 +10,9 @@ export default function ProfilePage() {
 
     const sessionUser = getSessionUser();
     const navigate = useNavigate();
+
+    const isOwnProfile = !userId || (sessionUser && String(sessionUser.id) === String(userId));
+    const sidebarActive = isOwnProfile ? "profile" : "leaderboard";
 
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState("");
@@ -24,15 +28,16 @@ export default function ProfilePage() {
     const [verifyInfo, setVerifyInfo] = useState(null);
     const [verifyMsg, setVerifyMsg] = useState("");
 
-
     const [lcUsername, setLcUsername] =
         useState("");
-
     const [lcStatus, setLcStatus] =
         useState(null);
-
     const [lcMsg, setLcMsg] =
         useState("");
+
+    const [ccHandle, setCcHandle] = useState("");
+    const [ccVerifyInfo, setCcVerifyInfo] = useState(null);
+    const [ccVerifyMsg, setCcVerifyMsg] = useState("");
 
     useEffect(() => {
 
@@ -275,6 +280,54 @@ export default function ProfilePage() {
 
     }
 
+    async function handleStartCcVerification(e) {
+        e.preventDefault();
+        setCcVerifyMsg("");
+
+        try {
+            const res = await api.startCcVerification(ccHandle);
+            setCcVerifyInfo(res);
+        } catch (err) {
+            setCcVerifyMsg(err.message);
+        }
+    }
+
+    async function handleCheckCcVerification() {
+        try {
+            const res = await api.checkCcVerification();
+            if (res.verified) {
+                setCcVerifyMsg("CodeChef account connected!");
+                setCcVerifyInfo(null);
+                await load();
+            } else {
+                setCcVerifyMsg(
+                    res.expired
+                        ? "Verification expired. Start again."
+                        : (res.message || "Not verified yet.")
+                );
+            }
+        } catch (err) {
+            setCcVerifyMsg(err.message);
+        }
+    }
+
+    async function handleDisconnectCodeChef() {
+        if (!window.confirm("Disconnect CodeChef?")) return;
+
+        try {
+            await api.disconnectCc();
+            const sessionUser = getSessionUser();
+            if (sessionUser) {
+                sessionUser.ccConnected = false;
+                localStorage.setItem("user", JSON.stringify(sessionUser));
+            }
+            setCcVerifyMsg("Disconnected.");
+            await load();
+        } catch (err) {
+            setCcVerifyMsg(err.message);
+        }
+    }
+
     if (!sessionUser)
         return null;
 
@@ -282,7 +335,7 @@ export default function ProfilePage() {
 
         return (
 
-            <SidebarLayout active="profile">
+            <SidebarLayout active={sidebarActive}>
                 <div style={styles.pageCenter}>
                     <div style={styles.error}>
                         {error}
@@ -298,7 +351,7 @@ export default function ProfilePage() {
 
         return (
 
-            <SidebarLayout active="profile">
+            <SidebarLayout active={sidebarActive}>
                 <div style={styles.pageCenter}>
                     <div style={styles.dim}>
                         Loading...
@@ -315,11 +368,29 @@ export default function ProfilePage() {
 
         return (
 
-    <SidebarLayout active="profile">
+    <SidebarLayout active={sidebarActive}>
 
         <div
             style={styles.main}
         >
+            <div style={{ marginBottom: "14px" }}>
+                <button
+                    onClick={() => navigate("/leaderboard")}
+                    style={styles.backBtn}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.color = "#fff";
+                        e.currentTarget.style.borderColor = "var(--accent-gold, #f59e0b)";
+                        e.currentTarget.style.background = "var(--surface-raised, rgba(255, 255, 255, 0.05))";
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.color = "var(--text-dim)";
+                        e.currentTarget.style.borderColor = "var(--border)";
+                        e.currentTarget.style.background = "var(--surface)";
+                    }}
+                >
+                    ← Back to Leaderboard
+                </button>
+            </div>
 
             <div
                 style={styles.card}
@@ -347,19 +418,83 @@ export default function ProfilePage() {
                     <Stat
                         label="CODEFORCES"
                         value={
-                            profile.cfHandle ||
-                            "Not Connected"
+                            profile.cfHandle ? (
+                                <a
+                                    href={`https://codeforces.com/profile/${profile.cfHandle}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{ color: "#3182CE", textDecoration: "none" }}
+                                    title="Open Codeforces profile"
+                                >
+                                    {profile.cfHandle} ↗
+                                </a>
+                            ) : (
+                                "Not Connected"
+                            )
                         }
                     />
 
                     <Stat
                         label="LEETCODE"
                         value={
-                            profile.lcUsername ||
-                            "Not Connected"
+                            profile.lcUsername ? (
+                                <a
+                                    href={`https://leetcode.com/${profile.lcUsername}/`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{ color: "#FFA116", textDecoration: "none" }}
+                                    title="Open LeetCode profile"
+                                >
+                                    {profile.lcUsername} ↗
+                                </a>
+                            ) : (
+                                "Not Connected"
+                            )
                         }
                     />
 
+                    <Stat
+                        label="CODECHEF"
+                        value={
+                            profile.ccHandle ? (
+                                <a
+                                    href={`https://www.codechef.com/users/${profile.ccHandle}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{ color: "#8B4513", textDecoration: "none" }}
+                                    title="Open CodeChef profile"
+                                >
+                                    {profile.ccHandle} ↗
+                                </a>
+                            ) : (
+                                "Not Connected"
+                            )
+                        }
+                    />
+
+                </div>
+
+                <div style={{ ...styles.statRow, marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                    <Stat
+                        label="TOTAL POINTS"
+                        value={profile.totalPoints || 0}
+                        color="var(--accent-green, #22C55E)"
+                    />
+                    <Stat
+                        label="CF POINTS"
+                        value={profile.codeforcesPoints || 0}
+                        color="#3182CE"
+                    />
+                    <Stat
+                        label="LC POINTS"
+                        value={profile.leetcodePoints || 0}
+                        color="#FFA116"
+                    />
+                    <Stat
+                        label="CC POINTS"
+                        value={profile.codechefPoints || 0}
+                        color="#8B4513"
+                    />
                 </div>
 
                 {isOwner && profile.usn && (
@@ -769,22 +904,101 @@ export default function ProfilePage() {
 
                 )}
 
+                {isOwner && (
+                    <div style={styles.cfConnect}>
+                        <div style={styles.eyebrow}>
+                            CONNECT CODECHEF
+                        </div>
+
+                        {!profile.ccConnected ? (
+                            <>
+                                <div style={{ ...styles.privateLine, marginBottom: 12 }}>
+                                    Connect your CodeChef account to earn leaderboard points.
+                                </div>
+
+                                {!ccVerifyInfo ? (
+                                    <form onSubmit={handleStartCcVerification} style={styles.cfForm}>
+                                        <input
+                                            style={styles.input}
+                                            placeholder="CodeChef Handle"
+                                            value={ccHandle}
+                                            onChange={(e) => setCcHandle(e.target.value)}
+                                            required
+                                        />
+                                        <button style={styles.smallBtn}>
+                                            Connect
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <div style={{ marginTop: 12 }}>
+                                        <p style={styles.instructions}>
+                                            Submit one intentionally non-compiling (compile error) solution to{" "}
+                                            <a
+                                                href={ccVerifyInfo.problemUrl}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                style={styles.link}
+                                            >
+                                                problem {ccVerifyInfo.problemCode}
+                                            </a>{" "}
+                                            on CodeChef within {ccVerifyInfo.windowMinutes} minutes.
+                                        </p>
+                                        <button
+                                            style={styles.smallBtn}
+                                            onClick={handleCheckCcVerification}
+                                        >
+                                            Verify Submission
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <div style={styles.privateLine}>
+                                    ✅ Connected as <strong>{profile.ccHandle}</strong>
+                                </div>
+                                <div style={{ marginTop: 14 }}>
+                                    <button
+                                        style={{
+                                            ...styles.smallBtn,
+                                            background: "var(--accent-red)",
+                                            color: "#fff"
+                                        }}
+                                        onClick={handleDisconnectCodeChef}
+                                    >
+                                        Disconnect
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {ccVerifyMsg && (
+                            <div style={styles.verifyMsg}>
+                                {ccVerifyMsg}
+                            </div>
+                        )}
+                    </div>
+                )}
+
             </div>
+
+            <ProfileHeatmap activityMap={profile.activityMap} userCreatedAt={profile.createdAt} />
 
             <div style={{ ...styles.card, marginTop: "24px" }} className="fade-up">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <div style={styles.eyebrow}>SOLVED PROBLEMS ({profile.solvedSubmissions?.length || 0})</div>
-                    <div style={{ ...styles.dim, fontSize: "11px" }}>Trailing Window</div>
+                    <div style={styles.eyebrow}>RECENT SOLVED PROBLEMS</div>
+                    <div style={{ ...styles.dim, fontSize: "11px" }}>Last 5 across all platforms</div>
                 </div>
 
                 {!profile.solvedSubmissions || profile.solvedSubmissions.length === 0 ? (
                     <div style={{ color: "var(--text-dim)", fontSize: "13px", padding: "16px 0", fontFamily: "'Orbitron', sans-serif" }}>
-                        No solved problems recorded yet in the trailing scoring window.
+                        No solved problems recorded yet.
                     </div>
                 ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {profile.solvedSubmissions.map(sub => {
+                        {profile.solvedSubmissions.slice(0, 5).map(sub => {
                             const isCf = sub.platform === "codeforces";
+                            const isCc = sub.platform === "codechef";
                             return (
                                 <div
                                     key={sub._id}
@@ -808,12 +1022,12 @@ export default function ProfilePage() {
                                                 padding: "2px 6px",
                                                 borderRadius: "4px",
                                                 fontFamily: "'Orbitron', sans-serif",
-                                                color: isCf ? "#3182ce" : "#FFA116",
-                                                background: isCf ? "rgba(49, 130, 206, 0.12)" : "rgba(255, 161, 22, 0.12)",
-                                                border: `1px solid ${isCf ? "#3182ce" : "#FFA116"}`
+                                                color: isCf ? "#3182CE" : isCc ? "#8B4513" : "#FFA116",
+                                                background: isCf ? "rgba(49, 130, 206, 0.12)" : isCc ? "rgba(139, 69, 19, 0.18)" : "rgba(255, 161, 22, 0.12)",
+                                                border: `1px solid ${isCf ? "#3182CE" : isCc ? "#8B4513" : "#FFA116"}`
                                             }}
                                         >
-                                            {isCf ? "CF" : "LC"}
+                                            {isCf ? "CF" : isCc ? "CC" : "LC"}
                                         </span>
                                         {sub.problemUrl ? (
                                             <a
@@ -954,17 +1168,23 @@ const styles = {
     },
 
     backBtn: {
-        background: "transparent",
-        border: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         color: "var(--text-dim)",
         cursor: "pointer",
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: "13px",
-        letterSpacing: "0.5px"
+        fontSize: "12px",
+        letterSpacing: "0.5px",
+        padding: "6px 14px",
+        borderRadius: "6px",
+        transition: "all 0.15s ease"
     },
 
     main: {
-        maxWidth: "760px",
+        maxWidth: "860px",
         margin: "0 auto",
         padding: "var(--space-4) var(--space-3)"
     },

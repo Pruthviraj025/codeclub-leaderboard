@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 function getToken() {
-    return localStorage.getItem("token");
+    return localStorage.getItem("token") || sessionStorage.getItem("token");
 }
 
 async function request(path, options = {}) {
@@ -49,6 +49,7 @@ export const api = {
     refresh: () => request("/leaderboard/refresh", { method: "POST" }),
     refreshCf: () => request("/leaderboard/refresh/cf", { method: "POST" }),
     refreshLc: () => request("/leaderboard/refresh/lc", { method: "POST", timeoutMs: 100000 }),
+    refreshCc: () => request("/leaderboard/refresh/cc", { method: "POST" }),
     profile: userId => request(`/profile/${userId}`),
     updateEmail: email => request("/profile/me/email", { method: "PATCH", body: JSON.stringify({ email }) }),
     startCfVerification: cfHandle => request("/cf/start-verification", { method: "POST", body: JSON.stringify({ cfHandle }) }),
@@ -58,6 +59,10 @@ export const api = {
     verifyLc: () => request("/lc/verify", { method: "POST" }),
     lcStatus: () => request("/lc/status"),
     disconnectLc: () => request("/lc/disconnect", { method: "DELETE" }),
+    startCcVerification: ccHandle => request("/cc/start-verification", { method: "POST", body: JSON.stringify({ ccHandle }) }),
+    checkCcVerification: () => request("/cc/verify", { method: "POST" }),
+    ccStatus: () => request("/cc/status"),
+    disconnectCc: () => request("/cc/disconnect", { method: "DELETE" }),
     contests: () => request("/contests"),
     analyticsDays: () => request("/analytics/days"),
     analyticsForDay: date => request(`/analytics/day/${date}`),
@@ -91,19 +96,34 @@ export const api = {
     }
 };
 
-export function saveSession(token, user) {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+export function saveSession(token, user, rememberMe = true) {
+    if (rememberMe) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+    } else {
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("user", JSON.stringify(user));
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+    }
 }
 
 export function getSessionUser() {
-    const raw = localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
+    const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+    try {
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
 }
 
 export function clearSession() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 }
 
 export function warmUpServer() {

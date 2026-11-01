@@ -12,7 +12,7 @@ router.use(requireAuth, requireAdmin);
 
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected lcUsername lcConnected createdAt')
+    const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected lcUsername lcConnected ccHandle ccConnected createdAt')
       .sort({ createdAt: -1 });
     res.json(users);
   } catch (err) {
@@ -24,7 +24,7 @@ router.get('/submissions', async (req, res) => {
   try {
     const status = req.query.status || 'unreviewed';
     const submissions = await ScoredSubmission.find({ reviewStatus: status })
-      .populate('userId', 'name usn cfHandle lcUsername')
+      .populate('userId', 'name usn cfHandle lcUsername ccHandle')
       .sort({ createdAt: -1 })
       .limit(100)
       .lean();
@@ -32,8 +32,9 @@ router.get('/submissions', async (req, res) => {
     const enriched = submissions.map(s => {
       let contestId = s.contestId || null;
       let problemIndex = s.problemIndex || null;
-      const submissionId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || null;
+      const submissionId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || s.ccSubmissionId || null;
       const isCf = s.platform === 'codeforces' || !s.platform;
+      const isCc = s.platform === 'codechef';
 
       if (isCf && s.problemId) {
         const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
@@ -60,6 +61,13 @@ router.get('/submissions', async (req, res) => {
           submissionUrl = `https://codeforces.com/contest/${contestId}/submission/${s.cfSubmissionId}`;
         } else if (s.cfSubmissionId) {
           submissionUrl = `https://codeforces.com/submission/${s.cfSubmissionId}`;
+        }
+      } else if (isCc) {
+        if (s.problemId) {
+          problemUrl = `https://www.codechef.com/problems/${s.problemId}`;
+        }
+        if (s.ccSubmissionId) {
+          submissionUrl = `https://www.codechef.com/viewsolution/${s.ccSubmissionId}`;
         }
       } else {
         if (s.problemId) {

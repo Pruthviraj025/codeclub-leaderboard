@@ -88,8 +88,10 @@ function CodeClubLoader() {
 export default function LandingPage() {
   const [showForm, setShowForm] = useState(false);
   const [joinTransition, setJoinTransition] = useState(false);
+  const rememberedEmail = localStorage.getItem("rememberedEmail") || "";
   const [mode, setMode] = useState('join');
-  const [form, setForm] = useState({ name: '', usn: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', usn: '', email: rememberedEmail, password: '' });
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [bootLines, setBootLines] = useState([]);
@@ -150,7 +152,14 @@ export default function LandingPage() {
       const data = mode === 'join'
         ? await api.signup(form)
         : await api.login({ email: form.email, password: form.password });
-      auth.login(data.token, data.user);
+      if (mode === 'login') {
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", form.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+      }
+      auth.login(data.token, data.user, rememberMe);
       navigate("/leaderboard");
     } catch (err) {
       setError(err.message);
@@ -294,10 +303,27 @@ export default function LandingPage() {
                 </div>
               )}
 
+              {mode === 'login' && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 2px 10px', fontSize: '12px', color: 'var(--text-dim, #94a3b8)' }}>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', userSelect: 'none' }}>
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      style={{ accentColor: '#22c55e', cursor: 'pointer', width: '14px', height: '14px' }}
+                    />
+                    <span>Remember me</span>
+                  </label>
+                  <Link to="/forgot-password" style={{ ...styles.backLink, margin: 0, fontSize: '12px' }}>Forgot password?</Link>
+                </div>
+              )}
+
               <button style={styles.submitBtn} type="submit" disabled={loading}>
                 {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
               </button>
-              <Link to="/forgot-password" style={styles.backLink}>Forgot password?</Link>
+              {mode === 'join' && (
+                <Link to="/forgot-password" style={styles.backLink}>Forgot password?</Link>
+              )}
             </form>
             </div>
           )}

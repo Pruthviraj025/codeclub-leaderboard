@@ -5,6 +5,7 @@ const ScoredSubmission = require("../models/ScoredSubmission");
 
 const { resolvePoints } = require("../utils/ratingMap");
 const { refreshLeetCodeScore } = require("./leetcodeService");
+const { refreshCodechefScore } = require("./codechefService");
 
 const REFRESH_COOLDOWN_MS = 15 * 1000;
 const MAX_RETRIES = 3;
@@ -259,6 +260,13 @@ async function refreshUserScore(
         error: null
     };
 
+    let cc = {
+        newlyScored: [],
+        pointsAdded: 0,
+        success: false,
+        error: null
+    };
+
     try {
 
         const result =
@@ -303,6 +311,28 @@ async function refreshUserScore(
 
     }
 
+    try {
+
+        const result =
+            await refreshCodechefScore(user);
+
+        cc = {
+            ...result,
+            success: true,
+            error: null
+        };
+
+    } catch (err) {
+
+        cc.error = err.message;
+
+        console.error(
+            "CodeChef refresh failed:",
+            err.message
+        );
+
+    }
+
     await User.updateOne(
         { _id: user._id },
         { $set: { lastRefreshAt: new Date() } }
@@ -314,9 +344,12 @@ async function refreshUserScore(
 
         leetcode: lc,
 
+        codechef: cc,
+
         totalPointsAdded:
             cf.pointsAdded +
-            lc.pointsAdded
+            lc.pointsAdded +
+            cc.pointsAdded
 
     };
 
@@ -406,6 +439,48 @@ async function refreshLcOnly(userId, options = {}) {
 
 }
 
+async function refreshCcOnly(userId, options = {}) {
+
+    const user =
+        await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (
+        !options.ignoreCooldown &&
+        user.lastCcRefreshAt &&
+        Date.now() -
+            user.lastCcRefreshAt.getTime() <
+            REFRESH_COOLDOWN_MS
+    ) {
+
+        const wait =
+            REFRESH_COOLDOWN_MS -
+            (
+                Date.now() -
+                user.lastCcRefreshAt.getTime()
+            );
+
+        throw new Error(
+            `Refresh on cooldown. Try again in ${Math.ceil(wait / 1000)}s`
+        );
+
+    }
+
+    const result =
+        await refreshCodechefScore(user);
+
+    await User.updateOne(
+        { _id: user._id },
+        { $set: { lastCcRefreshAt: new Date() } }
+    );
+
+    return result;
+
+}
+
 module.exports = {
 
     refreshUserScore,
@@ -414,7 +489,11 @@ module.exports = {
 
     refreshLcOnly,
 
+    refreshCcOnly,
+
     refreshCodeforcesScore,
+
+    refreshCodechefScore,
 
     fetchCFSubmissions,
 

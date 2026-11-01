@@ -226,7 +226,8 @@ input:focus { border-color: var(--accent-green) !important; }
     width: 44px !important;
   }
   .queue-col-cf,
-  .queue-col-lc {
+  .queue-col-lc,
+  .queue-col-cc {
     display: none !important;
   }
 
