@@ -35,7 +35,15 @@ async function request(path, options = {}) {
         throw new Error(res.ok ? "Unexpected response from server." : `Server error (${res.status}). Backend may still be starting.`);
     }
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Request failed.");
+    if (!res.ok) {
+        if (res.status === 401 && !path.startsWith('/auth/')) {
+            clearSession();
+            if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+                window.location.href = '/?mode=login';
+            }
+        }
+        throw new Error(data.error || "Request failed.");
+    }
     return data;
 }
 

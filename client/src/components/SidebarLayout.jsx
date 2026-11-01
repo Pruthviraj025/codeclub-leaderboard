@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, CalendarDays, BarChart3, Rocket, Shield, User, LogOut, Menu, X, MessageSquarePlus, MessageCircle } from 'lucide-react';
 import { getSessionUser, clearSession } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 const NAV_ITEMS = [
   { key: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
@@ -16,11 +17,16 @@ const NAV_ITEMS = [
 export default function SidebarLayout({ active, children }) {
   const user = getSessionUser();
   const navigate = useNavigate();
+  const auth = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   function handleLogout() {
-    clearSession();
-    navigate('/');
+    if (auth?.logout) {
+      auth.logout();
+    } else {
+      clearSession();
+    }
+    navigate('/?mode=login', { replace: true });
   }
 
   function go(path) {

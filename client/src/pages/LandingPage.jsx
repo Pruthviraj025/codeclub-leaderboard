@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { api, warmUpServer } from "../api";
 import { useAuth } from "../context/AuthContext";
 import ccLogo from '../assets/cc-logo-white.png';
@@ -86,25 +86,41 @@ function CodeClubLoader() {
 }
 
 export default function LandingPage() {
-  const [showForm, setShowForm] = useState(false);
-  const [joinTransition, setJoinTransition] = useState(false);
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const [searchParams] = useSearchParams();
+  const isLoginModeFromUrl = searchParams.get('mode') === 'login';
+
+  const isLoggedIn = Boolean(auth?.isAuthenticated || localStorage.getItem("token"));
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/leaderboard', { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
   const rememberedEmail = localStorage.getItem("rememberedEmail") || "";
-  const [mode, setMode] = useState('join');
+  const [showForm, setShowForm] = useState(isLoginModeFromUrl);
+  const [joinTransition, setJoinTransition] = useState(false);
+  const [mode, setMode] = useState(isLoginModeFromUrl ? 'login' : 'join');
   const [form, setForm] = useState({ name: '', usn: '', email: rememberedEmail, password: '' });
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [bootLines, setBootLines] = useState([]);
-  const [bootDone, setBootDone] = useState(false);
+  const [bootLines, setBootLines] = useState(isLoginModeFromUrl ? BOOT_LINES : []);
+  const [bootDone, setBootDone] = useState(isLoginModeFromUrl);
   const [slowHint, setSlowHint] = useState(false);
-  const navigate = useNavigate();
-  const auth = useAuth();
 
   useEffect(() => {
     warmUpServer();
   }, []);
 
   useEffect(() => {
+    if (isLoginModeFromUrl) {
+      setBootLines(BOOT_LINES);
+      setBootDone(true);
+      return;
+    }
     let lineIdx = 0;
     let charIdx = 0;
     let timeoutId;
@@ -131,7 +147,7 @@ export default function LandingPage() {
     }
     typeNext();
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [isLoginModeFromUrl]);
 
   function handleJoinClick() {
     setJoinTransition(true);
@@ -168,6 +184,10 @@ export default function LandingPage() {
       setLoading(false);
       setSlowHint(false);
     }
+  }
+
+  if (isLoggedIn) {
+    return null;
   }
 
   return (
@@ -235,7 +255,14 @@ export default function LandingPage() {
 
           {showForm && (
             <div className="form-overlay-wrap">
-              <form style={styles.form} className="scale-in form-overlay" onSubmit={handleSubmit}>
+              <form
+                id="auth-form"
+                method="post"
+                autoComplete="on"
+                style={styles.form}
+                className="scale-in form-overlay"
+                onSubmit={handleSubmit}
+              >
               <div style={styles.tabRow}>
                 <button
                   type="button"
@@ -256,6 +283,9 @@ export default function LandingPage() {
               {mode === 'join' && (
                 <>
                   <input
+                    id="join-name"
+                    name="name"
+                    autoComplete="name"
                     style={styles.input}
                     placeholder="Full name"
                     value={form.name}
@@ -263,6 +293,9 @@ export default function LandingPage() {
                     required
                   />
                   <input
+                    id="join-usn"
+                    name="usn"
+                    autoComplete="off"
                     style={styles.input}
                     placeholder="USN"
                     value={form.usn}
@@ -272,6 +305,9 @@ export default function LandingPage() {
                 </>
               )}
               <input
+                id="login-email"
+                name="email"
+                autoComplete="username email"
                 style={styles.input}
                 type="email"
                 placeholder="Email"
@@ -280,6 +316,9 @@ export default function LandingPage() {
                 required
               />
               <input
+                id="login-password"
+                name="password"
+                autoComplete={mode === 'join' ? "new-password" : "current-password"}
                 style={styles.input}
                 type="password"
                 placeholder="Password"
