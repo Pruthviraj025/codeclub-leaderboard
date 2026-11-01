@@ -19,9 +19,22 @@ export default function ForgotPasswordPage() {
     setError('');
     setLoading(true);
     try {
-      const data = await api.forgotPassword(email);
+      const data = await api.forgotPassword(email.trim());
       setInfo(data.message);
       setStep('otp');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendOtp() {
+    setError('');
+    setLoading(true);
+    try {
+      const data = await api.resendOtp(email.trim());
+      setInfo(data.message || 'OTP resent. Please check your inbox and spam folder.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -34,7 +47,7 @@ export default function ForgotPasswordPage() {
     setError('');
     setLoading(true);
     try {
-      const data = await api.verifyOtp(email, otp);
+      const data = await api.verifyOtp(email.trim(), otp.trim());
       setResetToken(data.resetToken);
       setStep('password');
     } catch (err) {
@@ -106,13 +119,23 @@ export default function ForgotPasswordPage() {
             <button style={styles.submitBtn} type="submit" disabled={loading}>
               {loading ? 'Verifying…' : 'Verify OTP'}
             </button>
-            <button
-              type="button"
-              style={styles.linkBtn}
-              onClick={() => { setStep('email'); setError(''); }}
-            >
-              Use a different email
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+              <button
+                type="button"
+                style={styles.linkBtn}
+                onClick={handleResendOtp}
+                disabled={loading}
+              >
+                Resend code
+              </button>
+              <button
+                type="button"
+                style={styles.linkBtn}
+                onClick={() => { setStep('email'); setError(''); }}
+              >
+                Change email
+              </button>
+            </div>
           </form>
         )}
 

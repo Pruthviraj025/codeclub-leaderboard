@@ -57,7 +57,8 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'email is required' });
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user || !user.isActive) {
       return res.json({ message: 'If that email is registered, an OTP has been sent.' });
@@ -69,11 +70,12 @@ router.post('/forgot-password', async (req, res) => {
     user.resetOtpAttempts = 0;
     await user.save();
 
-    sendOtpEmail(user.email, otp).catch(err => console.error('Failed to send OTP email:', err));
+    await sendOtpEmail(user.email, otp);
 
     res.json({ message: 'If that email is registered, an OTP has been sent.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: err.message || 'Failed to send OTP email. Please try again.' });
   }
 });
 
@@ -82,7 +84,8 @@ router.post('/resend-otp', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'email is required' });
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
     if (!user || !user.isActive) {
       return res.json({ message: 'If that email is registered, an OTP has been sent.' });
     }
@@ -93,10 +96,11 @@ router.post('/resend-otp', async (req, res) => {
     user.resetOtpAttempts = 0;
     await user.save();
 
-    sendOtpEmail(user.email, otp).catch(err => console.error('Failed to resend OTP email:', err));
+    await sendOtpEmail(user.email, otp);
     return res.json({ message: 'If that email is registered, an OTP has been sent.' });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.error('Resend OTP error:', err);
+    return res.status(500).json({ error: err.message || 'Failed to resend OTP email. Please try again.' });
   }
 });
 
@@ -105,7 +109,10 @@ router.post('/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ error: 'email and otp are required' });
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanOtp = String(otp || '').trim();
+
+    const user = await User.findOne({ email: cleanEmail });
     if (!user || !user.resetOtpHash || !user.resetOtpExpiry) {
       return res.status(400).json({ error: 'Invalid or expired OTP' });
     }
