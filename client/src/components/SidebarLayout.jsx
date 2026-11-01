@@ -12,7 +12,6 @@ const NAV_ITEMS = [
 ];
 
 
-import ReleaseNotesModal from './ReleaseNotesModal';
 
 export default function SidebarLayout({ active, children }) {
   const user = getSessionUser();
@@ -140,7 +139,6 @@ export default function SidebarLayout({ active, children }) {
           {children}
         </main>
       </div>
-      <ReleaseNotesModal />
     </div>
   );
 }
