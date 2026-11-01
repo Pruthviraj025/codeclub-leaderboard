@@ -150,8 +150,8 @@ export default function LandingPage() {
     const slowTimer = setTimeout(() => setSlowHint(true), 2500);
     try {
       const data = mode === 'join'
-        ? await api.signup(form)
-        : await api.login({ email: form.email, password: form.password });
+        ? await api.signup({ ...form, rememberMe })
+        : await api.login({ email: form.email, password: form.password, rememberMe });
       if (mode === 'login') {
         if (rememberMe) {
           localStorage.setItem("rememberedEmail", form.email);
