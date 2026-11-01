@@ -1,6 +1,10 @@
 const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
 
+const brevoApiKey = process.env.BREVO_API_KEY;
+const brevoSender = process.env.BREVO_SENDER || process.env.SMTP_USER || 'ptvrj25@gmail.com';
+const brevoSenderName = process.env.BREVO_SENDER_NAME || 'CodeClub Leaderboard';
+
 const resendApiKey = process.env.RESEND_API_KEY;
 const resendFrom = process.env.RESEND_FROM || 'CodeClub <onboarding@resend.dev>';
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -9,6 +13,7 @@ const smtpUser = process.env.SMTP_USER;
 const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
 
 console.log('Mailer config:', {
+  brevo: brevoApiKey ? 'configured' : 'off',
   resend: resend ? 'configured' : 'off',
   smtp: smtpUser && smtpPass ? 'configured' : 'off',
   smtpUser: smtpUser || 'none'
@@ -31,9 +36,9 @@ function createGmailTransport() {
   return nodemailer.createTransport({
     service: 'gmail',
     family: 4,
-    connectionTimeout: 12000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 10000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000,
     auth: {
       user: smtpUser,
       pass: smtpPass,
@@ -50,9 +55,9 @@ function createSmtpPort465Transport() {
     port: 465,
     secure: true,
     family: 4,
-    connectionTimeout: 12000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 10000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000,
     auth: {
       user: smtpUser,
       pass: smtpPass,
@@ -70,9 +75,9 @@ function createSmtpPort587Transport() {
     secure: false,
     requireTLS: true,
     family: 4,
-    connectionTimeout: 12000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 10000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000,
     auth: {
       user: smtpUser,
       pass: smtpPass,
@@ -84,10 +89,43 @@ function createSmtpPort587Transport() {
 }
 
 async function sendOtpEmail(toEmail, otp) {
+  let brevoErr = null;
   let resendErr = null;
   let smtpErr = null;
 
-  // 1. Try Resend if configured
+  // 1. Try Brevo HTTP API (Runs over HTTPS port 443; works on Render without custom domain)
+  if (brevoApiKey) {
+    try {
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: { name: brevoSenderName, email: brevoSender },
+          to: [{ email: toEmail }],
+          subject: SUBJECT,
+          htmlContent: htmlBody(otp),
+          textContent: textBody(otp),
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.messageId) {
+        console.log('OTP email sent via Brevo to', toEmail, 'id:', data.messageId);
+        return { provider: 'brevo', id: data.messageId };
+      }
+      brevoErr = new Error(data.message || `Brevo API error (${res.status})`);
+      console.warn('Brevo rejected email:', brevoErr.message, '- falling back');
+    } catch (err) {
+      brevoErr = err;
+      console.warn('Brevo request failed:', err.message, '- falling back');
+    }
+  }
+
+  // 2. Try Resend HTTP API (Runs over HTTPS port 443; requires verified domain or send to owner)
   if (resend) {
     try {
       const { data, error } = await resend.emails.send({
@@ -109,7 +147,7 @@ async function sendOtpEmail(toEmail, otp) {
     }
   }
 
-  // 2. Try Gmail SMTP with multiple connection strategies
+  // 3. Try Gmail SMTP with multiple connection strategies (Note: Render blocks SMTP ports 25, 465, 587)
   if (smtpUser && smtpPass) {
     // Attempt A: service: 'gmail'
     try {
@@ -164,9 +202,10 @@ async function sendOtpEmail(toEmail, otp) {
   }
 
   const errorDetails = [
+    brevoErr ? `Brevo: ${brevoErr.message}` : null,
     resendErr ? `Resend: ${resendErr.message}` : null,
     smtpErr ? `SMTP: ${smtpErr.message}` : null,
-    !resend && (!smtpUser || !smtpPass) ? 'No email credentials configured' : null,
+    !brevoApiKey && !resend && (!smtpUser || !smtpPass) ? 'No email credentials configured' : null,
   ].filter(Boolean).join(' | ');
 
   throw new Error(`Email delivery failed (${errorDetails})`);
