@@ -127,13 +127,6 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
             return `${y}-${m}-${day}`;
         };
 
-        const formatUTC = (d) => {
-            const y = d.getUTCFullYear();
-            const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-            const day = String(d.getUTCDate()).padStart(2, "0");
-            return `${y}-${m}-${day}`;
-        };
-
         const weeksList = [];
         let currentWeek = [];
         const monthPositions = [];
@@ -149,8 +142,11 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
 
         while (cursor <= endDate) {
             const dateStr = formatYMD(cursor);
-            const utcDateStr = formatUTC(cursor);
-            const dayData = activityMap[dateStr] || activityMap[utcDateStr] || { total: 0, codeforces: 0, leetcode: 0, codechef: 0 };
+            const emptyDay = { total: 0, codeforces: 0, leetcode: 0, codechef: 0 };
+            // Server buckets by the viewer's timezone, so local date key is the only lookup.
+            // Cells outside the selected range (Sunday padding) stay empty and uncounted.
+            const inRange = cursor >= startDate && cursor <= endDate;
+            const dayData = inRange ? (activityMap[dateStr] || emptyDay) : emptyDay;
 
             total += dayData.total || 0;
             cfTotal += dayData.codeforces || 0;
