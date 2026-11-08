@@ -6,6 +6,16 @@ const ScoredSubmission = require('../models/ScoredSubmission');
 
 const router = express.Router();
 
+function safeTimezone(tz) {
+  if (!tz || typeof tz !== 'string') return 'UTC';
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: tz });
+    return tz;
+  } catch {
+    return 'UTC';
+  }
+}
+
 router.patch('/me/email', requireAuth, async (req, res) => {
   try {
     const { email } = req.body;
@@ -139,6 +149,8 @@ router.get('/:userId', requireAuth, async (req, res) => {
       };
     });
 
+    const tz = safeTimezone(req.query.tz);
+
     const heatmapAgg = await ScoredSubmission.aggregate([
       {
         $match: {
@@ -148,7 +160,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
       {
         $group: {
           _id: {
-            date: { $dateToString: { format: "%Y-%m-%d", date: "$solvedAt" } },
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$solvedAt", timezone: tz } },
             platform: "$platform"
           },
           count: { $sum: 1 }
