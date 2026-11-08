@@ -59,7 +59,10 @@ export const api = {
     refreshCf: () => request("/leaderboard/refresh/cf", { method: "POST" }),
     refreshLc: () => request("/leaderboard/refresh/lc", { method: "POST", timeoutMs: 100000 }),
     refreshCc: () => request("/leaderboard/refresh/cc", { method: "POST" }),
-    profile: userId => request(`/profile/${userId}`),
+    profile: userId => {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+        return request(`/profile/${userId}?tz=${encodeURIComponent(tz)}`);
+    },
     updateEmail: email => request("/profile/me/email", { method: "PATCH", body: JSON.stringify({ email }) }),
     startCfVerification: cfHandle => request("/cf/start-verification", { method: "POST", body: JSON.stringify({ cfHandle }) }),
     checkCfVerification: () => request("/cf/verify", { method: "POST" }),
