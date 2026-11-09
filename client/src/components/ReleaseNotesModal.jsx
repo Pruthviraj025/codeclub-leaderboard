@@ -132,19 +132,19 @@ const styles = {
   },
   versionBadge: {
     alignSelf: 'flex-start',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '10px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '11px',
     fontWeight: 700,
-    letterSpacing: '1.5px',
-    color: 'var(--accent-green)',
-    background: 'var(--accent-green-dim)',
-    border: '1px solid var(--accent-green)',
+    letterSpacing: '1px',
+    color: '#5EEAD4',
+    background: 'rgba(94, 234, 212, 0.12)',
+    border: '1px solid rgba(94, 234, 212, 0.3)',
     padding: '3px 8px',
-    borderRadius: '4px'
+    borderRadius: '6px'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '20px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '22px',
     fontWeight: 700,
     color: '#FFF',
     margin: '4px 0 0'
@@ -179,28 +179,28 @@ const styles = {
     flexShrink: 0
   },
   featureTitle: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '13px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '14px',
     fontWeight: 600,
     color: '#FFF',
     marginBottom: '3px'
   },
   featureDesc: {
-    fontSize: '12px',
+    fontSize: '13px',
     color: 'var(--text-dim)',
     lineHeight: '1.4'
   },
   submitBtn: {
     width: '100%',
-    background: 'var(--accent-green-dim)',
-    border: '1px solid var(--accent-green)',
-    color: 'var(--accent-green)',
-    borderRadius: 'var(--radius-sm)',
+    background: 'rgba(94, 234, 212, 0.12)',
+    border: '1px solid rgba(94, 234, 212, 0.35)',
+    color: '#5EEAD4',
+    borderRadius: '10px',
     padding: '12px',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '13px',
-    fontWeight: 700,
-    letterSpacing: '1px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '14px',
+    fontWeight: 600,
+    letterSpacing: '0.4px',
     cursor: 'pointer',
     textAlign: 'center',
     transition: 'all 0.2s ease'

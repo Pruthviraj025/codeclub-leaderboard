@@ -11,8 +11,8 @@ export default function ContestsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [platform, setPlatform] = useState('all'); 
-  const [statusFilter, setStatusFilter] = useState('all'); 
+  const [platform, setPlatform] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
 
   const user = getSessionUser();
@@ -67,10 +67,10 @@ export default function ContestsPage() {
   return (
     <SidebarLayout active="contests">
       <div style={styles.container}>
-        <div style={styles.headerRow}>
+        <div style={styles.headerRow} className="contests-header-row">
           <div>
             <div style={styles.eyebrow}>
-              <Sparkles size={13} style={{ marginRight: '6px', color: 'var(--accent-gold)' }} />
+              <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
               CODEFORCES &amp; LEETCODE CONTESTS
             </div>
             <h1 style={styles.title}>Contests &amp; Competitions</h1>
@@ -85,15 +85,25 @@ export default function ContestsPage() {
             disabled={loading}
             title="Refresh Contests"
           >
-            <RefreshCw size={15} className={loading ? 'spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'spin' : ''} />
             {loading ? 'Fetching...' : 'Refresh'}
           </button>
         </div>
 
         <div style={styles.statsRow} className="mobile-grid-2">
-          <div style={{ ...styles.statCard, cursor: 'pointer' }} onClick={() => setPlatform('all')}>
-            <div style={styles.statIconWrapper}>
-              <CalendarDays size={18} color="#10B981" />
+          <div
+            style={{
+              ...styles.statCard,
+              borderColor: platform === 'all' ? '#5EEAD4' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'all'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(94, 234, 212, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+              cursor: 'pointer'
+            }}
+            onClick={() => setPlatform('all')}
+          >
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(94, 234, 212, 0.12)', color: '#5EEAD4' }}>
+              <CalendarDays size={18} />
             </div>
             <div>
               <div style={styles.statValue}>{loading ? '-' : stats.totalCount}</div>
@@ -104,12 +114,15 @@ export default function ContestsPage() {
           <div
             style={{
               ...styles.statCard,
-              borderColor: platform === 'codeforces' ? '#3B82F6' : 'var(--border)',
+              borderColor: platform === 'codeforces' ? '#7DD3FC' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'codeforces'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(125, 211, 252, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
               cursor: 'pointer'
             }}
             onClick={() => setPlatform(platform === 'codeforces' ? 'all' : 'codeforces')}
           >
-            <div style={{ ...styles.statIconWrapper, background: 'rgba(59, 130, 246, 0.15)', color: '#60A5FA' }}>
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(99, 223, 255, 0.12)', color: '#7DD3FC' }}>
               <Trophy size={18} />
             </div>
             <div>
@@ -121,12 +134,15 @@ export default function ContestsPage() {
           <div
             style={{
               ...styles.statCard,
-              borderColor: platform === 'leetcode' ? '#F97316' : 'var(--border)',
+              borderColor: platform === 'leetcode' ? '#FCD34D' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'leetcode'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(252, 211, 77, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
               cursor: 'pointer'
             }}
             onClick={() => setPlatform(platform === 'leetcode' ? 'all' : 'leetcode')}
           >
-            <div style={{ ...styles.statIconWrapper, background: 'rgba(249, 115, 22, 0.15)', color: '#F97316' }}>
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(252, 211, 77, 0.12)', color: '#FCD34D' }}>
               <Flame size={18} />
             </div>
             <div>
@@ -136,7 +152,7 @@ export default function ContestsPage() {
           </div>
 
           <div style={styles.statCard}>
-            <div style={{ ...styles.statIconWrapper, background: 'rgba(234, 179, 8, 0.15)', color: '#EAB308' }}>
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(216, 180, 254, 0.12)', color: '#D8B4FE' }}>
               <Clock size={18} />
             </div>
             <div>
@@ -160,14 +176,14 @@ export default function ContestsPage() {
               style={{ ...styles.tab, ...(platform === 'codeforces' ? styles.tabActiveCF : {}) }}
               onClick={() => setPlatform('codeforces')}
             >
-              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#60A5FA', marginRight: '6px' }}></span>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#7DD3FC', marginRight: '6px' }}></span>
               Codeforces
             </button>
             <button
               style={{ ...styles.tab, ...(platform === 'leetcode' ? styles.tabActiveLC : {}) }}
               onClick={() => setPlatform('leetcode')}
             >
-              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#F97316', marginRight: '6px' }}></span>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#FCD34D', marginRight: '6px' }}></span>
               LeetCode
             </button>
           </div>
@@ -203,8 +219,8 @@ export default function ContestsPage() {
         {!loading && (platform === 'all' || platform === 'codeforces') && (
           <div style={{ marginBottom: '40px' }}>
             <div style={styles.platformHeader}>
-              <Trophy size={18} color="#60A5FA" style={{ marginRight: '8px' }} />
-              <span style={{ color: '#60A5FA' }}>Codeforces Contests</span>
+              <Trophy size={18} color="#7DD3FC" style={{ marginRight: '8px' }} />
+              <span style={{ color: '#7DD3FC' }}>Codeforces Contests</span>
             </div>
 
             {cfDivisions.map(div => {
@@ -214,7 +230,7 @@ export default function ContestsPage() {
               return (
                 <section key={div} style={styles.section}>
                   <div style={styles.sectionTitle}>{div}</div>
-                  <div style={styles.grid}>
+                  <div style={styles.grid} className="contests-grid-responsive">
                     {list.map(c => (
                       <a
                         key={c.id}
@@ -222,32 +238,32 @@ export default function ContestsPage() {
                         target="_blank"
                         rel="noreferrer"
                         style={styles.card}
-                        className="row-hover"
+                        className="contest-card contest-card-cf"
                       >
                         <div style={styles.cardTop}>
                           <div style={styles.badgeRow}>
-                            <span style={{ ...styles.platformBadge, background: 'rgba(59, 130, 246, 0.2)', color: '#60A5FA' }}>
+                            <span style={{ ...styles.platformBadge, background: 'rgba(99, 223, 255, 0.12)', color: '#7DD3FC', border: '1px solid rgba(99, 223, 255, 0.25)' }}>
                               Codeforces
                             </span>
                             <span style={{ ...styles.phaseBadge, ...phaseStyle(c.phase) }}>
                               {phaseLabel(c.phase)}
                             </span>
                           </div>
-                          <ExternalLink size={13} color="var(--text-dim)" />
+                          <ExternalLink size={14} color="rgba(255, 255, 255, 0.4)" />
                         </div>
 
                         <div style={styles.cardName}>{c.name}</div>
 
                         <div style={styles.cardMetaRow}>
-                          <div style={styles.cardMeta} className="mono">
+                          <div style={styles.cardMeta}>
                             {c.startTimeSeconds
                               ? new Date(c.startTimeSeconds * 1000).toLocaleString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
                               : 'TBA'}
                           </div>
                           <div style={styles.durationPill}>
@@ -266,8 +282,8 @@ export default function ContestsPage() {
         {!loading && (platform === 'all' || platform === 'leetcode') && (
           <div style={{ marginBottom: '40px' }}>
             <div style={styles.platformHeader}>
-              <Flame size={18} color="#F97316" style={{ marginRight: '8px' }} />
-              <span style={{ color: '#F97316' }}>LeetCode Contests</span>
+              <Flame size={18} color="#FCD34D" style={{ marginRight: '8px' }} />
+              <span style={{ color: '#FCD34D' }}>LeetCode Contests</span>
             </div>
 
             {lcCategories.map(cat => {
@@ -277,40 +293,40 @@ export default function ContestsPage() {
               return (
                 <section key={cat} style={styles.section}>
                   <div style={styles.sectionTitle}>{cat}</div>
-                  <div style={styles.grid}>
+                  <div style={styles.grid} className="contests-grid-responsive">
                     {list.map(c => (
                       <a
                         key={c.id}
                         href={c.url}
                         target="_blank"
                         rel="noreferrer"
-                        style={{ ...styles.card, borderColor: 'rgba(249, 115, 22, 0.25)' }}
-                        className="row-hover"
+                        style={styles.card}
+                        className="contest-card contest-card-lc"
                       >
                         <div style={styles.cardTop}>
                           <div style={styles.badgeRow}>
-                            <span style={{ ...styles.platformBadge, background: 'rgba(249, 115, 22, 0.2)', color: '#F97316' }}>
+                            <span style={{ ...styles.platformBadge, background: 'rgba(252, 211, 77, 0.12)', color: '#FCD34D', border: '1px solid rgba(252, 211, 77, 0.25)' }}>
                               LeetCode
                             </span>
                             <span style={{ ...styles.phaseBadge, ...phaseStyle(c.phase) }}>
                               {phaseLabel(c.phase)}
                             </span>
                           </div>
-                          <ExternalLink size={13} color="var(--text-dim)" />
+                          <ExternalLink size={14} color="rgba(255, 255, 255, 0.4)" />
                         </div>
 
                         <div style={styles.cardName}>{c.name}</div>
 
                         <div style={styles.cardMetaRow}>
-                          <div style={styles.cardMeta} className="mono">
+                          <div style={styles.cardMeta}>
                             {c.startTimeSeconds
                               ? new Date(c.startTimeSeconds * 1000).toLocaleString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
                               : 'TBA'}
                           </div>
                           <div style={styles.durationPill}>
@@ -341,9 +357,9 @@ function phaseLabel(phase) {
 }
 
 function phaseStyle(phase) {
-  if (phase === 'BEFORE') return { background: 'var(--accent-gold-dim)', color: 'var(--accent-gold)' };
-  if (phase === 'CODING') return { background: 'var(--accent-green-dim)', color: 'var(--accent-green)' };
-  return { background: 'var(--border)', color: 'var(--text-dim)' };
+  if (phase === 'BEFORE') return { background: 'rgba(252, 211, 77, 0.12)', color: '#FCD34D', border: '1px solid rgba(252, 211, 77, 0.25)' };
+  if (phase === 'CODING') return { background: 'rgba(94, 234, 212, 0.12)', color: '#5EEAD4', border: '1px solid rgba(94, 234, 212, 0.3)' };
+  return { background: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.45)', border: '1px solid rgba(255, 255, 255, 0.08)' };
 }
 
 const styles = {
@@ -356,99 +372,117 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '24px',
+    marginBottom: '26px',
     gap: '16px',
     flexWrap: 'wrap'
   },
   eyebrow: {
     display: 'flex',
     alignItems: 'center',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '11px',
-    letterSpacing: '2px',
-    color: 'var(--text-dim)',
-    marginBottom: '6px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '12px',
+    fontWeight: 600,
+    letterSpacing: '2.5px',
+    color: '#5EEAD4',
+    marginBottom: '8px',
     textTransform: 'uppercase'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: 'clamp(22px, 5vw, 32px)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: 'clamp(24px, 4vw, 32px)',
     fontWeight: 700,
     margin: 0,
-    letterSpacing: '1px',
-    color: '#FFF'
+    letterSpacing: '-0.3px',
+    color: '#FFFFFF',
+    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
   },
   subtitle: {
-    color: 'var(--text-dim)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.65)',
     fontSize: '14px',
+    lineHeight: '1.5',
     margin: '8px 0 0 0',
     maxWidth: '650px'
   },
   refreshBtn: {
-    display: 'flex',
+    display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
-    background: 'var(--surface)',
-    color: 'var(--text)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '8px 14px',
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.14)',
+    borderRadius: '10px',
+    color: '#FFFFFF',
+    padding: '9px 18px',
     fontSize: '13px',
+    fontWeight: 600,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    letterSpacing: '0.3px',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
     cursor: 'pointer',
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   statsRow: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
-    gap: '12px',
-    marginBottom: '24px'
+    gap: '14px',
+    marginBottom: '26px'
   },
   statCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '14px',
-    transition: 'all 0.2s ease'
+    gap: '14px',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
+    padding: '16px 18px',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   statIconWrapper: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '10px',
-    background: 'rgba(16, 185, 129, 0.15)',
+    width: '40px',
+    height: '40px',
+    borderRadius: '11px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0
   },
   statValue: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '16px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '18px',
     fontWeight: 700,
-    color: '#FFF'
+    color: '#FFFFFF',
+    letterSpacing: '0.2px'
   },
   statLabel: {
-    fontSize: '11px',
-    color: 'var(--text-dim)',
-    marginTop: '2px'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '12px',
+    fontWeight: 500,
+    color: 'rgba(255, 255, 255, 0.55)',
+    marginTop: '3px'
   },
   controlsBar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: '16px',
-    marginBottom: '24px',
+    marginBottom: '28px',
     flexWrap: 'wrap'
   },
   tabsContainer: {
     display: 'flex',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '4px',
-    gap: '4px'
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '12px',
+    padding: '5px',
+    gap: '4px',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
   },
   tab: {
     display: 'flex',
@@ -457,29 +491,36 @@ const styles = {
     flex: 1,
     whiteSpace: 'nowrap',
     background: 'transparent',
-    border: 'none',
-    color: 'var(--text-dim)',
-    padding: '8px 14px',
-    borderRadius: '6px',
+    border: '1px solid transparent',
+    color: 'rgba(255, 255, 255, 0.65)',
+    padding: '8px 16px',
+    borderRadius: '8px',
     fontSize: '13px',
     fontWeight: 500,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     cursor: 'pointer',
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   tabActive: {
-    background: 'var(--border)',
-    color: '#FFF',
-    fontWeight: 600
+    background: 'rgba(255, 255, 255, 0.08)',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    color: '#FFFFFF',
+    fontWeight: 600,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
   },
   tabActiveCF: {
-    background: 'rgba(59, 130, 246, 0.3)',
-    color: '#60A5FA',
-    fontWeight: 600
+    background: 'rgba(99, 223, 255, 0.1)',
+    border: '1px solid rgba(99, 223, 255, 0.3)',
+    color: '#7DD3FC',
+    fontWeight: 600,
+    boxShadow: '0 2px 10px rgba(99, 223, 255, 0.15)'
   },
   tabActiveLC: {
-    background: 'rgba(249, 115, 22, 0.3)',
-    color: '#F97316',
-    fontWeight: 600
+    background: 'rgba(252, 211, 77, 0.1)',
+    border: '1px solid rgba(252, 211, 77, 0.3)',
+    color: '#FCD34D',
+    fontWeight: 600,
+    boxShadow: '0 2px 10px rgba(252, 211, 77, 0.15)'
   },
   searchAndFilters: {
     display: 'flex',
@@ -500,63 +541,76 @@ const styles = {
     left: '12px',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: 'var(--text-dim)'
+    color: 'rgba(255, 255, 255, 0.45)'
   },
   searchInput: {
     width: '100%',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '8px 12px 8px 36px',
-    color: 'var(--text)',
-    fontSize: '13px',
-    outline: 'none'
-  },
-  selectFilter: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '8px 12px',
-    color: 'var(--text)',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    borderRadius: '10px',
+    padding: '9px 14px 9px 38px',
+    color: '#FFFFFF',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     outline: 'none',
-    cursor: 'pointer'
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    transition: 'all 0.2s ease'
+  },
+  selectFilter: {
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    borderRadius: '10px',
+    padding: '9px 14px',
+    color: '#FFFFFF',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '13px',
+    outline: 'none',
+    cursor: 'pointer',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    transition: 'all 0.2s ease'
   },
   platformHeader: {
     display: 'flex',
     alignItems: 'center',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '16px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '18px',
     fontWeight: 700,
-    letterSpacing: '1px',
-    marginBottom: '16px',
-    paddingBottom: '8px',
-    borderBottom: '1px solid var(--border)'
+    letterSpacing: '0.4px',
+    marginBottom: '18px',
+    paddingBottom: '10px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
   },
-  section: { marginBottom: '24px' },
+  section: { marginBottom: '26px' },
   sectionTitle: {
-    fontFamily: "'Orbitron', sans-serif",
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '12px',
-    fontWeight: 700,
-    letterSpacing: '2px',
-    color: 'var(--text-dim)',
+    fontWeight: 600,
+    letterSpacing: '1.8px',
+    color: 'rgba(255, 255, 255, 0.55)',
     textTransform: 'uppercase',
-    marginBottom: '12px',
+    marginBottom: '14px',
     userSelect: 'none'
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '14px'
+    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+    gap: '16px'
   },
   card: {
     display: 'block',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '16px',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
+    padding: '18px',
     textDecoration: 'none',
-    transition: 'transform 0.2s ease, border-color 0.2s ease'
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   cardTop: {
     display: 'flex',
@@ -570,30 +624,30 @@ const styles = {
     gap: '6px'
   },
   platformBadge: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '9px',
-    fontWeight: 700,
-    letterSpacing: '1px',
-    padding: '3px 8px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '10px',
+    fontWeight: 600,
+    letterSpacing: '0.8px',
+    padding: '3px 9px',
     borderRadius: '999px',
     textTransform: 'uppercase'
   },
   phaseBadge: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '9px',
-    fontWeight: 700,
-    letterSpacing: '1px',
-    padding: '3px 8px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '10px',
+    fontWeight: 600,
+    letterSpacing: '0.8px',
+    padding: '3px 9px',
     borderRadius: '999px',
     userSelect: 'none'
   },
   cardName: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '14px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '15px',
     fontWeight: 600,
-    color: 'var(--text)',
-    marginBottom: '10px',
-    lineHeight: '1.3'
+    color: '#FFFFFF',
+    marginBottom: '12px',
+    lineHeight: '1.4'
   },
   cardMetaRow: {
     display: 'flex',
@@ -602,27 +656,33 @@ const styles = {
     gap: '8px'
   },
   cardMeta: {
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '12px',
-    color: 'var(--text-dim)'
+    fontWeight: 500,
+    color: 'rgba(255, 255, 255, 0.55)'
   },
   durationPill: {
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '11px',
-    color: 'var(--text-dim)',
+    fontWeight: 500,
+    color: 'rgba(255, 255, 255, 0.65)',
     background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid var(--border)',
-    borderRadius: '4px',
-    padding: '2px 6px'
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '6px',
+    padding: '3px 8px'
   },
   error: {
     color: 'var(--accent-red)',
     background: 'var(--accent-red-dim)',
     padding: '14px',
     borderRadius: 'var(--radius)',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    fontFamily: "'Space Grotesk', sans-serif"
   },
   empty: {
-    color: 'var(--text-dim)',
-    padding: '30px 0',
-    textAlign: 'center'
+    color: 'rgba(255, 255, 255, 0.55)',
+    padding: '36px 0',
+    textAlign: 'center',
+    fontFamily: "'Space Grotesk', sans-serif"
   }
 };

@@ -88,10 +88,10 @@ export default function HackathonsPage() {
   return (
     <SidebarLayout active="hackathons">
       <div style={styles.container}>
-        <div style={styles.headerRow}>
+        <div style={styles.headerRow} className="hackathons-header-row">
           <div>
             <div style={styles.eyebrow}>
-              <Sparkles size={13} style={{ marginRight: '6px', color: 'var(--accent-gold)' }} />
+              <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
               UNSTOP · DEVFOLIO · HACKEREARTH
             </div>
             <h1 style={styles.title}>Hackathons &amp; Builds</h1>
@@ -106,18 +106,25 @@ export default function HackathonsPage() {
             disabled={loading}
             title="Refresh Hackathons"
           >
-            <RefreshCw size={15} className={loading ? 'spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'spin' : ''} />
             {loading ? 'Fetching...' : 'Refresh'}
           </button>
         </div>
 
         <div style={styles.statsRow} className="mobile-grid-2">
           <div
-            style={{ ...styles.statCard, cursor: 'pointer' }}
+            style={{
+              ...styles.statCard,
+              borderColor: platform === 'all' ? '#5EEAD4' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'all'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(94, 234, 212, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+              cursor: 'pointer'
+            }}
             onClick={() => setPlatform('all')}
           >
-            <div style={styles.statIconWrapper}>
-              <Rocket size={18} color="#10B981" />
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(94, 234, 212, 0.12)', color: '#5EEAD4' }}>
+              <Rocket size={18} />
             </div>
             <div>
               <div style={styles.statValue}>{loading ? '-' : stats.total}</div>
@@ -128,12 +135,15 @@ export default function HackathonsPage() {
           <div
             style={{
               ...styles.statCard,
-              borderColor: platform === 'unstop' ? '#1C4980' : 'var(--border)',
+              borderColor: platform === 'unstop' ? '#38BDF8' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'unstop'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(56, 189, 248, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
               cursor: 'pointer'
             }}
             onClick={() => setPlatform(platform === 'unstop' ? 'all' : 'unstop')}
           >
-            <div style={{ ...styles.statIconWrapper, background: 'rgba(28, 73, 128, 0.15)', color: '#38BDF8' }}>
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(56, 189, 248, 0.12)', color: '#38BDF8' }}>
               <Layers size={18} />
             </div>
             <div>
@@ -145,12 +155,15 @@ export default function HackathonsPage() {
           <div
             style={{
               ...styles.statCard,
-              borderColor: platform === 'devfolio' ? '#3770FF' : 'var(--border)',
+              borderColor: platform === 'devfolio' ? '#60A5FA' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'devfolio'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(96, 165, 250, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
               cursor: 'pointer'
             }}
             onClick={() => setPlatform(platform === 'devfolio' ? 'all' : 'devfolio')}
           >
-            <div style={{ ...styles.statIconWrapper, background: 'rgba(55, 112, 255, 0.15)', color: '#60A5FA' }}>
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(96, 165, 250, 0.12)', color: '#60A5FA' }}>
               <CheckCircle2 size={18} />
             </div>
             <div>
@@ -162,12 +175,15 @@ export default function HackathonsPage() {
           <div
             style={{
               ...styles.statCard,
-              borderColor: platform === 'hackerearth' ? '#A855F7' : 'var(--border)',
+              borderColor: platform === 'hackerearth' ? '#C084FC' : 'rgba(255, 255, 255, 0.08)',
+              boxShadow: platform === 'hackerearth'
+                ? '0 12px 30px rgba(0, 0, 0, 0.55), 0 0 16px rgba(192, 132, 252, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                : '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
               cursor: 'pointer'
             }}
             onClick={() => setPlatform(platform === 'hackerearth' ? 'all' : 'hackerearth')}
           >
-            <div style={{ ...styles.statIconWrapper, background: 'rgba(168, 85, 247, 0.15)', color: '#C084FC' }}>
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(192, 132, 252, 0.12)', color: '#C084FC' }}>
               <Code2 size={18} />
             </div>
             <div>
@@ -196,7 +212,7 @@ export default function HackathonsPage() {
               style={{ ...styles.tab, ...(platform === 'devfolio' ? styles.tabActiveDevfolio : {}) }}
               onClick={() => setPlatform('devfolio')}
             >
-              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#3770FF', marginRight: '6px' }}></span>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#60A5FA', marginRight: '6px' }}></span>
               Devfolio
             </button>
             <button
@@ -247,7 +263,7 @@ export default function HackathonsPage() {
         {error && <div style={styles.errorBox}>{error}</div>}
 
         {loading && (
-          <div style={styles.grid}>
+          <div style={styles.grid} className="hackathons-grid-responsive">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} style={styles.skeletonCard}>
                 <div style={styles.skeletonBanner} />
@@ -273,7 +289,7 @@ export default function HackathonsPage() {
         )}
 
         {!loading && filteredHackathons.length > 0 && (
-          <div style={styles.grid}>
+          <div style={styles.grid} className="hackathons-grid-responsive">
             {filteredHackathons.map(h => {
               const isDevfolio = h.platform === 'devfolio';
               const isHackerEarth = h.platform === 'hackerearth';
@@ -288,12 +304,17 @@ export default function HackathonsPage() {
 
               const platformLabel = isDevfolio ? 'Devfolio' : (isHackerEarth ? 'HackerEarth' : 'Unstop');
               const platformBg = isDevfolio
-                ? 'rgba(55, 112, 255, 0.9)'
-                : (isHackerEarth ? 'rgba(168, 85, 247, 0.9)' : 'rgba(28, 73, 128, 0.9)');
-              const platformBorder = isDevfolio ? '#60A5FA' : (isHackerEarth ? '#C084FC' : '#38BDF8');
+                ? 'rgba(55, 112, 255, 0.22)'
+                : (isHackerEarth ? 'rgba(168, 85, 247, 0.22)' : 'rgba(56, 189, 248, 0.22)');
+              const platformColor = isDevfolio ? '#60A5FA' : (isHackerEarth ? '#C084FC' : '#38BDF8');
+              const platformBorder = isDevfolio ? 'rgba(96, 165, 250, 0.4)' : (isHackerEarth ? 'rgba(192, 132, 252, 0.4)' : 'rgba(56, 189, 248, 0.4)');
+
+              const modeBg = isOnline ? 'rgba(94, 234, 212, 0.15)' : 'rgba(216, 180, 254, 0.15)';
+              const modeColor = isOnline ? '#5EEAD4' : '#D8B4FE';
+              const modeBorder = isOnline ? 'rgba(94, 234, 212, 0.35)' : 'rgba(216, 180, 254, 0.35)';
 
               return (
-                <div key={h.id} style={styles.card} className="row-hover">
+                <div key={h.id} style={styles.card} className="hackathon-card">
                   <div style={styles.cardBannerWrapper}>
                     {h.banner ? (
                       <img
@@ -317,6 +338,7 @@ export default function HackathonsPage() {
                       style={{
                         ...styles.platformBadge,
                         background: platformBg,
+                        color: platformColor,
                         borderColor: platformBorder
                       }}
                     >
@@ -326,7 +348,9 @@ export default function HackathonsPage() {
                     <div
                       style={{
                         ...styles.modeBadge,
-                        background: isOnline ? 'rgba(16, 185, 129, 0.9)' : 'rgba(139, 92, 246, 0.9)'
+                        background: modeBg,
+                        color: modeColor,
+                        borderColor: modeBorder
                       }}
                     >
                       {isOnline ? (
@@ -372,20 +396,20 @@ export default function HackathonsPage() {
                       <div style={styles.metaLeft}>
                         {Number(h.participantsCount) > 0 && (
                           <div style={styles.metaItem} title="Registered Hackers">
-                            <Users size={13} color="var(--text-dim)" />
+                            <Users size={13} color="rgba(255, 255, 255, 0.55)" />
                             <span>{Number(h.participantsCount).toLocaleString()}</span>
                           </div>
                         )}
                         {prizesStr && (
-                          <div style={{ ...styles.metaItem, color: 'var(--accent-gold)' }} title="Prizes">
+                          <div style={{ ...styles.metaItem, color: '#FCD34D' }} title="Prizes">
                             <Award size={13} />
                             <span style={{ fontWeight: 600 }}>{prizesStr}</span>
                           </div>
                         )}
                         {daysLeftStr && (
                           <div style={styles.metaItem} title="Time Remaining">
-                            <Clock size={13} color="var(--accent-green)" />
-                            <span style={{ color: 'var(--accent-green)' }}>{daysLeftStr}</span>
+                            <Clock size={13} color="#5EEAD4" />
+                            <span style={{ color: '#5EEAD4', fontWeight: 600 }}>{daysLeftStr}</span>
                           </div>
                         )}
                       </div>
@@ -397,14 +421,14 @@ export default function HackathonsPage() {
                         style={{
                           ...styles.applyBtn,
                           background: isDevfolio
-                            ? 'rgba(55, 112, 255, 0.15)'
-                            : (isHackerEarth ? 'rgba(168, 85, 247, 0.15)' : 'rgba(16, 185, 129, 0.15)'),
+                            ? 'rgba(96, 165, 250, 0.12)'
+                            : (isHackerEarth ? 'rgba(192, 132, 252, 0.12)' : 'rgba(94, 234, 212, 0.12)'),
                           color: isDevfolio
                             ? '#60A5FA'
-                            : (isHackerEarth ? '#C084FC' : 'var(--accent-green)'),
+                            : (isHackerEarth ? '#C084FC' : '#5EEAD4'),
                           borderColor: isDevfolio
-                            ? 'rgba(55, 112, 255, 0.4)'
-                            : (isHackerEarth ? 'rgba(168, 85, 247, 0.4)' : 'rgba(16, 185, 129, 0.4)')
+                            ? 'rgba(96, 165, 250, 0.35)'
+                            : (isHackerEarth ? 'rgba(192, 132, 252, 0.35)' : 'rgba(94, 234, 212, 0.35)')
                         }}
                       >
                         Apply <ExternalLink size={13} style={{ marginLeft: '4px' }} />
@@ -431,99 +455,118 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '24px',
+    marginBottom: '26px',
     gap: '16px',
     flexWrap: 'wrap'
   },
   eyebrow: {
     display: 'flex',
     alignItems: 'center',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '11px',
-    letterSpacing: '2px',
-    color: 'var(--text-dim)',
-    marginBottom: '6px',
-    textTransform: 'uppercase'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '12px',
+    fontWeight: 600,
+    letterSpacing: '2.5px',
+    color: '#5EEAD4',
+    marginBottom: '8px',
+    textTransform: 'uppercase',
+    userSelect: 'none'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: 'clamp(22px, 5vw, 32px)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: 'clamp(24px, 4vw, 32px)',
     fontWeight: 700,
     margin: 0,
-    letterSpacing: '1px',
-    color: '#FFF'
+    letterSpacing: '-0.3px',
+    color: '#FFFFFF',
+    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
   },
   subtitle: {
-    color: 'var(--text-dim)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.65)',
     fontSize: '14px',
+    lineHeight: '1.5',
     margin: '8px 0 0 0',
     maxWidth: '650px'
   },
   refreshBtn: {
-    display: 'flex',
+    display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
-    background: 'var(--surface)',
-    color: 'var(--text)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '8px 14px',
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.14)',
+    borderRadius: '10px',
+    color: '#FFFFFF',
+    padding: '9px 18px',
     fontSize: '13px',
+    fontWeight: 600,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    letterSpacing: '0.3px',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
     cursor: 'pointer',
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   statsRow: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
-    gap: '12px',
-    marginBottom: '24px'
+    gap: '14px',
+    marginBottom: '26px'
   },
   statCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '14px',
-    transition: 'all 0.2s ease'
+    gap: '14px',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
+    padding: '16px 18px',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   statIconWrapper: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '10px',
-    background: 'rgba(16, 185, 129, 0.15)',
+    width: '40px',
+    height: '40px',
+    borderRadius: '11px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0
   },
   statValue: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '16px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '18px',
     fontWeight: 700,
-    color: '#FFF'
+    color: '#FFFFFF',
+    letterSpacing: '0.2px'
   },
   statLabel: {
-    fontSize: '11px',
-    color: 'var(--text-dim)',
-    marginTop: '2px'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '12px',
+    fontWeight: 500,
+    color: 'rgba(255, 255, 255, 0.55)',
+    marginTop: '3px'
   },
   controlsBar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: '16px',
-    marginBottom: '24px',
+    marginBottom: '28px',
     flexWrap: 'wrap'
   },
   tabsContainer: {
     display: 'flex',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '4px',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '12px',
+    padding: '5px',
     gap: '4px',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
     whiteSpace: 'nowrap'
   },
   tab: {
@@ -532,35 +575,43 @@ const styles = {
     justifyContent: 'center',
     whiteSpace: 'nowrap',
     background: 'transparent',
-    border: 'none',
-    color: 'var(--text-dim)',
-    padding: '8px 14px',
-    borderRadius: '6px',
+    border: '1px solid transparent',
+    color: 'rgba(255, 255, 255, 0.65)',
+    padding: '8px 16px',
+    borderRadius: '8px',
     fontSize: '13px',
     fontWeight: 500,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     cursor: 'pointer',
-    transition: 'all 0.2s ease'
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   tabActive: {
-    background: 'var(--border)',
-    color: '#FFF',
-    fontWeight: 600
+    background: 'rgba(255, 255, 255, 0.08)',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    color: '#FFFFFF',
+    fontWeight: 600,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
   },
   tabActiveUnstop: {
-    background: 'rgba(28, 73, 128, 0.4)',
+    background: 'rgba(56, 189, 248, 0.12)',
+    border: '1px solid rgba(56, 189, 248, 0.3)',
     color: '#38BDF8',
-    borderColor: '#1C4980',
-    fontWeight: 600
+    fontWeight: 600,
+    boxShadow: '0 2px 10px rgba(56, 189, 248, 0.15)'
   },
   tabActiveDevfolio: {
-    background: 'rgba(55, 112, 255, 0.3)',
+    background: 'rgba(96, 165, 250, 0.12)',
+    border: '1px solid rgba(96, 165, 250, 0.3)',
     color: '#60A5FA',
-    fontWeight: 600
+    fontWeight: 600,
+    boxShadow: '0 2px 10px rgba(96, 165, 250, 0.15)'
   },
   tabActiveHackerEarth: {
-    background: 'rgba(168, 85, 247, 0.3)',
+    background: 'rgba(192, 132, 252, 0.12)',
+    border: '1px solid rgba(192, 132, 252, 0.3)',
     color: '#C084FC',
-    fontWeight: 600
+    fontWeight: 600,
+    boxShadow: '0 2px 10px rgba(192, 132, 252, 0.15)'
   },
   searchAndFilters: {
     display: 'flex',
@@ -581,41 +632,54 @@ const styles = {
     left: '12px',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: 'var(--text-dim)'
+    color: 'rgba(255, 255, 255, 0.45)'
   },
   searchInput: {
     width: '100%',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '8px 12px 8px 36px',
-    color: 'var(--text)',
-    fontSize: '13px',
-    outline: 'none'
-  },
-  selectFilter: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '8px 12px',
-    color: 'var(--text)',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    borderRadius: '10px',
+    padding: '9px 14px 9px 38px',
+    color: '#FFFFFF',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     outline: 'none',
-    cursor: 'pointer'
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    transition: 'all 0.2s ease'
+  },
+  selectFilter: {
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    borderRadius: '10px',
+    padding: '9px 14px',
+    color: '#FFFFFF',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '13px',
+    outline: 'none',
+    cursor: 'pointer',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    transition: 'all 0.2s ease'
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-    gap: '16px'
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '18px'
   },
   card: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease'
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease'
   },
   cardBannerWrapper: {
     position: 'relative',
@@ -644,15 +708,16 @@ const styles = {
     position: 'absolute',
     top: '12px',
     left: '12px',
-    color: '#FFF',
     fontSize: '10px',
-    fontFamily: "'Orbitron', sans-serif",
-    fontWeight: 700,
-    letterSpacing: '1px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontWeight: 600,
+    letterSpacing: '0.8px',
     padding: '4px 10px',
     borderRadius: '999px',
     textTransform: 'uppercase',
     border: '1px solid transparent',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
     boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
     zIndex: 2
   },
@@ -660,18 +725,22 @@ const styles = {
     position: 'absolute',
     top: '12px',
     right: '12px',
-    color: '#FFF',
     fontSize: '10px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontWeight: 600,
+    letterSpacing: '0.4px',
     padding: '4px 10px',
     borderRadius: '999px',
     display: 'flex',
     alignItems: 'center',
+    border: '1px solid transparent',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
     boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
     zIndex: 2
   },
   cardBody: {
-    padding: '16px',
+    padding: '18px',
     display: 'flex',
     flexDirection: 'column',
     flex: 1
@@ -686,7 +755,8 @@ const styles = {
   organizerText: {
     fontSize: '12px',
     fontWeight: 600,
-    color: 'var(--text-dim)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.55)',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
@@ -695,27 +765,31 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     fontSize: '11px',
-    color: 'var(--text-dim)',
-    background: 'rgba(255,255,255,0.05)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.65)',
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     padding: '2px 8px',
-    borderRadius: '4px'
+    borderRadius: '6px'
   },
   cardTitle: {
-    fontSize: '16px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '17px',
     fontWeight: 700,
-    color: '#FFF',
+    color: '#FFFFFF',
     margin: '0 0 8px 0',
-    lineHeight: '1.3',
+    lineHeight: '1.35',
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden'
   },
   cardTagline: {
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
-    color: 'var(--text-dim)',
+    color: 'rgba(255, 255, 255, 0.65)',
     margin: '0 0 14px 0',
-    lineHeight: '1.4',
+    lineHeight: '1.45',
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
@@ -730,18 +804,19 @@ const styles = {
   },
   tagPill: {
     fontSize: '11px',
-    color: 'var(--text-dim)',
-    background: 'var(--bg)',
-    border: '1px solid var(--border)',
-    borderRadius: '4px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.65)',
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '6px',
     padding: '3px 8px'
   },
   cardMetaFooter: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: '12px',
-    borderTop: '1px solid var(--border)',
+    paddingTop: '14px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
     gap: '12px'
   },
   metaLeft: {
@@ -755,19 +830,23 @@ const styles = {
     alignItems: 'center',
     gap: '5px',
     fontSize: '12px',
-    color: 'var(--text-dim)'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.55)'
   },
   applyBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '7px 14px',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: '12px',
+    padding: '8px 16px',
+    borderRadius: '8px',
+    fontSize: '13px',
     fontWeight: 600,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     border: '1px solid transparent',
     textDecoration: 'none',
-    transition: 'all 0.2s ease',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
     whiteSpace: 'nowrap'
   },
   errorBox: {
@@ -776,31 +855,33 @@ const styles = {
     padding: '14px',
     borderRadius: 'var(--radius)',
     marginBottom: '20px',
-    fontSize: '14px'
+    fontSize: '14px',
+    fontFamily: "'Space Grotesk', sans-serif"
   },
   emptyContainer: {
     textAlign: 'center',
     padding: '60px 20px',
-    background: 'var(--surface)',
-    borderRadius: 'var(--radius)',
-    border: '1px dashed var(--border)'
+    background: 'rgba(10, 13, 19, 0.72)',
+    borderRadius: '14px',
+    border: '1px dashed rgba(255, 255, 255, 0.12)',
+    fontFamily: "'Space Grotesk', sans-serif"
   },
   skeletonCard: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
     overflow: 'hidden',
     height: '280px'
   },
   skeletonBanner: {
     height: '140px',
-    background: 'var(--border)',
+    background: 'rgba(255, 255, 255, 0.05)',
     opacity: 0.6
   },
   skeletonLine: (widthPercent, heightPx) => ({
     width: typeof widthPercent === 'number' ? `${widthPercent}%` : widthPercent,
     height: `${heightPx}px`,
-    background: 'var(--border)',
+    background: 'rgba(255, 255, 255, 0.06)',
     borderRadius: '4px',
     marginBottom: '10px',
     opacity: 0.5

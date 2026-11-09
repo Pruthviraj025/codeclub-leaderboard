@@ -18,7 +18,7 @@ export default function AdminPage() {
   return (
     <div style={styles.page}>
       <header style={styles.header}>
-        <button style={styles.backBtn} onClick={() => navigate('/leaderboard')}>← Leaderboard</button>
+        <button style={styles.backBtn} className="admin-back-btn" onClick={() => navigate('/leaderboard')}>← Leaderboard</button>
         <div style={styles.headerTitle}>ADMIN CONSOLE</div>
       </header>
 
@@ -43,6 +43,7 @@ function TabButton({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
+      className={`admin-tab-btn${active ? ' admin-tab-active' : ''}`}
       style={{ ...styles.tab, ...(active ? styles.tabActive : {}) }}
     >
       {children}
@@ -119,15 +120,15 @@ function UsersTab() {
             <span style={{ ...styles.col, flex: 1 }}>CF HANDLE</span>
             <span style={{ ...styles.col, flex: 1 }}>LC HANDLE</span>
             <span style={{ ...styles.col, flex: 1 }}>CC HANDLE</span>
-            <span style={{ ...styles.col, width: '90px' }}>STATUS</span>
+            <span style={{ ...styles.col, width: '95px' }}>STATUS</span>
             <span style={{ ...styles.col, width: '90px' }}>ROLE</span>
-            <span style={{ ...styles.col, width: '180px' }}>ACTIONS</span>
+            <span style={{ ...styles.col, width: '210px' }}>ACTIONS</span>
           </div>
 
           {users.map(u => (
             <div key={u._id} style={styles.tableRow}>
               <div style={{ flex: 2 }}>
-                <div style={{ fontWeight: 600 }}>{u.name}</div>
+                <div style={styles.userName}>{u.name}</div>
                 <div style={styles.subtext}>{u.usn} · {u.email}</div>
               </div>
 
@@ -164,7 +165,7 @@ function UsersTab() {
                 )}
               </div>
 
-              <div style={{ width: '90px' }}>
+              <div style={{ width: '95px' }}>
                 <span style={u.isActive ? styles.pillGreen : styles.pillRed}>
                   {u.isActive ? 'Active' : 'Soft-Rem'}
                 </span>
@@ -174,10 +175,11 @@ function UsersTab() {
                 <span style={styles.dim}>{u.role}</span>
               </div>
 
-              <div style={{ width: '180px', display: 'flex', gap: '6px' }}>
+              <div style={{ width: '210px', display: 'flex', gap: '8px' }}>
                 {u.isActive ? (
                   <button
                     style={styles.actionBtn}
+                    className="admin-btn-warm"
                     disabled={busyId === u._id}
                     onClick={() => handleSoftRemove(u)}
                   >
@@ -186,6 +188,7 @@ function UsersTab() {
                 ) : (
                   <button
                     style={styles.actionBtnGreen}
+                    className="admin-btn-primary"
                     disabled={busyId === u._id}
                     onClick={() => handleReactivate(u)}
                   >
@@ -196,6 +199,7 @@ function UsersTab() {
                 {confirmDelete === u._id ? (
                   <button
                     style={styles.actionBtnRed}
+                    className="admin-btn-danger"
                     disabled={busyId === u._id}
                     onClick={() => handleHardDelete(u)}
                   >
@@ -204,6 +208,7 @@ function UsersTab() {
                 ) : (
                   <button
                     style={styles.actionBtnRedOutline}
+                    className="admin-btn-danger"
                     onClick={() => setConfirmDelete(u._id)}
                   >
                     Delete
@@ -255,6 +260,7 @@ function ReviewTab() {
           <button
             key={st}
             onClick={() => setFilter(st)}
+            className="admin-btn-warm"
             style={{ ...styles.actionBtn, ...(filter === st ? styles.tabActive : {}) }}
           >
             {st.toUpperCase()}
@@ -272,8 +278,8 @@ function ReviewTab() {
             <div style={styles.tableHeader}>
               <span style={{ ...styles.col, flex: 2 }}>USER</span>
               <span style={{ ...styles.col, flex: 3 }}>CONTEST / PROBLEM</span>
-              <span style={{ ...styles.col, width: '90px' }}>POINTS</span>
-              <span style={{ ...styles.col, width: '160px' }}>ACTIONS</span>
+              <span style={{ ...styles.col, width: '105px' }}>POINTS</span>
+              <span style={{ ...styles.col, width: '185px' }}>ACTIONS</span>
             </div>
 
             {submissions.map(s => {
@@ -318,7 +324,7 @@ function ReviewTab() {
               return (
                 <div key={s._id} style={styles.tableRow}>
                   <div style={{ flex: 2 }}>
-                    <div style={{ fontWeight: 600 }}>{u.name || 'Unknown'}</div>
+                    <div style={styles.userName}>{u.name || 'Unknown'}</div>
                     <div style={styles.subtext}>
                       {u.usn ? `${u.usn} ` : ''}
                       {userPlatformHandle ? `(${userPlatformHandle})` : (u.cfHandle ? `(${u.cfHandle})` : '')}
@@ -384,13 +390,14 @@ function ReviewTab() {
                     </div>
                   </div>
 
-                  <div style={{ width: '90px' }}>
+                  <div style={{ width: '105px' }}>
                     <span style={styles.pillGreen}>+{s.points} pts</span>
                   </div>
 
-                  <div style={{ width: '160px', display: 'flex', gap: '6px' }}>
+                  <div style={{ width: '185px', display: 'flex', gap: '8px' }}>
                     <button
                       style={styles.actionBtnGreen}
+                      className="admin-btn-primary"
                       disabled={busyId === s._id}
                       onClick={() => handleReview(s, 'cleared')}
                     >
@@ -398,6 +405,7 @@ function ReviewTab() {
                     </button>
                     <button
                       style={styles.actionBtnRedOutline}
+                      className="admin-btn-danger"
                       disabled={busyId === s._id}
                       onClick={() => handleReview(s, 'flagged')}
                     >
@@ -416,8 +424,8 @@ function ReviewTab() {
 
 
 const SUGGESTION_STATUS = {
-  pending: { label: 'PENDING', color: 'var(--text-dim)', border: 'var(--border)' },
-  accepted: { label: 'ACCEPTED', color: 'var(--accent-green)', border: 'var(--accent-green)' },
+  pending: { label: 'PENDING', color: 'rgba(255, 255, 255, 0.55)', border: 'rgba(255, 255, 255, 0.15)' },
+  accepted: { label: 'ACCEPTED', color: '#FCD34D', border: 'rgba(255, 193, 43, 0.4)' },
   rejected: { label: 'REJECTED', color: 'var(--accent-red)', border: 'var(--accent-red)' }
 };
 
@@ -536,7 +544,7 @@ function SuggestionsTab() {
               <span style={{ ...styles.col, flex: 2 }}>SUBMITTED BY</span>
               <span style={{ ...styles.col, flex: 4 }}>SUGGESTION DETAILS</span>
               <span style={{ ...styles.col, flex: 2 }}>DATE &amp; TIME</span>
-              <span style={{ ...styles.col, width: '100px', textAlign: 'right' }}>ACTION</span>
+              <span style={{ ...styles.col, width: '115px', textAlign: 'right' }}>ACTION</span>
             </div>
 
             {suggestions.map(s => {
@@ -550,37 +558,37 @@ function SuggestionsTab() {
               const editing = editingId === s._id;
 
               return (
-                <div key={s._id} style={{ ...styles.tableRow, alignItems: 'flex-start', padding: '14px 16px' }}>
+                <div key={s._id} style={{ ...styles.tableRow, alignItems: 'flex-start', padding: '16px 18px' }}>
                   <div style={{ flex: 2 }}>
-                    <div style={{ fontWeight: 600, color: 'var(--text)' }}>{u.name || 'User'}</div>
+                    <div style={styles.userName}>{u.name || 'User'}</div>
                     <div style={styles.subtext}>{u.usn ? `USN: ${u.usn}` : ''}</div>
                     <div style={styles.subtext}>{u.email || ''}</div>
                   </div>
 
-                  <div style={{ flex: 4, color: 'var(--text)', lineHeight: '1.5', fontFamily: 'inherit' }}>
-                    <div style={{ marginBottom: '6px' }}>
+                  <div style={{ flex: 4, color: 'var(--text)', lineHeight: '1.55', fontFamily: 'inherit' }}>
+                    <div style={{ marginBottom: '8px' }}>
                       <span style={{
                         color: meta.color, border: `1px solid ${meta.border}`, borderRadius: '4px',
-                        padding: '2px 8px', fontSize: '10px', letterSpacing: '1px',
-                        fontFamily: "'Orbitron', sans-serif"
+                        padding: '3px 9px', fontSize: '11px', letterSpacing: '1px', fontWeight: 600,
+                        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
                       }}>
                         {meta.label}
                       </span>
                     </div>
 
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{s.text}</div>
+                    <div style={{ whiteSpace: 'pre-wrap', fontSize: '14px' }}>{s.text}</div>
                     {s.editedAt && (
                       <div style={{ ...styles.subtext, fontStyle: 'italic', marginTop: '4px' }}>
                         Edited {fmtDate(s.editedAt)}
                       </div>
                     )}
                     {(s.additions || []).map(a => (
-                      <div key={a._id} style={{ marginTop: '8px', paddingLeft: '10px', borderLeft: '2px solid var(--border-hover)' }}>
+                      <div key={a._id} style={{ marginTop: '8px', paddingLeft: '10px', borderLeft: '2px solid rgba(255, 193, 43, 0.3)' }}>
                         <div style={styles.subtext}>
                           Added {fmtDate(a.createdAt)}
                           {a.editedAt && <span style={{ fontStyle: 'italic' }}> · edited {fmtDate(a.editedAt)}</span>}
                         </div>
-                        <div style={{ whiteSpace: 'pre-wrap', fontSize: '13px' }}>{a.text}</div>
+                        <div style={{ whiteSpace: 'pre-wrap', fontSize: '13.5px' }}>{a.text}</div>
                       </div>
                     ))}
 
@@ -589,9 +597,9 @@ function SuggestionsTab() {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
                             <div style={{
-                              flex: 1, background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)',
-                              borderRadius: '8px', padding: '8px 12px', fontSize: '13px',
-                              whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', lineHeight: '1.5'
+                              flex: 1, background: 'rgba(255, 193, 43, 0.08)', border: '1px solid rgba(255, 193, 43, 0.3)',
+                              borderRadius: '8px', padding: '10px 14px', fontSize: '14px',
+                              whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', lineHeight: '1.55', color: '#FFFBEB'
                             }}>
                               {s.adminReply}
                             </div>
@@ -600,7 +608,7 @@ function SuggestionsTab() {
                                 <button
                                   aria-label="Reply options"
                                   style={{
-                                    background: 'transparent', border: 'none', color: 'var(--text-dim)',
+                                    background: 'transparent', border: 'none', color: 'rgba(255, 255, 255, 0.6)',
                                     cursor: 'pointer', padding: '6px 2px', display: 'flex'
                                   }}
                                   onClick={e => { e.stopPropagation(); setMenuId(menuId === s._id ? null : s._id); }}
@@ -612,7 +620,7 @@ function SuggestionsTab() {
                                     style={{
                                       position: 'absolute', right: 0, top: '100%', zIndex: 5,
                                       background: 'var(--surface-raised)', border: '1px solid var(--border)',
-                                      borderRadius: '4px', minWidth: '90px'
+                                      borderRadius: '6px', minWidth: '96px', overflow: 'hidden'
                                     }}
                                     onClick={e => e.stopPropagation()}
                                   >
@@ -620,19 +628,19 @@ function SuggestionsTab() {
                                       style={{
                                         display: 'flex', alignItems: 'center', gap: '6px', width: '100%',
                                         background: 'transparent', border: 'none', color: 'var(--text)',
-                                        padding: '8px 12px', fontSize: '12px', cursor: 'pointer'
+                                        padding: '8px 12px', fontSize: '13px', cursor: 'pointer'
                                       }}
                                       onClick={() => startEdit(s)}
                                     >
-                                      <Pencil size={12} /> Edit
+                                      <Pencil size={13} /> Edit
                                     </button>
                                   </div>
                                 )}
                               </div>
                             )}
                           </div>
-                          <div style={{ ...styles.subtext, marginTop: '4px', color: 'var(--accent-green)' }}>
-                            <Check size={11} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                          <div style={{ ...styles.subtext, marginTop: '6px', color: '#FCD34D' }}>
+                            <Check size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
                             Sent {fmtDate(s.repliedAt)}
                             {s.replyUpdatedAt && <span style={{ fontStyle: 'italic' }}> · updated {fmtDate(s.replyUpdatedAt)}</span>}
                           </div>
@@ -641,10 +649,10 @@ function SuggestionsTab() {
                         <div>
                           <textarea
                             style={{
-                              width: '100%', boxSizing: 'border-box', background: 'var(--bg)',
-                              border: '1px solid var(--border-hover)', borderRadius: '4px',
-                              color: 'var(--text)', padding: '8px 10px', fontSize: '13px',
-                              fontFamily: 'inherit', resize: 'vertical', outline: 'none', lineHeight: '1.5'
+                              width: '100%', boxSizing: 'border-box', background: 'rgba(0, 0, 0, 0.35)',
+                              border: '1px solid rgba(255, 193, 43, 0.25)', borderRadius: '6px',
+                              color: '#FFFFFF', padding: '10px 12px', fontSize: '14px',
+                              fontFamily: 'inherit', resize: 'vertical', outline: 'none', lineHeight: '1.55'
                             }}
                             rows={2}
                             maxLength={2000}
@@ -653,8 +661,9 @@ function SuggestionsTab() {
                             value={draft}
                             onChange={e => setReplyDrafts(prev => ({ ...prev, [s._id]: e.target.value }))}
                           />
-                          <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                             <button
+                              className="admin-btn-primary"
                               style={{
                                 ...styles.actionBtnGreen,
                                 display: 'inline-flex', alignItems: 'center', gap: '6px',
@@ -664,20 +673,21 @@ function SuggestionsTab() {
                               disabled={busy || !draft.trim() || (editing && draft.trim() === s.adminReply)}
                               onClick={() => handleReview(s, { reply: draft })}
                             >
-                              <Send size={12} />
+                              <Send size={13} />
                               {busy ? 'Sending...' : editing ? 'Update' : 'Send'}
                             </button>
                             {editing && (
-                              <button style={styles.actionBtn} disabled={busy} onClick={() => cancelEdit(s)}>
-                                <X size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />Cancel
+                              <button style={styles.actionBtn} className="admin-btn-warm" disabled={busy} onClick={() => cancelEdit(s)}>
+                                <X size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />Cancel
                               </button>
                             )}
                           </div>
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                         <button
+                          className="admin-btn-primary"
                           style={{ ...styles.actionBtnGreen, opacity: busy || !hasReply || status === 'accepted' ? 0.5 : 1 }}
                           disabled={busy || !hasReply || status === 'accepted'}
                           title={hasReply ? '' : 'Send a reply first'}
@@ -686,6 +696,7 @@ function SuggestionsTab() {
                           Accept
                         </button>
                         <button
+                          className="admin-btn-danger"
                           style={{ ...styles.actionBtnRedOutline, opacity: busy || !hasReply || status === 'rejected' ? 0.5 : 1 }}
                           disabled={busy || !hasReply || status === 'rejected'}
                           title={hasReply ? '' : 'Send a reply first'}
@@ -695,6 +706,7 @@ function SuggestionsTab() {
                         </button>
                         {status !== 'pending' && (
                           <button
+                            className="admin-btn-warm"
                             style={styles.actionBtn}
                             disabled={busy}
                             onClick={() => handleReview(s, { status: 'pending' })}
@@ -705,17 +717,18 @@ function SuggestionsTab() {
                       </div>
 
                       {rowError.id === s._id && (
-                        <div style={{ ...styles.error, marginTop: '8px', marginBottom: 0, fontSize: '12px' }}>{rowError.msg}</div>
+                        <div style={{ ...styles.error, marginTop: '8px', marginBottom: 0, fontSize: '13px' }}>{rowError.msg}</div>
                       )}
                     </div>
                   </div>
 
-                  <div style={{ flex: 2, fontSize: '11px', color: 'var(--text-dim)' }}>
+                  <div style={{ flex: 2, fontSize: '12.5px', color: 'var(--text-dim)' }}>
                     {fmtDate(s.createdAt)}
                   </div>
 
-                  <div style={{ width: '100px', textAlign: 'right' }}>
+                  <div style={{ width: '115px', textAlign: 'right' }}>
                     <button
+                      className="admin-btn-danger"
                       style={styles.actionBtnRedOutline}
                       disabled={busy}
                       onClick={() => handleDelete(s)}
@@ -758,7 +771,7 @@ function AuditTab() {
 
           {actions.map(a => (
             <div key={a._id} style={styles.tableRow}>
-              <div style={{ flex: 2, fontSize: '12px' }}>
+              <div style={{ flex: 2, fontSize: '13px', color: 'var(--text)' }}>
                 {new Date(a.createdAt).toLocaleString()}
               </div>
               <div style={{ flex: 1.5 }}>
@@ -766,7 +779,7 @@ function AuditTab() {
                   {a.action}
                 </span>
               </div>
-              <div style={{ flex: 2, color: 'var(--text-dim)' }}>
+              <div style={{ flex: 2, color: 'var(--text-dim)', fontSize: '13.5px' }}>
                 {a.reason || '—'}
               </div>
             </div>
@@ -784,115 +797,260 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 'var(--space-3)',
-    padding: '14px 16px',
-    borderBottom: '1px solid var(--border)'
+    padding: '18px 24px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.07)'
   },
   backBtn: {
-    background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-dim)',
-    fontSize: '12px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', padding: '6px 12px', borderRadius: '4px'
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 193, 43, 0.22)',
+    color: 'rgba(255, 255, 255, 0.78)',
+    fontSize: '14.5px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontWeight: 500,
+    cursor: 'pointer',
+    padding: '8px 20px',
+    borderRadius: '8px'
   },
   headerTitle: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '13px', fontWeight: 700, color: 'var(--accent-gold)', letterSpacing: '2px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#FCD34D',
+    letterSpacing: '1.4px',
     userSelect: 'none'
   },
-  main: { maxWidth: '1040px', margin: '0 auto', padding: 'var(--space-4) var(--space-3)' },
-  tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' },
+  main: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: 'var(--space-5) var(--space-4)'
+  },
+  tabRow: {
+    display: 'flex',
+    gap: '12px',
+    marginBottom: 'var(--space-4)',
+    flexWrap: 'wrap'
+  },
   tab: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '10px 16px',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px',
-    letterSpacing: '0.5px',
+    background: 'rgba(255, 255, 255, 0.025)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '8px',
+    color: 'rgba(255, 255, 255, 0.65)',
+    padding: '12px 24px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '15px',
+    fontWeight: 500,
+    letterSpacing: '0.3px',
     userSelect: 'none',
     cursor: 'pointer',
-    minHeight: '40px'
+    minHeight: '46px'
   },
-  tabActive: { borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' },
-  table: { border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' },
+  tabActive: {
+    background: 'rgba(255, 193, 43, 0.1)',
+    borderColor: 'rgba(255, 193, 43, 0.42)',
+    color: '#FCD34D',
+    fontWeight: 600,
+    boxShadow: '0 2px 12px rgba(255, 193, 43, 0.1)'
+  },
+  table: {
+    border: '1px solid rgba(255, 255, 255, 0.07)',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    background: '#090B0F'
+  },
   tableHeader: {
     display: 'flex',
-    padding: '10px 16px',
-    background: 'var(--surface-raised)',
-    borderBottom: '1px solid var(--border)'
+    padding: '14px 22px',
+    background: 'rgba(255, 255, 255, 0.025)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
   },
   tableRow: {
     display: 'flex',
     alignItems: 'center',
-    padding: '12px 16px',
-    background: 'var(--surface)',
-    borderBottom: '1px solid var(--border)',
-    fontSize: '13px',
-    fontFamily: "'Orbitron', sans-serif"
+    padding: '16px 22px',
+    background: 'transparent',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    fontSize: '15px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'var(--text)'
   },
   col: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '10px', color: 'var(--text-dim)', letterSpacing: '1.5px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '13px',
+    fontWeight: 600,
+    color: 'rgba(255, 255, 255, 0.52)',
+    letterSpacing: '1.1px',
     userSelect: 'none'
   },
-  subtext: { fontSize: '11px', color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif" },
-  dim: { color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif" },
-  verifiedDot: { color: 'var(--accent-green)', marginLeft: '6px', fontSize: '10px' },
+  userName: {
+    fontWeight: 600,
+    fontSize: '16.5px',
+    color: '#FFFFFF'
+  },
+  subtext: {
+    fontSize: '13.5px',
+    color: 'rgba(255, 255, 255, 0.55)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    marginTop: '3px'
+  },
+  dim: {
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: '15px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  },
+  verifiedDot: {
+    color: '#5EEAD4',
+    marginLeft: '6px',
+    fontSize: '13px'
+  },
   pillGreen: {
-    color: 'var(--accent-green)', background: 'var(--accent-green-dim)',
-    border: '1px solid var(--accent-green)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px',
-    fontFamily: "'Orbitron', sans-serif"
+    color: '#5EEAD4',
+    background: 'rgba(94, 234, 212, 0.1)',
+    border: '1px solid rgba(94, 234, 212, 0.3)',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    fontSize: '13px',
+    fontWeight: 600,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   pillRed: {
-    color: 'var(--accent-red)', background: 'var(--accent-red-dim)',
-    border: '1px solid var(--accent-red)', borderRadius: '4px', padding: '2px 8px', fontSize: '11px',
-    fontFamily: "'Orbitron', sans-serif"
+    color: '#F87171',
+    background: 'rgba(248, 113, 113, 0.1)',
+    border: '1px solid rgba(248, 113, 113, 0.3)',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    fontSize: '13px',
+    fontWeight: 600,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   pillCf: {
-    color: '#3182ce', background: 'rgba(49, 130, 206, 0.12)',
-    border: '1px solid #3182ce', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
-    fontFamily: "'Orbitron', sans-serif"
+    color: '#7DD3FC',
+    background: 'rgba(99, 223, 255, 0.12)',
+    border: '1px solid rgba(99, 223, 255, 0.28)',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    fontSize: '13px',
+    fontWeight: 700,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   pillLc: {
-    color: '#FFA116', background: 'rgba(255, 161, 22, 0.12)',
-    border: '1px solid #FFA116', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
-    fontFamily: "'Orbitron', sans-serif"
+    color: '#FCD34D',
+    background: 'rgba(252, 211, 77, 0.12)',
+    border: '1px solid rgba(252, 211, 77, 0.28)',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    fontSize: '13px',
+    fontWeight: 700,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   pillCc: {
-    color: '#D48843', background: 'rgba(212, 136, 67, 0.12)',
-    border: '1px solid #D48843', borderRadius: '4px', padding: '1px 6px', fontSize: '10px', fontWeight: 700,
-    fontFamily: "'Orbitron', sans-serif"
+    color: '#D8B4FE',
+    background: 'rgba(216, 180, 254, 0.12)',
+    border: '1px solid rgba(216, 180, 254, 0.28)',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    fontSize: '13px',
+    fontWeight: 700,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   problemLink: {
-    color: 'var(--text)', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
-    display: 'inline-flex', alignItems: 'center', gap: '4px'
+    color: 'var(--text)',
+    textDecoration: 'none',
+    fontWeight: 600,
+    fontSize: '15.5px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px'
   },
   subLink: {
-    color: 'var(--accent-gold)', textDecoration: 'none', borderBottom: '1px dashed var(--accent-gold)'
+    color: '#FCD34D',
+    textDecoration: 'none',
+    fontSize: '14px',
+    borderBottom: '1px dashed rgba(252, 211, 77, 0.5)'
   },
   ratingBadge: {
-    color: 'var(--accent-gold)', fontSize: '11px', background: 'rgba(230, 180, 80, 0.12)',
-    border: '1px solid rgba(230, 180, 80, 0.3)', padding: '1px 6px', borderRadius: '3px'
+    color: '#FCD34D',
+    fontSize: '13px',
+    fontWeight: 600,
+    background: 'rgba(255, 193, 43, 0.12)',
+    border: '1px solid rgba(255, 193, 43, 0.3)',
+    padding: '3px 8px',
+    borderRadius: '4px'
   },
   difficultyBadge: {
-    color: 'var(--text-dim)', fontSize: '11px', background: 'var(--surface-raised)',
-    border: '1px solid var(--border)', padding: '1px 6px', borderRadius: '3px'
+    color: 'rgba(255, 255, 255, 0.65)',
+    fontSize: '13px',
+    fontWeight: 500,
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    padding: '3px 8px',
+    borderRadius: '4px'
   },
   actionBtn: {
-    background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '4px',
-    color: 'var(--text)', padding: '8px 12px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
+    background: 'rgba(255, 193, 43, 0.06)',
+    border: '1px solid rgba(255, 193, 43, 0.22)',
+    borderRadius: '7px',
+    color: 'rgba(255, 230, 160, 0.9)',
+    padding: '9px 16px',
+    fontSize: '13.5px',
+    fontWeight: 500,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    cursor: 'pointer',
+    minHeight: '38px'
   },
   actionBtnGreen: {
-    background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)', borderRadius: '4px',
-    color: 'var(--accent-green)', padding: '8px 12px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
+    background: 'rgba(255, 193, 43, 0.14)',
+    border: '1px solid rgba(255, 193, 43, 0.42)',
+    borderRadius: '7px',
+    color: '#FCD34D',
+    padding: '9px 16px',
+    fontSize: '13.5px',
+    fontWeight: 600,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    cursor: 'pointer',
+    minHeight: '38px',
+    boxShadow: '0 2px 8px rgba(255, 193, 43, 0.08)'
   },
   actionBtnRed: {
-    background: 'var(--accent-red)', border: 'none', borderRadius: '4px',
-    color: '#2A0A08', padding: '8px 12px', fontSize: '11px', fontWeight: 600, fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
+    background: 'rgba(248, 113, 113, 0.85)',
+    border: '1px solid rgba(248, 113, 113, 0.9)',
+    borderRadius: '7px',
+    color: '#1A0505',
+    padding: '9px 16px',
+    fontSize: '13.5px',
+    fontWeight: 700,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    cursor: 'pointer',
+    minHeight: '38px'
   },
   actionBtnRedOutline: {
-    background: 'transparent', border: '1px solid var(--accent-red)', borderRadius: '4px',
-    color: 'var(--accent-red)', padding: '8px 12px', fontSize: '11px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', minHeight: '34px'
+    background: 'rgba(248, 113, 113, 0.04)',
+    border: '1px solid rgba(248, 113, 113, 0.28)',
+    borderRadius: '7px',
+    color: '#F87171',
+    padding: '9px 16px',
+    fontSize: '13.5px',
+    fontWeight: 500,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    cursor: 'pointer',
+    minHeight: '38px'
   },
-  error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' },
-  infoMsg: { color: 'var(--accent-gold)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '12px' },
-  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' }
+  error: {
+    color: 'var(--accent-red)',
+    marginBottom: 'var(--space-3)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '15px'
+  },
+  infoMsg: {
+    color: '#FCD34D',
+    marginBottom: 'var(--space-3)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '15px'
+  },
+  empty: {
+    padding: 'var(--space-5)',
+    textAlign: 'center',
+    color: 'var(--text-dim)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '16px'
+  }
 };

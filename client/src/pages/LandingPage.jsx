@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { api, warmUpServer } from "../api";
 import { useAuth } from "../context/AuthContext";
+import GrainMass from '../components/GrainMass';
 import ccLogo from '../assets/cc-logo-white.png';
 import '../styles/LandingPage.css';
 
@@ -11,29 +12,6 @@ const BOOT_LINES = [
   '> syncing codeclub server...... ',
   '> ready.',
 ];
-
-const NUM_LIGHTS = 8;
-const LIGHT_STAGGER = 0.08;
-const NUM_PARTICLES = 61;
-
-const RING_LIGHTS = Array.from({ length: NUM_LIGHTS }).map((_, i) => {
-  const angle = (360 / NUM_LIGHTS) * i - 90;
-  const rad = (angle * Math.PI) / 180;
-  const radiusPercent = 43.75;
-  return {
-    x: 50 + radiusPercent * Math.cos(rad),
-    y: 50 + radiusPercent * Math.sin(rad),
-    delay: i * LIGHT_STAGGER,
-  };
-});
-
-const PARTICLES = Array.from({ length: NUM_PARTICLES }).map(() => ({
-  top: Math.random() * 100,
-  left: Math.random() * 100,
-  size: 2 + Math.random() * 3,
-  delay: Math.random() * 8,
-  duration: 6 + Math.random() * 6,
-}));
 
 function CodeClubLoader() {
   const [text, setText] = useState('');
@@ -85,6 +63,8 @@ function CodeClubLoader() {
   );
 }
 
+let hasPlayedEntranceAnimation = false;
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -110,6 +90,20 @@ export default function LandingPage() {
   const [bootLines, setBootLines] = useState(isLoginModeFromUrl ? BOOT_LINES : []);
   const [bootDone, setBootDone] = useState(isLoginModeFromUrl);
   const [slowHint, setSlowHint] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
+  const [skipEntrance] = useState(() => hasPlayedEntranceAnimation || isLoginModeFromUrl);
+
+  useEffect(() => {
+    hasPlayedEntranceAnimation = true;
+  }, []);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     warmUpServer();
@@ -193,27 +187,19 @@ export default function LandingPage() {
   return (
     <div style={styles.page}>
 
-      <div className="landing-bg-overlay">
-        <div className="ocean-gradient" />
-        <div className="electric-wave-1" />
-        <div className="electric-wave-2" />
-        {PARTICLES.map((p, i) => (
-          <div
-            key={i}
-            className="space-particle"
-            style={{
-              top: `${p.top}%`,
-              left: `${p.left}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-            }}
-          />
-        ))}
+      <div className={`landing-bg-overlay ${skipEntrance ? 'entrance-done' : ''}`}>
+        <GrainMass
+          background="#000000"
+          scale={isMobile ? 85 : 150}
+          rotateSpeed={5}
+          boil={6}
+          glow={3.8}
+        />
+        <div className="landing-radial-glow" />
+        <div className="landing-vignette" />
       </div>
 
-      <div style={styles.bootLine} className="mono landing-boot-line">
+      <div style={styles.bootLine} className="landing-boot-line">
         {bootLines.map((line, i) => (
           <div key={i}>
             {line}
@@ -227,24 +213,13 @@ export default function LandingPage() {
       <div style={{ ...styles.corner, bottom: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderTop: 'none' }} />
       <div style={{ ...styles.corner, bottom: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderTop: 'none' }} />
 
-      <div style={styles.quote} className="mono fade-up landing-quote">
+      <div style={styles.quote} className="fade-up landing-quote">
         {'// "Productive days are the days where you do what you want to do"'}
       </div>
 
-      <div style={styles.center}>
+      <div style={styles.center} className={skipEntrance ? 'entrance-done' : ''}>
         <div className="stage">
           <div className={`ring-wrap ${showForm ? 'ring-hidden' : ''} ${joinTransition ? 'ring-burst' : ''}`}>
-            {RING_LIGHTS.map((l, i) => (
-              <div
-                key={i}
-                className="ring-light"
-                style={{
-                  left: `${l.x}%`,
-                  top: `${l.y}%`,
-                  animationDelay: `${l.delay}s`,
-                }}
-              />
-            ))}
             <img src={ccLogo} alt="CodeClub" className="ring-logo" />
             <div className={`ring-subtitle ${showForm ? 'ring-hidden' : ''}`}>
               LEADERBOARD
@@ -263,107 +238,107 @@ export default function LandingPage() {
                 className="scale-in form-overlay"
                 onSubmit={handleSubmit}
               >
-              <div style={styles.tabRow}>
-                <button
-                  type="button"
-                  onClick={() => setMode('join')}
-                  style={{ ...styles.tab, ...(mode === 'join' ? styles.tabActive : {}) }}
-                >
-                  New here
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('login')}
-                  style={{ ...styles.tab, ...(mode === 'login' ? styles.tabActive : {}) }}
-                >
-                  Already a member
-                </button>
-              </div>
-
-              {mode === 'join' && (
-                <>
-                  <input
-                    id="join-name"
-                    name="name"
-                    autoComplete="name"
-                    style={styles.input}
-                    placeholder="Full name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                  />
-                  <input
-                    id="join-usn"
-                    name="usn"
-                    autoComplete="off"
-                    style={styles.input}
-                    placeholder="USN"
-                    value={form.usn}
-                    onChange={(e) => setForm({ ...form, usn: e.target.value })}
-                    required
-                  />
-                </>
-              )}
-              <input
-                id="login-email"
-                name="email"
-                autoComplete="username email"
-                style={styles.input}
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-              />
-              <input
-                id="login-password"
-                name="password"
-                autoComplete={mode === 'join' ? "new-password" : "current-password"}
-                style={styles.input}
-                type="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-              />
-
-              {error && <div style={styles.error}>✕ {error}</div>}
-
-              {loading && (
-                <div style={styles.loadingWrap}>
-                  {slowHint ? (
-                    <>
-                      <CodeClubLoader />
-                      <div style={styles.hint}>Server was asleep — waking it up, hang tight…</div>
-                    </>
-                  ) : (
-                    <CodeClubLoader />
-                  )}
+                <div style={styles.tabRow}>
+                  <button
+                    type="button"
+                    onClick={() => setMode('join')}
+                    style={{ ...styles.tab, ...(mode === 'join' ? styles.tabActive : {}) }}
+                  >
+                    New here
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    style={{ ...styles.tab, ...(mode === 'login' ? styles.tabActive : {}) }}
+                  >
+                    Already a member
+                  </button>
                 </div>
-              )}
 
-              {mode === 'login' && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 2px 10px', fontSize: '12px', color: 'var(--text-dim, #94a3b8)' }}>
-                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', userSelect: 'none' }}>
+                {mode === 'join' && (
+                  <>
                     <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      style={{ accentColor: '#22c55e', cursor: 'pointer', width: '14px', height: '14px' }}
+                      id="join-name"
+                      name="name"
+                      autoComplete="name"
+                      style={styles.input}
+                      placeholder="Full name"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      required
                     />
-                    <span>Remember me</span>
-                  </label>
-                  <Link to="/forgot-password" style={{ ...styles.backLink, margin: 0, fontSize: '12px' }}>Forgot password?</Link>
-                </div>
-              )}
+                    <input
+                      id="join-usn"
+                      name="usn"
+                      autoComplete="off"
+                      style={styles.input}
+                      placeholder="USN"
+                      value={form.usn}
+                      onChange={(e) => setForm({ ...form, usn: e.target.value })}
+                      required
+                    />
+                  </>
+                )}
+                <input
+                  id="login-email"
+                  name="email"
+                  autoComplete="username email"
+                  style={styles.input}
+                  type="email"
+                  placeholder="Email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  required
+                />
+                <input
+                  id="login-password"
+                  name="password"
+                  autoComplete={mode === 'join' ? "new-password" : "current-password"}
+                  style={styles.input}
+                  type="password"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                />
 
-              <button style={styles.submitBtn} type="submit" disabled={loading}>
-                {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
-              </button>
-              {mode === 'join' && (
-                <Link to="/forgot-password" style={styles.backLink}>Forgot password?</Link>
-              )}
-            </form>
+                {error && <div style={styles.error}>✕ {error}</div>}
+
+                {loading && (
+                  <div style={styles.loadingWrap}>
+                    {slowHint ? (
+                      <>
+                        <CodeClubLoader />
+                        <div style={styles.hint}>Server was asleep — waking it up, hang tight…</div>
+                      </>
+                    ) : (
+                      <CodeClubLoader />
+                    )}
+                  </div>
+                )}
+
+                {mode === 'login' && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 2px 10px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>
+                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', userSelect: 'none' }}>
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        style={{ accentColor: '#ffffff', cursor: 'pointer', width: '14px', height: '14px' }}
+                      />
+                      <span>Remember me</span>
+                    </label>
+                    <Link to="/forgot-password" style={{ ...styles.backLink, margin: 0, fontSize: '12px' }}>Forgot password?</Link>
+                  </div>
+                )}
+
+                <button style={styles.submitBtn} type="submit" disabled={loading}>
+                  {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
+                </button>
+                {mode === 'join' && (
+                  <Link to="/forgot-password" style={styles.backLink}>Forgot password?</Link>
+                )}
+              </form>
             </div>
           )}
         </div>
@@ -391,100 +366,143 @@ const styles = {
     position: 'relative',
     background: '#000',
     overflow: 'hidden',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   corner: {
     position: 'absolute',
     width: '20px',
     height: '20px',
-    border: '1px solid var(--border-hover)',
+    border: '1px solid rgba(255, 255, 255, 0.25)',
     opacity: 0.6,
-    pointerEvents: 'none'
+    pointerEvents: 'none',
+    zIndex: 2,
   },
   bootLine: {
     position: 'absolute',
     top: 'var(--space-4)',
     left: 'var(--space-4)',
-    fontSize: '12px',
-    color: 'var(--accent-green)',
-    opacity: 0.7
+    fontSize: '17px',
+    color: '#FFFFFF',
+    opacity: 0.95,
+    zIndex: 2,
+    lineHeight: '1.75',
+    letterSpacing: '0.5px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontWeight: 500,
+    textShadow: '0 1px 4px rgba(0, 0, 0, 0.95), 0 0 12px rgba(255, 255, 255, 0.15)',
   },
   quote: {
     position: 'absolute',
     bottom: 'var(--space-4)',
     left: '50%',
     transform: 'translateX(-50%)',
-    fontSize: '12px',
-    color: 'var(--accent-green)',
-    letterSpacing: '0.3px',
-    opacity: 0.85,
+    fontSize: '17px',
+    color: '#FFFFFF',
+    letterSpacing: '0.6px',
+    opacity: 0.9,
     textAlign: 'center',
     maxWidth: '90vw',
-    padding: '0 var(--space-3)'
+    padding: '0 var(--space-3)',
+    zIndex: 2,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontWeight: 500,
+    textShadow: '0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(255, 255, 255, 0.15)',
   },
-  center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)', position: 'relative', zIndex: 1 },
+  center: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '32px',
+    position: 'relative',
+    zIndex: 10,
+  },
   form: {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-3)',
-    width: 'min(320px, 100%)',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: 'var(--space-4)'
+    width: 'min(360px, 92vw)',
+    background: 'rgba(10, 12, 17, 0.88)',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '14px',
+    padding: 'var(--space-4)',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' },
   tab: {
     flex: 1,
     minWidth: 0,
     background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '8px 4px',
-    fontSize: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '8px',
+    color: 'rgba(255, 255, 255, 0.65)',
+    padding: '10px 6px',
+    fontSize: '13px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 500,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
   },
   tabActive: {
-    borderColor: 'var(--accent-green)',
-    color: 'var(--accent-green)'
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    color: '#FFFFFF',
+    background: 'rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 0 16px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
   },
   input: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 12px',
-    color: 'var(--text)',
-    fontSize: '14px',
-    fontFamily: 'var(--font-mono)',
-    outline: 'none'
+    background: 'rgba(10, 12, 16, 0.85)',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    borderRadius: '8px',
+    padding: '12px 14px',
+    color: '#FFFFFF',
+    fontSize: '16px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    outline: 'none',
   },
   submitBtn: {
-    background: 'var(--accent-green)',
-    color: '#0A1A10',
+    background: '#FFFFFF',
+    color: '#0A0A0A',
     border: 'none',
-    borderRadius: 'var(--radius-sm)',
+    borderRadius: '8px',
     padding: '12px',
     fontWeight: 600,
-    marginTop: 'var(--space-1)'
+    fontSize: '16px',
+    letterSpacing: '0.5px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    marginTop: 'var(--space-1)',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
   },
   error: {
     color: 'var(--accent-red)',
     fontSize: '13px',
-    fontFamily: 'var(--font-mono)'
+    fontFamily: "'Space Grotesk', sans-serif",
   },
   loadingWrap: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: '6px',
-    padding: '4px 0'
+    padding: '4px 0',
   },
   hint: {
-    color: 'var(--accent-gold)',
+    color: '#FFFFFF',
     fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
-    textAlign: 'center'
+    fontFamily: "'Space Grotesk', sans-serif",
+    textAlign: 'center',
+    opacity: 0.85,
+  },
+  backLink: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: '12px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    textAlign: 'center',
+    marginTop: '4px',
+    textDecoration: 'none',
   }
 };

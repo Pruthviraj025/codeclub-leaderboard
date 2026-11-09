@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Send, Pencil, Trash2, Check, X, Shield, Loader2 } from 'lucide-react';
+import { Send, Pencil, Trash2, Check, X, Shield, Loader2, Sparkles } from 'lucide-react';
 import { api, getSessionUser } from '../api';
 import SidebarLayout from '../components/SidebarLayout';
 
@@ -181,28 +181,33 @@ export default function DiscussPage() {
     <SidebarLayout active="discuss">
       <div style={styles.wrap}>
         <div style={styles.header}>
+          <div style={styles.eyebrow}>
+            <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
+            COMMUNITY &amp; DISCUSSIONS
+          </div>
           <h1 style={styles.title}>Discuss</h1>
           <p style={styles.subtitle}>
-            Open to everyone in CodeClub. Ask questions, share resources, talk contests.
+            Open to everyone in CodeClub. Ask questions, share resources, and talk competitive programming.
           </p>
         </div>
 
-        <form onSubmit={handleSend} style={styles.form}>
+        <form onSubmit={handleSend} style={styles.form} className="discuss-composer">
           <textarea
             style={styles.textarea}
-            placeholder="Write a message…"
+            placeholder="Share your thoughts, contest solutions, or questions…"
             value={text}
             onChange={e => setText(e.target.value)}
             onKeyDown={handleComposerKeyDown}
             maxLength={MAX_LEN}
             rows={3}
           />
-          <div style={styles.formFooter}>
+          <div style={styles.formFooter} className="discuss-footer-row">
             <span style={styles.charCount}>
-              {text.length}/{MAX_LEN} · Ctrl+Enter to send
+              {text.length}/{MAX_LEN} · Press Ctrl+Enter to send
             </span>
             <button
               type="submit"
+              className="discuss-send-btn"
               style={{
                 ...styles.sendBtn,
                 opacity: sending || !text.trim() ? 0.6 : 1,
@@ -210,7 +215,7 @@ export default function DiscussPage() {
               }}
               disabled={sending || !text.trim()}
             >
-              <Send size={13} style={{ marginRight: '6px' }} />
+              <Send size={14} style={{ marginRight: '6px' }} />
               {sending ? 'Sending…' : 'Post'}
             </button>
           </div>
@@ -221,7 +226,7 @@ export default function DiscussPage() {
         <div style={styles.feed}>
           {loading && (
             <div style={styles.empty}>
-              <Loader2 size={16} style={{ marginRight: '8px' }} /> Loading messages…
+              <Loader2 size={16} className="spin" style={{ marginRight: '8px' }} /> Loading discussion messages…
             </div>
           )}
 
@@ -237,6 +242,7 @@ export default function DiscussPage() {
             return (
               <div
                 key={m.id}
+                className="discuss-card"
                 style={{ ...styles.card, ...(mine ? styles.cardMine : {}) }}
               >
                 <div style={styles.cardHead}>
@@ -337,28 +343,68 @@ export default function DiscussPage() {
 }
 
 const styles = {
-  wrap: { maxWidth: '720px', margin: '0 auto', paddingBottom: '40px' },
-  header: { marginBottom: '20px' },
-  title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '24px',
-    fontWeight: 700,
-    color: 'var(--text)',
-    margin: '0 0 6px'
+  wrap: {
+    maxWidth: '780px',
+    margin: '0 auto',
+    paddingBottom: '40px'
   },
-  subtitle: { color: 'var(--text-dim)', fontSize: '14px', margin: 0 },
-  form: { display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' },
-  textarea: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    color: 'var(--text)',
-    padding: '14px',
+  header: {
+    marginBottom: '26px'
+  },
+  eyebrow: {
+    display: 'flex',
+    alignItems: 'center',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '12px',
+    fontWeight: 600,
+    letterSpacing: '2.5px',
+    color: '#5EEAD4',
+    marginBottom: '8px',
+    textTransform: 'uppercase',
+    userSelect: 'none'
+  },
+  title: {
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: 'clamp(24px, 4vw, 32px)',
+    fontWeight: 700,
+    margin: '0 0 6px 0',
+    letterSpacing: '-0.3px',
+    color: '#FFFFFF',
+    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
+  },
+  subtitle: {
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.65)',
     fontSize: '14px',
-    fontFamily: 'inherit',
+    lineHeight: '1.5',
+    margin: 0
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '24px',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    borderRadius: '16px',
+    padding: '20px',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+  },
+  textarea: {
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    borderRadius: '10px',
+    color: '#FFFFFF',
+    padding: '14px 16px',
+    fontSize: '15px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     resize: 'vertical',
     outline: 'none',
-    lineHeight: '1.5'
+    lineHeight: '1.6',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    transition: 'border-color 0.2s ease'
   },
   formFooter: {
     display: 'flex',
@@ -367,153 +413,218 @@ const styles = {
     gap: '12px',
     flexWrap: 'wrap'
   },
-  charCount: { fontSize: '12px', color: 'var(--text-dim)' },
+  charCount: {
+    fontSize: '12px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.45)'
+  },
   sendBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(16, 185, 129, 0.15)',
-    border: '1px solid var(--accent-green)',
-    color: 'var(--accent-green)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 22px',
+    background: 'rgba(94, 234, 212, 0.12)',
+    border: '1px solid rgba(94, 234, 212, 0.35)',
+    color: '#5EEAD4',
+    borderRadius: '10px',
+    padding: '9px 20px',
     fontSize: '13px',
     fontWeight: 600,
-    fontFamily: "'Orbitron', sans-serif",
-    minHeight: '40px'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    letterSpacing: '0.3px',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    boxShadow: '0 4px 14px rgba(94, 234, 212, 0.15)',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   error: {
-    marginBottom: '16px',
-    color: '#ff6b6b',
-    background: 'rgba(255, 107, 107, 0.1)',
-    border: '1px solid rgba(255, 107, 107, 0.3)',
-    padding: '12px 16px',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: '13px'
+    marginBottom: '20px',
+    color: '#F87171',
+    background: 'rgba(248, 113, 113, 0.12)',
+    border: '1px solid rgba(248, 113, 113, 0.3)',
+    padding: '12px 18px',
+    borderRadius: '10px',
+    fontSize: '13px',
+    fontFamily: "'Space Grotesk', sans-serif"
   },
-  feed: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  feed: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '14px'
+  },
   empty: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'var(--text-dim)',
-    fontSize: '13px',
-    padding: '32px 0',
-    border: '1px dashed var(--border)',
-    borderRadius: 'var(--radius)'
+    color: 'rgba(255, 255, 255, 0.55)',
+    fontSize: '14px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    padding: '48px 20px',
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px dashed rgba(255, 255, 255, 0.12)',
+    borderRadius: '14px'
   },
   card: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '12px 14px'
+    background: 'rgba(10, 13, 19, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
+    padding: '18px 22px',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
   },
-  cardMine: { borderColor: 'var(--border-hover)', background: 'var(--surface-raised)' },
+  cardMine: {
+    background: 'rgba(12, 17, 25, 0.82)',
+    border: '1px solid rgba(99, 223, 255, 0.2)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(99, 223, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)'
+  },
   cardHead: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: '8px',
-    marginBottom: '6px'
+    marginBottom: '10px'
   },
-  authorRow: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', minWidth: 0 },
-  author: { fontWeight: 600, fontSize: '14px', color: 'var(--text)' },
+  authorRow: {
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '8px',
+    minWidth: 0
+  },
+  author: {
+    fontWeight: 600,
+    fontSize: '15px',
+    color: '#FFFFFF',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  },
   adminTag: {
     display: 'inline-flex',
     alignItems: 'center',
     fontSize: '10px',
     fontWeight: 600,
-    color: 'var(--accent-gold)',
-    background: 'var(--accent-gold-dim)',
-    border: '1px solid var(--accent-gold)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '1px 6px'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: '#FCD34D',
+    background: 'rgba(252, 211, 77, 0.12)',
+    border: '1px solid rgba(252, 211, 77, 0.3)',
+    borderRadius: '999px',
+    padding: '2px 8px',
+    letterSpacing: '0.4px'
   },
   youTag: {
     fontSize: '10px',
     fontWeight: 600,
-    color: 'var(--accent-green)',
-    border: '1px solid var(--accent-green)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '1px 6px'
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: '#7DD3FC',
+    background: 'rgba(99, 223, 255, 0.12)',
+    border: '1px solid rgba(99, 223, 255, 0.3)',
+    borderRadius: '999px',
+    padding: '2px 8px',
+    letterSpacing: '0.4px'
   },
-  time: { fontSize: '12px', color: 'var(--text-dim)' },
-  edited: { fontSize: '12px', color: 'var(--text-dim)', fontStyle: 'italic' },
-  actions: { display: 'flex', gap: '4px', flexShrink: 0 },
+  time: {
+    fontSize: '12px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.48)'
+  },
+  edited: {
+    fontSize: '11px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    color: 'rgba(255, 255, 255, 0.4)',
+    fontStyle: 'italic'
+  },
+  actions: {
+    display: 'flex',
+    gap: '6px',
+    flexShrink: 0
+  },
   iconBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'transparent',
-    border: '1px solid transparent',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    width: '30px',
-    height: '30px',
-    cursor: 'pointer'
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '8px',
+    color: 'rgba(255, 255, 255, 0.65)',
+    width: '32px',
+    height: '32px',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease'
   },
-  iconBtnDanger: { color: 'var(--accent-red)' },
+  iconBtnDanger: {
+    color: '#F87171',
+    borderColor: 'rgba(248, 113, 113, 0.25)',
+    background: 'rgba(248, 113, 113, 0.08)'
+  },
   body: {
     margin: 0,
-    fontSize: '14px',
-    lineHeight: '1.55',
-    color: 'var(--text)',
+    fontSize: '15px',
+    lineHeight: '1.65',
+    color: 'rgba(255, 255, 255, 0.88)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     whiteSpace: 'pre-wrap',
     overflowWrap: 'anywhere'
   },
   editTextarea: {
     width: '100%',
     boxSizing: 'border-box',
-    background: 'var(--bg)',
-    border: '1px solid var(--border-hover)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text)',
-    padding: '10px 12px',
-    fontSize: '14px',
-    fontFamily: 'inherit',
+    background: 'rgba(0, 0, 0, 0.4)',
+    border: '1px solid rgba(255, 255, 255, 0.16)',
+    borderRadius: '10px',
+    color: '#FFFFFF',
+    padding: '12px 14px',
+    fontSize: '15px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     resize: 'vertical',
     outline: 'none',
-    lineHeight: '1.5'
+    lineHeight: '1.6'
   },
   editFooter: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: '8px',
-    marginTop: '8px',
+    marginTop: '10px',
     flexWrap: 'wrap'
   },
   cancelBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     background: 'transparent',
-    border: '1px solid var(--border)',
-    color: 'var(--text-dim)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '6px 12px',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    color: 'rgba(255, 255, 255, 0.65)',
+    borderRadius: '8px',
+    padding: '6px 14px',
     fontSize: '12px',
-    cursor: 'pointer'
+    fontFamily: "'Space Grotesk', sans-serif",
+    cursor: 'pointer',
+    transition: 'all 0.15s ease'
   },
   saveBtn: {
     display: 'inline-flex',
     alignItems: 'center',
-    background: 'rgba(16, 185, 129, 0.15)',
-    border: '1px solid var(--accent-green)',
-    color: 'var(--accent-green)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '6px 12px',
+    background: 'rgba(94, 234, 212, 0.12)',
+    border: '1px solid rgba(94, 234, 212, 0.35)',
+    color: '#5EEAD4',
+    borderRadius: '8px',
+    padding: '6px 14px',
     fontSize: '12px',
-    fontWeight: 600
+    fontWeight: 600,
+    fontFamily: "'Space Grotesk', sans-serif",
+    transition: 'all 0.15s ease'
   },
   loadMoreBtn: {
     alignSelf: 'center',
-    background: 'transparent',
-    border: '1px dashed var(--border)',
-    color: 'var(--text-dim)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 20px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    color: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: '10px',
+    padding: '10px 24px',
     fontSize: '13px',
+    fontWeight: 500,
+    fontFamily: "'Space Grotesk', sans-serif",
     cursor: 'pointer',
-    marginTop: '4px'
+    marginTop: '6px',
+    transition: 'all 0.2s ease'
   }
 };
