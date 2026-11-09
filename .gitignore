@@ -2,8 +2,3 @@ node_modules/
 .env
 client/node_modules/
 client/dist/
-
-.agents/
-client/.agents/
-skills-lock.json
-client/skills-lock.json

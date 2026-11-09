@@ -788,12 +788,12 @@ const styles = {
     borderBottom: '1px solid var(--border)'
   },
   backBtn: {
-    background: 'var(--color-paper-white, #ffffff)', border: '1px solid var(--border)', color: 'var(--text)',
-    fontSize: '13px', fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)", fontWeight: 460, cursor: 'pointer', padding: '6px 14px', borderRadius: '8px'
+    background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-dim)',
+    fontSize: '12px', fontFamily: "'Orbitron', sans-serif", cursor: 'pointer', padding: '6px 12px', borderRadius: '4px'
   },
   headerTitle: {
-    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
-    fontSize: '15px', fontWeight: 540, color: 'var(--text)', letterSpacing: '-0.01em',
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '13px', fontWeight: 700, color: 'var(--accent-gold)', letterSpacing: '2px',
     userSelect: 'none'
   },
   main: { maxWidth: '1040px', margin: '0 auto', padding: 'var(--space-4) var(--space-3)' },
@@ -801,18 +801,18 @@ const styles = {
   tab: {
     background: 'var(--surface)',
     border: '1px solid var(--border)',
-    borderRadius: '8px',
+    borderRadius: 'var(--radius-sm)',
     color: 'var(--text-dim)',
     padding: '10px 16px',
-    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
-    fontSize: '13px',
-    fontWeight: 460,
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: '12px',
+    letterSpacing: '0.5px',
     userSelect: 'none',
     cursor: 'pointer',
     minHeight: '40px'
   },
-  tabActive: { background: 'var(--color-lilac-mist, #d4c7ff)', borderColor: 'rgba(113, 76, 182, 0.4)', color: 'var(--color-ink-charcoal, #292827)', fontWeight: 540 },
-  table: { border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden', background: 'var(--surface)' },
+  tabActive: { borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' },
+  table: { border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden' },
   tableHeader: {
     display: 'flex',
     padding: '10px 16px',
