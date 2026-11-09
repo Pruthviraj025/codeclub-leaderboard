@@ -182,7 +182,7 @@ export default function DiscussPage() {
       <div style={styles.wrap}>
         <div style={styles.header}>
           <div style={styles.eyebrow}>
-            <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
+            <Sparkles size={13} style={{ marginRight: '6px', color: 'var(--accent-green, #5EEAD4)' }} />
             COMMUNITY &amp; DISCUSSIONS
           </div>
           <h1 style={styles.title}>Discuss</h1>
@@ -358,7 +358,7 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
     letterSpacing: '2.5px',
-    color: '#5EEAD4',
+    color: 'var(--accent-green, #5EEAD4)',
     marginBottom: '8px',
     textTransform: 'uppercase',
     userSelect: 'none'
@@ -369,12 +369,11 @@ const styles = {
     fontWeight: 700,
     margin: '0 0 6px 0',
     letterSpacing: '-0.3px',
-    color: '#FFFFFF',
-    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
+    color: 'var(--text, #FFFFFF)'
   },
   subtitle: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     fontSize: '14px',
     lineHeight: '1.5',
     margin: 0
@@ -384,19 +383,19 @@ const styles = {
     flexDirection: 'column',
     gap: '12px',
     marginBottom: '24px',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.09))',
     borderRadius: '16px',
     padding: '20px',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+    boxShadow: 'var(--card-shadow, 0 16px 40px rgba(0, 0, 0, 0.55))'
   },
   textarea: {
-    background: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
+    background: 'var(--input-bg, rgba(255, 255, 255, 0.03))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.09))',
     borderRadius: '10px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     padding: '14px 16px',
     fontSize: '15px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -416,15 +415,15 @@ const styles = {
   charCount: {
     fontSize: '12px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.45)'
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.45))'
   },
   sendBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(94, 234, 212, 0.12)',
-    border: '1px solid rgba(94, 234, 212, 0.35)',
-    color: '#5EEAD4',
+    background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))',
+    border: '1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.35))',
+    color: 'var(--accent-green, #5EEAD4)',
     borderRadius: '10px',
     padding: '9px 20px',
     fontSize: '13px',
@@ -438,8 +437,8 @@ const styles = {
   },
   error: {
     marginBottom: '20px',
-    color: '#F87171',
-    background: 'rgba(248, 113, 113, 0.12)',
+    color: 'var(--accent-red, #F87171)',
+    background: 'var(--accent-red-dim, rgba(248, 113, 113, 0.12))',
     border: '1px solid rgba(248, 113, 113, 0.3)',
     padding: '12px 18px',
     borderRadius: '10px',
@@ -455,28 +454,28 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     fontSize: '14px',
     fontFamily: "'Space Grotesk', sans-serif",
     padding: '48px 20px',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px dashed rgba(255, 255, 255, 0.12)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px dashed var(--border, rgba(255, 255, 255, 0.12))',
     borderRadius: '14px'
   },
   card: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     padding: '18px 22px',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    boxShadow: 'var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.45))',
     transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
   },
   cardMine: {
-    background: 'rgba(12, 17, 25, 0.82)',
-    border: '1px solid rgba(99, 223, 255, 0.2)',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(99, 223, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.07)'
+    background: 'var(--surface-raised, rgba(12, 17, 25, 0.82))',
+    border: '1px solid var(--border-hover, rgba(99, 223, 255, 0.2))',
+    boxShadow: 'var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.45))'
   },
   cardHead: {
     display: 'flex',
@@ -495,7 +494,7 @@ const styles = {
   author: {
     fontWeight: 600,
     fontSize: '15px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   adminTag: {
@@ -504,9 +503,9 @@ const styles = {
     fontSize: '10px',
     fontWeight: 600,
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: '#FCD34D',
-    background: 'rgba(252, 211, 77, 0.12)',
-    border: '1px solid rgba(252, 211, 77, 0.3)',
+    color: 'var(--accent-orange, #FCD34D)',
+    background: 'var(--accent-orange-dim, rgba(252, 211, 77, 0.12))',
+    border: '1px solid var(--accent-orange-dim, rgba(252, 211, 77, 0.3))',
     borderRadius: '999px',
     padding: '2px 8px',
     letterSpacing: '0.4px'
@@ -515,9 +514,9 @@ const styles = {
     fontSize: '10px',
     fontWeight: 600,
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: '#7DD3FC',
-    background: 'rgba(99, 223, 255, 0.12)',
-    border: '1px solid rgba(99, 223, 255, 0.3)',
+    color: 'var(--accent-blue, #7DD3FC)',
+    background: 'var(--accent-blue-dim, rgba(99, 223, 255, 0.12))',
+    border: '1px solid var(--accent-blue-dim, rgba(99, 223, 255, 0.3))',
     borderRadius: '999px',
     padding: '2px 8px',
     letterSpacing: '0.4px'
@@ -525,12 +524,12 @@ const styles = {
   time: {
     fontSize: '12px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.48)'
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.48))'
   },
   edited: {
     fontSize: '11px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.4)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.4))',
     fontStyle: 'italic'
   },
   actions: {
@@ -542,25 +541,25 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(255, 255, 255, 0.04))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: '8px',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     width: '32px',
     height: '32px',
     cursor: 'pointer',
     transition: 'all 0.15s ease'
   },
   iconBtnDanger: {
-    color: '#F87171',
-    borderColor: 'rgba(248, 113, 113, 0.25)',
-    background: 'rgba(248, 113, 113, 0.08)'
+    color: 'var(--accent-red, #F87171)',
+    borderColor: 'var(--accent-red-dim, rgba(248, 113, 113, 0.25))',
+    background: 'var(--accent-red-dim, rgba(248, 113, 113, 0.08))'
   },
   body: {
     margin: 0,
     fontSize: '15px',
     lineHeight: '1.65',
-    color: 'rgba(255, 255, 255, 0.88)',
+    color: 'var(--text, rgba(255, 255, 255, 0.88))',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     whiteSpace: 'pre-wrap',
     overflowWrap: 'anywhere'
@@ -568,10 +567,10 @@ const styles = {
   editTextarea: {
     width: '100%',
     boxSizing: 'border-box',
-    background: 'rgba(0, 0, 0, 0.4)',
-    border: '1px solid rgba(255, 255, 255, 0.16)',
+    background: 'var(--input-bg, rgba(0, 0, 0, 0.4))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.16))',
     borderRadius: '10px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     padding: '12px 14px',
     fontSize: '15px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -591,8 +590,8 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     background: 'transparent',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
-    color: 'rgba(255, 255, 255, 0.65)',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.12))',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     borderRadius: '8px',
     padding: '6px 14px',
     fontSize: '12px',
@@ -603,9 +602,9 @@ const styles = {
   saveBtn: {
     display: 'inline-flex',
     alignItems: 'center',
-    background: 'rgba(94, 234, 212, 0.12)',
-    border: '1px solid rgba(94, 234, 212, 0.35)',
-    color: '#5EEAD4',
+    background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))',
+    border: '1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.35))',
+    color: 'var(--accent-green, #5EEAD4)',
     borderRadius: '8px',
     padding: '6px 14px',
     fontSize: '12px',
@@ -615,9 +614,9 @@ const styles = {
   },
   loadMoreBtn: {
     alignSelf: 'center',
-    background: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    color: 'rgba(255, 255, 255, 0.7)',
+    background: 'var(--card-bg, rgba(255, 255, 255, 0.03))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.1))',
+    color: 'var(--text, rgba(255, 255, 255, 0.7))',
     borderRadius: '10px',
     padding: '10px 24px',
     fontSize: '13px',

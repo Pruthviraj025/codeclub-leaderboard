@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { api } from "../api";
 
 export default function ForgotPasswordPage() {
-  const [step, setStep] = useState('email'); 
+  const [step, setStep] = useState('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [resetToken, setResetToken] = useState('');
@@ -180,7 +180,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 'var(--space-4)'
+    padding: 'var(--space-4)',
+    background: 'var(--bg-page, #050608)'
   },
   center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)' },
   logoBlock: { textAlign: 'center' },
@@ -212,14 +213,15 @@ const styles = {
     flexDirection: 'column',
     gap: 'var(--space-3)',
     width: 'min(320px, 100%)',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
+    background: 'var(--card-bg, var(--surface))',
+    border: '1px solid var(--card-border, var(--border))',
     borderRadius: 'var(--radius)',
-    padding: 'var(--space-4)'
+    padding: 'var(--space-4)',
+    boxShadow: 'var(--card-shadow, 0 16px 40px rgba(0,0,0,0.4))'
   },
   input: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
+    background: 'var(--input-bg, var(--surface-raised))',
+    border: '1px solid var(--input-border, var(--border))',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 12px',
     color: 'var(--text)',
@@ -229,7 +231,7 @@ const styles = {
   },
   submitBtn: {
     background: 'var(--accent-green)',
-    color: '#0A1A10',
+    color: 'var(--btn-green-text, #0A1A10)',
     border: 'none',
     borderRadius: 'var(--radius-sm)',
     padding: '12px',

@@ -242,14 +242,14 @@ export default function ContestsPage() {
                       >
                         <div style={styles.cardTop}>
                           <div style={styles.badgeRow}>
-                            <span style={{ ...styles.platformBadge, background: 'rgba(99, 223, 255, 0.12)', color: '#7DD3FC', border: '1px solid rgba(99, 223, 255, 0.25)' }}>
+                            <span style={{ ...styles.platformBadge, background: 'var(--cf-dim, rgba(99, 223, 255, 0.12))', color: 'var(--cf-color, #7DD3FC)', border: '1px solid var(--cf-border, rgba(99, 223, 255, 0.25))' }}>
                               Codeforces
                             </span>
                             <span style={{ ...styles.phaseBadge, ...phaseStyle(c.phase) }}>
                               {phaseLabel(c.phase)}
                             </span>
                           </div>
-                          <ExternalLink size={14} color="rgba(255, 255, 255, 0.4)" />
+                          <ExternalLink size={14} color="var(--text-dim, rgba(255, 255, 255, 0.4))" />
                         </div>
 
                         <div style={styles.cardName}>{c.name}</div>
@@ -282,8 +282,8 @@ export default function ContestsPage() {
         {!loading && (platform === 'all' || platform === 'leetcode') && (
           <div style={{ marginBottom: '40px' }}>
             <div style={styles.platformHeader}>
-              <Flame size={18} color="#FCD34D" style={{ marginRight: '8px' }} />
-              <span style={{ color: '#FCD34D' }}>LeetCode Contests</span>
+              <Flame size={18} color="var(--lc-color, #FCD34D)" style={{ marginRight: '8px' }} />
+              <span style={{ color: 'var(--lc-color, #FCD34D)' }}>LeetCode Contests</span>
             </div>
 
             {lcCategories.map(cat => {
@@ -305,14 +305,14 @@ export default function ContestsPage() {
                       >
                         <div style={styles.cardTop}>
                           <div style={styles.badgeRow}>
-                            <span style={{ ...styles.platformBadge, background: 'rgba(252, 211, 77, 0.12)', color: '#FCD34D', border: '1px solid rgba(252, 211, 77, 0.25)' }}>
+                            <span style={{ ...styles.platformBadge, background: 'var(--lc-dim, rgba(252, 211, 77, 0.12))', color: 'var(--lc-color, #FCD34D)', border: '1px solid var(--lc-border, rgba(252, 211, 77, 0.25))' }}>
                               LeetCode
                             </span>
                             <span style={{ ...styles.phaseBadge, ...phaseStyle(c.phase) }}>
                               {phaseLabel(c.phase)}
                             </span>
                           </div>
-                          <ExternalLink size={14} color="rgba(255, 255, 255, 0.4)" />
+                          <ExternalLink size={14} color="var(--text-dim, rgba(255, 255, 255, 0.4))" />
                         </div>
 
                         <div style={styles.cardName}>{c.name}</div>
@@ -357,9 +357,9 @@ function phaseLabel(phase) {
 }
 
 function phaseStyle(phase) {
-  if (phase === 'BEFORE') return { background: 'rgba(252, 211, 77, 0.12)', color: '#FCD34D', border: '1px solid rgba(252, 211, 77, 0.25)' };
-  if (phase === 'CODING') return { background: 'rgba(94, 234, 212, 0.12)', color: '#5EEAD4', border: '1px solid rgba(94, 234, 212, 0.3)' };
-  return { background: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.45)', border: '1px solid rgba(255, 255, 255, 0.08)' };
+  if (phase === 'BEFORE') return { background: 'var(--accent-gold-dim, rgba(252, 211, 77, 0.12))', color: 'var(--accent-gold, #FCD34D)', border: '1px solid var(--accent-gold-dim, rgba(252, 211, 77, 0.25))' };
+  if (phase === 'CODING') return { background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))', color: 'var(--accent-green, #5EEAD4)', border: '1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.3))' };
+  return { background: 'var(--surface-raised, rgba(255, 255, 255, 0.05))', color: 'var(--text-dim, rgba(255, 255, 255, 0.45))', border: '1px solid var(--border, rgba(255, 255, 255, 0.08))' };
 }
 
 const styles = {
@@ -383,7 +383,7 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
     letterSpacing: '2.5px',
-    color: '#5EEAD4',
+    color: 'var(--accent-green, #5EEAD4)',
     marginBottom: '8px',
     textTransform: 'uppercase'
   },
@@ -393,12 +393,11 @@ const styles = {
     fontWeight: 700,
     margin: 0,
     letterSpacing: '-0.3px',
-    color: '#FFFFFF',
-    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
+    color: 'var(--text, #FFFFFF)'
   },
   subtitle: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
     fontSize: '14px',
     lineHeight: '1.5',
     margin: '8px 0 0 0',
@@ -408,10 +407,10 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.14)',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.04))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.14))',
     borderRadius: '10px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     padding: '9px 18px',
     fontSize: '13px',
     fontWeight: 600,
@@ -419,7 +418,7 @@ const styles = {
     letterSpacing: '0.3px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
     cursor: 'pointer',
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
@@ -433,13 +432,13 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '14px',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     padding: '16px 18px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
-    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    boxShadow: 'var(--card-shadow, 0 12px 30px rgba(0, 0, 0, 0.55))',
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   statIconWrapper: {
@@ -455,14 +454,14 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '18px',
     fontWeight: 700,
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     letterSpacing: '0.2px'
   },
   statLabel: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '12px',
     fontWeight: 500,
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     marginTop: '3px'
   },
   controlsBar: {
@@ -475,14 +474,14 @@ const styles = {
   },
   tabsContainer: {
     display: 'flex',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: '12px',
     padding: '5px',
     gap: '4px',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+    boxShadow: 'var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.4))'
   },
   tab: {
     display: 'flex',
@@ -492,7 +491,7 @@ const styles = {
     whiteSpace: 'nowrap',
     background: 'transparent',
     border: '1px solid transparent',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     padding: '8px 16px',
     borderRadius: '8px',
     fontSize: '13px',
@@ -502,23 +501,23 @@ const styles = {
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   tabActive: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: '1px solid rgba(255, 255, 255, 0.18)',
-    color: '#FFFFFF',
+    background: 'rgba(67, 0, 255, 0.1)',
+    border: '1px solid rgba(67, 0, 255, 0.3)',
+    color: 'var(--text, #FFFFFF)',
     fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
   },
   tabActiveCF: {
-    background: 'rgba(99, 223, 255, 0.1)',
-    border: '1px solid rgba(99, 223, 255, 0.3)',
-    color: '#7DD3FC',
+    background: 'var(--cf-dim, rgba(99, 223, 255, 0.1))',
+    border: '1px solid var(--cf-border, rgba(99, 223, 255, 0.3))',
+    color: 'var(--cf-color, #7DD3FC)',
     fontWeight: 600,
     boxShadow: '0 2px 10px rgba(99, 223, 255, 0.15)'
   },
   tabActiveLC: {
-    background: 'rgba(252, 211, 77, 0.1)',
-    border: '1px solid rgba(252, 211, 77, 0.3)',
-    color: '#FCD34D',
+    background: 'var(--lc-dim, rgba(252, 211, 77, 0.1))',
+    border: '1px solid var(--lc-border, rgba(252, 211, 77, 0.3))',
+    color: 'var(--lc-color, #FCD34D)',
     fontWeight: 600,
     boxShadow: '0 2px 10px rgba(252, 211, 77, 0.15)'
   },
@@ -541,36 +540,34 @@ const styles = {
     left: '12px',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: 'rgba(255, 255, 255, 0.45)'
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.45))'
   },
   searchInput: {
     width: '100%',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
+    background: 'var(--input-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.09))',
     borderRadius: '10px',
     padding: '9px 14px 9px 38px',
-    color: '#FFFFFF',
+    color: 'var(--input-text, #FFFFFF)',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     outline: 'none',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
     transition: 'all 0.2s ease'
   },
   selectFilter: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
+    background: 'var(--input-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.09))',
     borderRadius: '10px',
     padding: '9px 14px',
-    color: '#FFFFFF',
+    color: 'var(--input-text, #FFFFFF)',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     outline: 'none',
     cursor: 'pointer',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
     transition: 'all 0.2s ease'
   },
   platformHeader: {
@@ -582,7 +579,7 @@ const styles = {
     letterSpacing: '0.4px',
     marginBottom: '18px',
     paddingBottom: '10px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+    borderBottom: '1px solid var(--border, rgba(255, 255, 255, 0.08))'
   },
   section: { marginBottom: '26px' },
   sectionTitle: {
@@ -590,7 +587,7 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
     letterSpacing: '1.8px',
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     textTransform: 'uppercase',
     marginBottom: '14px',
     userSelect: 'none'
@@ -602,14 +599,14 @@ const styles = {
   },
   card: {
     display: 'block',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     padding: '18px',
     textDecoration: 'none',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
-    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    boxShadow: 'var(--card-shadow, 0 12px 30px rgba(0, 0, 0, 0.55))',
     transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   cardTop: {
@@ -645,7 +642,7 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '15px',
     fontWeight: 600,
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     marginBottom: '12px',
     lineHeight: '1.4'
   },
@@ -659,15 +656,15 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '12px',
     fontWeight: 500,
-    color: 'rgba(255, 255, 255, 0.55)'
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))'
   },
   durationPill: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '11px',
     fontWeight: 500,
-    color: 'rgba(255, 255, 255, 0.65)',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.05))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.1))',
     borderRadius: '6px',
     padding: '3px 8px'
   },
@@ -680,7 +677,7 @@ const styles = {
     fontFamily: "'Space Grotesk', sans-serif"
   },
   empty: {
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     padding: '36px 0',
     textAlign: 'center',
     fontFamily: "'Space Grotesk', sans-serif"

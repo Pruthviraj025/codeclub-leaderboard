@@ -36,8 +36,30 @@ export default function HackathonsPage() {
       navigate('/');
       return;
     }
-    fetchHackathons();
-  }, [platform, mode]);
+
+    let ignore = false;
+    api.hackathons({ platform, mode })
+      .then(res => {
+        if (!ignore) {
+          setHackathons(res.hackathons || []);
+          if (res.stats) setStats(res.stats);
+        }
+      })
+      .catch(err => {
+        if (!ignore) {
+          setError(err.message || 'Failed to fetch hackathons.');
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [user, navigate, platform, mode]);
 
   function fetchHackathons() {
     setLoading(true);
@@ -396,20 +418,20 @@ export default function HackathonsPage() {
                       <div style={styles.metaLeft}>
                         {Number(h.participantsCount) > 0 && (
                           <div style={styles.metaItem} title="Registered Hackers">
-                            <Users size={13} color="rgba(255, 255, 255, 0.55)" />
+                            <Users size={13} color="var(--text-dim, rgba(255, 255, 255, 0.55))" />
                             <span>{Number(h.participantsCount).toLocaleString()}</span>
                           </div>
                         )}
                         {prizesStr && (
-                          <div style={{ ...styles.metaItem, color: '#FCD34D' }} title="Prizes">
+                          <div style={{ ...styles.metaItem, color: 'var(--accent-gold, #FCD34D)' }} title="Prizes">
                             <Award size={13} />
                             <span style={{ fontWeight: 600 }}>{prizesStr}</span>
                           </div>
                         )}
                         {daysLeftStr && (
                           <div style={styles.metaItem} title="Time Remaining">
-                            <Clock size={13} color="#5EEAD4" />
-                            <span style={{ color: '#5EEAD4', fontWeight: 600 }}>{daysLeftStr}</span>
+                            <Clock size={13} color="var(--accent-green, #5EEAD4)" />
+                            <span style={{ color: 'var(--accent-green, #5EEAD4)', fontWeight: 600 }}>{daysLeftStr}</span>
                           </div>
                         )}
                       </div>
@@ -477,12 +499,11 @@ const styles = {
     fontWeight: 700,
     margin: 0,
     letterSpacing: '-0.3px',
-    color: '#FFFFFF',
-    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
+    color: 'var(--text, #FFFFFF)'
   },
   subtitle: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
     fontSize: '14px',
     lineHeight: '1.5',
     margin: '8px 0 0 0',
@@ -492,10 +513,10 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.14)',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.04))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.14))',
     borderRadius: '10px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     padding: '9px 18px',
     fontSize: '13px',
     fontWeight: 600,
@@ -503,7 +524,7 @@ const styles = {
     letterSpacing: '0.3px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
     cursor: 'pointer',
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
@@ -517,13 +538,13 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '14px',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     padding: '16px 18px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
-    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    boxShadow: 'var(--card-shadow, 0 12px 30px rgba(0, 0, 0, 0.55))',
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   statIconWrapper: {
@@ -539,14 +560,14 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '18px',
     fontWeight: 700,
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     letterSpacing: '0.2px'
   },
   statLabel: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '12px',
     fontWeight: 500,
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     marginTop: '3px'
   },
   controlsBar: {
@@ -559,14 +580,14 @@ const styles = {
   },
   tabsContainer: {
     display: 'flex',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: '12px',
     padding: '5px',
     gap: '4px',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+    boxShadow: 'var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.4))',
     whiteSpace: 'nowrap'
   },
   tab: {
@@ -576,7 +597,7 @@ const styles = {
     whiteSpace: 'nowrap',
     background: 'transparent',
     border: '1px solid transparent',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     padding: '8px 16px',
     borderRadius: '8px',
     fontSize: '13px',
@@ -586,30 +607,30 @@ const styles = {
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   tabActive: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: '1px solid rgba(255, 255, 255, 0.18)',
-    color: '#FFFFFF',
+    background: 'rgba(67, 0, 255, 0.1)',
+    border: '1px solid rgba(67, 0, 255, 0.3)',
+    color: 'var(--text, #FFFFFF)',
     fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
   },
   tabActiveUnstop: {
     background: 'rgba(56, 189, 248, 0.12)',
     border: '1px solid rgba(56, 189, 248, 0.3)',
-    color: '#38BDF8',
+    color: 'var(--cf-color, #38BDF8)',
     fontWeight: 600,
     boxShadow: '0 2px 10px rgba(56, 189, 248, 0.15)'
   },
   tabActiveDevfolio: {
     background: 'rgba(96, 165, 250, 0.12)',
     border: '1px solid rgba(96, 165, 250, 0.3)',
-    color: '#60A5FA',
+    color: 'var(--cf-color, #3B82F6)',
     fontWeight: 600,
     boxShadow: '0 2px 10px rgba(96, 165, 250, 0.15)'
   },
   tabActiveHackerEarth: {
     background: 'rgba(192, 132, 252, 0.12)',
     border: '1px solid rgba(192, 132, 252, 0.3)',
-    color: '#C084FC',
+    color: 'var(--cc-color, #C084FC)',
     fontWeight: 600,
     boxShadow: '0 2px 10px rgba(192, 132, 252, 0.15)'
   },
@@ -632,36 +653,34 @@ const styles = {
     left: '12px',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: 'rgba(255, 255, 255, 0.45)'
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.45))'
   },
   searchInput: {
     width: '100%',
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
+    background: 'var(--input-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.09))',
     borderRadius: '10px',
     padding: '9px 14px 9px 38px',
-    color: '#FFFFFF',
+    color: 'var(--input-text, #FFFFFF)',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     outline: 'none',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
     transition: 'all 0.2s ease'
   },
   selectFilter: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
+    background: 'var(--input-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.09))',
     borderRadius: '10px',
     padding: '9px 14px',
-    color: '#FFFFFF',
+    color: 'var(--input-text, #FFFFFF)',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     outline: 'none',
     cursor: 'pointer',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
     transition: 'all 0.2s ease'
   },
   grid: {
@@ -670,22 +689,22 @@ const styles = {
     gap: '18px'
   },
   card: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    boxShadow: 'var(--card-shadow, 0 12px 30px rgba(0, 0, 0, 0.55))',
     transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease'
   },
   cardBannerWrapper: {
     position: 'relative',
     width: '100%',
     height: '140px',
-    backgroundColor: '#0D1117',
+    backgroundColor: 'var(--surface-raised, #0D1117)',
     overflow: 'hidden'
   },
   cardBannerImg: {
@@ -756,7 +775,7 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
@@ -766,9 +785,9 @@ const styles = {
     alignItems: 'center',
     fontSize: '11px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.65)',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.05))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     padding: '2px 8px',
     borderRadius: '6px'
   },
@@ -776,7 +795,7 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '17px',
     fontWeight: 700,
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     margin: '0 0 8px 0',
     lineHeight: '1.35',
     display: '-webkit-box',
@@ -787,7 +806,7 @@ const styles = {
   cardTagline: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
     margin: '0 0 14px 0',
     lineHeight: '1.45',
     display: '-webkit-box',
@@ -805,9 +824,9 @@ const styles = {
   tagPill: {
     fontSize: '11px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.65)',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.04))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: '6px',
     padding: '3px 8px'
   },
@@ -816,7 +835,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: '14px',
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    borderTop: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     gap: '12px'
   },
   metaLeft: {
@@ -831,7 +850,7 @@ const styles = {
     gap: '5px',
     fontSize: '12px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.55)'
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))'
   },
   applyBtn: {
     display: 'inline-flex',
@@ -861,29 +880,30 @@ const styles = {
   emptyContainer: {
     textAlign: 'center',
     padding: '60px 20px',
-    background: 'rgba(10, 13, 19, 0.72)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
     borderRadius: '14px',
-    border: '1px dashed rgba(255, 255, 255, 0.12)',
+    border: '1px dashed var(--border, rgba(255, 255, 255, 0.12))',
     fontFamily: "'Space Grotesk', sans-serif"
   },
   skeletonCard: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     overflow: 'hidden',
     height: '280px'
   },
   skeletonBanner: {
     height: '140px',
-    background: 'rgba(255, 255, 255, 0.05)',
+    background: 'rgba(128, 128, 128, 0.08)',
     opacity: 0.6
   },
   skeletonLine: (widthPercent, heightPx) => ({
     width: typeof widthPercent === 'number' ? `${widthPercent}%` : widthPercent,
     height: `${heightPx}px`,
-    background: 'rgba(255, 255, 255, 0.06)',
+    background: 'rgba(128, 128, 128, 0.1)',
     borderRadius: '4px',
     marginBottom: '10px',
     opacity: 0.5
   })
 };
+

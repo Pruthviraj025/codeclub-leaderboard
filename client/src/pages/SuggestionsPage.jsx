@@ -13,8 +13,8 @@ function canEdit(iso) {
 
 const STATUS_META = {
   pending: { label: 'Pending', color: 'var(--text-dim)', bg: 'transparent', border: 'var(--border)' },
-  accepted: { label: 'Accepted', color: 'var(--accent-green)', bg: 'rgba(16, 185, 129, 0.12)', border: 'var(--accent-green)' },
-  rejected: { label: 'Rejected', color: '#ff6b6b', bg: 'rgba(255, 107, 107, 0.1)', border: '#ff6b6b' }
+  accepted: { label: 'Accepted', color: 'var(--accent-green)', bg: 'var(--accent-green-dim, rgba(16, 185, 129, 0.12))', border: 'var(--accent-green)' },
+  rejected: { label: 'Rejected', color: 'var(--accent-red, #EF4444)', bg: 'var(--accent-red-dim, rgba(239, 68, 68, 0.1))', border: 'var(--accent-red, #EF4444)' }
 };
 
 function fmt(iso) {
@@ -394,8 +394,8 @@ const styles = {
   },
   form: { display: 'flex', flexDirection: 'column', gap: '10px' },
   textarea: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
+    background: 'var(--input-bg, var(--surface))',
+    border: '1px solid var(--input-border, var(--border))',
     borderRadius: 'var(--radius)',
     color: 'var(--text)',
     padding: '14px',
@@ -417,9 +417,9 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(94, 234, 212, 0.12)',
-    border: '1px solid rgba(94, 234, 212, 0.35)',
-    color: '#5EEAD4',
+    background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))',
+    border: '1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.35))',
+    color: 'var(--accent-green, #5EEAD4)',
     borderRadius: '10px',
     padding: '12px 24px',
     fontSize: '14px',
@@ -433,18 +433,18 @@ const styles = {
     marginTop: '16px',
     display: 'flex',
     alignItems: 'center',
-    background: 'rgba(94, 234, 212, 0.12)',
-    border: '1px solid rgba(94, 234, 212, 0.35)',
-    color: '#5EEAD4',
+    background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))',
+    border: '1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.35))',
+    color: 'var(--accent-green, #5EEAD4)',
     padding: '12px 16px',
     borderRadius: '10px',
     fontSize: '13px'
   },
   error: {
     marginTop: '16px',
-    color: '#F87171',
-    background: 'rgba(248, 113, 113, 0.1)',
-    border: '1px solid rgba(248, 113, 113, 0.3)',
+    color: 'var(--accent-red, #F87171)',
+    background: 'var(--accent-red-dim, rgba(248, 113, 113, 0.1))',
+    border: '1px solid var(--accent-red-dim, rgba(248, 113, 113, 0.3))',
     padding: '12px 16px',
     borderRadius: '10px',
     fontSize: '13px'
@@ -474,8 +474,9 @@ const styles = {
   },
   list: { display: 'flex', flexDirection: 'column', gap: '12px' },
   card: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
+    background: 'var(--card-bg, var(--surface))',
+    border: '1px solid var(--card-border, var(--border))',
+    boxShadow: 'var(--card-shadow, 0 4px 16px rgba(0, 0, 0, 0.3))',
     borderRadius: 'var(--radius)',
     padding: '12px 14px'
   },
@@ -499,8 +500,8 @@ const styles = {
   },
   reply: {
     marginTop: '12px',
-    background: 'var(--bg)',
-    border: '1px solid',
+    background: 'var(--surface-raised, var(--bg))',
+    border: '1px solid var(--border)',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 12px'
   },
@@ -545,8 +546,8 @@ const styles = {
   editTextarea: {
     width: '100%',
     boxSizing: 'border-box',
-    background: 'var(--bg)',
-    border: '1px solid var(--border-hover)',
+    background: 'var(--input-bg, var(--bg))',
+    border: '1px solid var(--input-border, var(--border-hover))',
     borderRadius: 'var(--radius-sm)',
     color: 'var(--text)',
     padding: '10px 12px',

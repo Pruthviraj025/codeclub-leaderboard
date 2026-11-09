@@ -126,7 +126,7 @@ export default function LeaderboardPage() {
           <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cf">CF</span>
           <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-lc">LC</span>
           <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cc">CC</span>
-          <span style={{ ...styles.col, width: '85px', textAlign: 'right', color: '#FFFFFF' }} className="queue-col-points">TOTAL</span>
+          <span style={{ ...styles.col, width: '85px', textAlign: 'right', color: 'var(--text, #FFFFFF)' }} className="queue-col-points">TOTAL</span>
         </div>
 
         {loadingBoard ? (
@@ -196,19 +196,19 @@ export default function LeaderboardPage() {
                 </span>
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#7DD3FC', fontWeight: 600, fontSize: '15px' }} className="queue-col-cf">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--cf-color, #7DD3FC)', fontWeight: 600, fontSize: '15px' }} className="queue-col-cf">
                 {row.codeforcesPoints}
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#FCD34D', fontWeight: 600, fontSize: '15px' }} className="queue-col-lc">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--lc-color, #FB923C)', fontWeight: 600, fontSize: '15px' }} className="queue-col-lc">
                 {row.leetcodePoints}
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#D8B4FE', fontWeight: 600, fontSize: '15px' }} className="queue-col-cc">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--cc-color, #D8B4FE)', fontWeight: 600, fontSize: '15px' }} className="queue-col-cc">
                 {row.codechefPoints || 0}
               </span>
 
-              <span style={{ ...styles.col, width: '85px', textAlign: 'right', fontWeight: 700, color: '#FFFFFF', fontSize: '16px' }} className="queue-col-points">
+              <span style={{ ...styles.col, width: '85px', textAlign: 'right', fontWeight: 700, color: 'var(--text, #FFFFFF)', fontSize: '16px' }} className="queue-col-points">
                 {row.totalPoints}
               </span>
             </div>
@@ -232,9 +232,9 @@ const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
 function RankBadge({ rank }) {
   if (MEDALS[rank]) {
-    return <span>{MEDALS[rank]} <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '13px', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" }}>#{rank}</span></span>;
+    return <span>{MEDALS[rank]} <span style={{ color: 'var(--text-dim, rgba(255, 255, 255, 0.6))', fontSize: '13px', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" }}>#{rank}</span></span>;
   }
-  return <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontWeight: 600, fontSize: '14px', fontFamily: "'Space Grotesk', sans-serif" }}>#{rank}</span>;
+  return <span style={{ color: 'var(--text-dim, rgba(255, 255, 255, 0.6))', fontWeight: 600, fontSize: '14px', fontFamily: "'Space Grotesk', sans-serif" }}>#{rank}</span>;
 }
 
 function CfIcon() {
@@ -445,7 +445,7 @@ const styles = {
     textAlign: 'center',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '14px',
-    color: 'rgba(255, 255, 255, 0.45)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.45))',
     padding: '40px 0 24px',
     lineHeight: 1.8
   },
@@ -463,7 +463,7 @@ const styles = {
   eyebrow: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '12px',
-    color: '#5EEAD4',
+    color: 'var(--accent-green, #5EEAD4)',
     letterSpacing: '3.5px',
     fontWeight: 600,
     textTransform: 'uppercase',
@@ -475,17 +475,16 @@ const styles = {
     margin: 0,
     letterSpacing: '0.5px',
     fontWeight: 700,
-    color: '#FFFFFF',
-    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
+    color: 'var(--text, #FFFFFF)'
   },
   titleWithInfo: { display: 'flex', alignItems: 'center', gap: '12px' },
   infoBtn: {
     width: '26px',
     height: '26px',
     borderRadius: '50%',
-    border: '1px solid rgba(255, 255, 255, 0.18)',
-    background: 'rgba(255, 255, 255, 0.05)',
-    color: '#FFFFFF',
+    border: '1px solid var(--border-hover, rgba(255, 255, 255, 0.18))',
+    background: 'var(--card-bg, rgba(255, 255, 255, 0.05))',
+    color: 'var(--text, #FFFFFF)',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     fontWeight: 600,
@@ -500,7 +499,7 @@ const styles = {
   overlay: {
     position: 'fixed',
     inset: 0,
-    background: 'rgba(0,0,0,0.7)',
+    background: 'var(--modal-overlay, rgba(0,0,0,0.7))',
     backdropFilter: 'blur(8px)',
     WebkitBackdropFilter: 'blur(8px)',
     display: 'flex',
@@ -510,8 +509,8 @@ const styles = {
     zIndex: 100
   },
   modal: {
-    background: 'rgba(10, 12, 17, 0.95)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: 'var(--modal-bg, rgba(10, 12, 17, 0.95))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.1))',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '14px',
@@ -519,7 +518,7 @@ const styles = {
     width: '100%',
     maxHeight: '85vh',
     overflowY: 'auto',
-    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    boxShadow: 'var(--card-shadow, 0 24px 60px rgba(0, 0, 0, 0.8))',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   modalHeader: {
@@ -527,15 +526,15 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 'var(--space-4)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    borderBottom: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     position: 'sticky',
     top: 0,
-    background: 'rgba(11, 14, 20, 0.98)',
+    background: 'var(--modal-header-bg, rgba(11, 14, 20, 0.98))',
     backdropFilter: 'blur(12px)',
     zIndex: 10
   },
-  modalTitle: { margin: 0, fontSize: '18px', fontWeight: 700, color: '#FFFFFF', fontFamily: "'Space Grotesk', sans-serif" },
-  closeBtn: { background: 'transparent', border: 'none', color: 'rgba(255, 255, 255, 0.6)', fontSize: '16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" },
+  modalTitle: { margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text, #FFFFFF)', fontFamily: "'Space Grotesk', sans-serif" },
+  closeBtn: { background: 'transparent', border: 'none', color: 'var(--text-dim, rgba(255, 255, 255, 0.6))', fontSize: '16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" },
   modalBody: { padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' },
   section: {},
   sectionTitle: {
@@ -543,7 +542,7 @@ const styles = {
     fontSize: '13px',
     letterSpacing: '1px',
     fontWeight: 600,
-    color: '#5EEAD4',
+    color: 'var(--accent-green, #5EEAD4)',
     marginBottom: 'var(--space-2)'
   },
   list: {
@@ -553,7 +552,7 @@ const styles = {
     flexDirection: 'column',
     gap: '8px',
     fontSize: '13px',
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.85))',
     lineHeight: 1.6,
     fontFamily: "'Space Grotesk', sans-serif"
   },
@@ -573,27 +572,27 @@ const styles = {
     alignItems: 'center',
     gap: '2px',
     padding: '6px 4px',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.04))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: 'var(--radius-sm)'
   },
-  ratingNum: { fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', fontFamily: "'Space Grotesk', sans-serif" },
-  ratingPts: { fontSize: '13px', color: '#7DD3FC', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" },
+  ratingNum: { fontSize: '11px', color: 'var(--text-dim, rgba(255, 255, 255, 0.5))', fontFamily: "'Space Grotesk', sans-serif" },
+  ratingPts: { fontSize: '13px', color: 'var(--cf-color, #7DD3FC)', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" },
   formulaBox: {
     marginTop: '10px',
     padding: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.1))',
     borderRadius: 'var(--radius-sm)',
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.03))',
     overflowX: 'auto',
     fontSize: '13px',
     lineHeight: 1.8,
-    color: 'rgba(255, 255, 255, 0.75)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.75))',
     fontFamily: "'Space Grotesk', monospace"
   },
   formulaNote: {
     marginTop: '14px',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     lineHeight: 1.7,
     fontSize: '13px',
     fontFamily: "'Space Grotesk', sans-serif"
@@ -609,9 +608,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    background: 'rgba(99, 223, 255, 0.04)',
-    border: '1px solid rgba(99, 223, 255, 0.22)',
-    color: '#7DD3FC',
+    background: 'var(--cf-dim, rgba(99, 223, 255, 0.04))',
+    border: '1px solid var(--cf-border, rgba(99, 223, 255, 0.22))',
+    color: 'var(--cf-color, #7DD3FC)',
     borderRadius: '10px',
     padding: '10px 20px',
     fontSize: '14px',
@@ -627,9 +626,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    background: 'rgba(252, 211, 77, 0.04)',
-    border: '1px solid rgba(252, 211, 77, 0.22)',
-    color: '#FCD34D',
+    background: 'var(--lc-dim, rgba(252, 211, 77, 0.04))',
+    border: '1px solid var(--lc-border, rgba(252, 211, 77, 0.22))',
+    color: 'var(--lc-color, #FCD34D)',
     borderRadius: '10px',
     padding: '10px 20px',
     fontSize: '14px',
@@ -645,9 +644,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    background: 'rgba(216, 180, 254, 0.04)',
-    border: '1px solid rgba(216, 180, 254, 0.22)',
-    color: '#D8B4FE',
+    background: 'var(--cc-dim, rgba(216, 180, 254, 0.04))',
+    border: '1px solid var(--cc-border, rgba(216, 180, 254, 0.22))',
+    color: 'var(--cc-color, #D8B4FE)',
     borderRadius: '10px',
     padding: '10px 20px',
     fontSize: '14px',
@@ -662,31 +661,31 @@ const styles = {
     fontFamily: "'Space Grotesk', sans-serif",
     fontSize: '14px',
     fontWeight: 500,
-    color: '#FCD34D',
+    color: 'var(--accent-gold, #FCD34D)',
     marginBottom: 'var(--space-3)'
   },
-  error: { color: '#F87171', marginBottom: 'var(--space-3)', fontFamily: "'Space Grotesk', sans-serif", fontSize: '13px' },
+  error: { color: 'var(--accent-red, #F87171)', marginBottom: 'var(--space-3)', fontFamily: "'Space Grotesk', sans-serif", fontSize: '13px' },
   queue: {
     marginTop: 0,
-    background: 'rgba(10, 12, 17, 0.72)',
+    background: 'var(--card-bg, rgba(10, 12, 17, 0.72))',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '14px',
     overflow: 'hidden',
-    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.09), inset 0 0 20px rgba(255, 255, 255, 0.015)'
+    boxShadow: 'var(--card-shadow, 0 24px 60px rgba(0, 0, 0, 0.75))'
   },
   queueHeader: {
     display: 'flex',
     gap: '10px',
     padding: '14px 22px',
-    background: 'rgba(255, 255, 255, 0.025)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.025))',
+    borderBottom: '1px solid var(--border, rgba(255, 255, 255, 0.06))'
   },
   col: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.6))',
     fontWeight: 600,
     letterSpacing: '1px'
   },
@@ -696,16 +695,16 @@ const styles = {
     gap: '10px',
     padding: '16px 22px',
     background: 'transparent',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    borderBottom: '1px solid var(--border, rgba(255, 255, 255, 0.05))',
     cursor: 'pointer'
   },
   queueRowSelf: {
-    background: 'rgba(99, 223, 255, 0.04)',
-    borderLeft: '2px solid rgba(99, 223, 255, 0.7)'
+    background: 'rgba(99, 223, 255, 0.06)',
+    borderLeft: '2px solid var(--accent-aqua, rgba(99, 223, 255, 0.7))'
   },
   cfIconLink: { display: 'flex', alignItems: 'center', flexShrink: 0 },
   nameLink: {
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     fontWeight: 600,
     fontSize: '15px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -714,5 +713,6 @@ const styles = {
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
   },
-  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'rgba(255, 255, 255, 0.55)', fontFamily: "'Space Grotesk', sans-serif", fontSize: '14px' }
+  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim, rgba(255, 255, 255, 0.55))', fontFamily: "'Space Grotesk', sans-serif", fontSize: '14px' }
 };
+

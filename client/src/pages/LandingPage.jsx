@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Sun, Moon } from 'lucide-react';
 import { api, warmUpServer } from "../api";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import GrainMass from '../components/GrainMass';
 import ccLogo from '../assets/cc-logo-white.png';
 import '../styles/LandingPage.css';
@@ -68,6 +70,7 @@ let hasPlayedEntranceAnimation = false;
 export default function LandingPage() {
   const navigate = useNavigate();
   const auth = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [searchParams] = useSearchParams();
   const isLoginModeFromUrl = searchParams.get('mode') === 'login';
 
@@ -185,11 +188,11 @@ export default function LandingPage() {
   }
 
   return (
-    <div style={styles.page}>
+    <div className="landing-page" style={{ ...styles.page, background: isDark ? '#000000' : '#F8FAFC' }}>
 
       <div className={`landing-bg-overlay ${skipEntrance ? 'entrance-done' : ''}`}>
         <GrainMass
-          background="#000000"
+          background={isDark ? "#000000" : "#F8FAFC"}
           scale={isMobile ? 85 : 150}
           rotateSpeed={5}
           boil={6}
@@ -208,10 +211,25 @@ export default function LandingPage() {
         ))}
       </div>
 
-      <div style={{ ...styles.corner, top: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderBottom: 'none' }} />
-      <div style={{ ...styles.corner, top: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderBottom: 'none' }} />
-      <div style={{ ...styles.corner, bottom: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderTop: 'none' }} />
-      <div style={{ ...styles.corner, bottom: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderTop: 'none' }} />
+      <div className="landing-corner" style={{ ...styles.corner, top: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderBottom: 'none' }} />
+      <div className="landing-corner" style={{ ...styles.corner, top: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderBottom: 'none' }} />
+      <div className="landing-corner" style={{ ...styles.corner, bottom: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderTop: 'none' }} />
+      <div className="landing-corner" style={{ ...styles.corner, bottom: 'var(--space-4)', right: 'var(--space-4)', borderLeft: 'none', borderTop: 'none' }} />
+
+      <button
+        type="button"
+        className="landing-theme-toggle"
+        onClick={toggleTheme}
+        title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        aria-label="Toggle dark and light theme"
+      >
+        {isDark ? (
+          <Sun size={15} strokeWidth={2} style={{ color: '#FCD34D' }} />
+        ) : (
+          <Moon size={15} strokeWidth={2} style={{ color: '#4300FF' }} />
+        )}
+        <span>{isDark ? 'Light' : 'Dark'}</span>
+      </button>
 
       <div style={styles.quote} className="fade-up landing-quote">
         {'// "Productive days are the days where you do what you want to do"'}
@@ -241,6 +259,7 @@ export default function LandingPage() {
                 <div style={styles.tabRow}>
                   <button
                     type="button"
+                    className={`landing-tab ${mode === 'join' ? 'landing-tab-active' : ''}`}
                     onClick={() => setMode('join')}
                     style={{ ...styles.tab, ...(mode === 'join' ? styles.tabActive : {}) }}
                   >
@@ -248,6 +267,7 @@ export default function LandingPage() {
                   </button>
                   <button
                     type="button"
+                    className={`landing-tab ${mode === 'login' ? 'landing-tab-active' : ''}`}
                     onClick={() => setMode('login')}
                     style={{ ...styles.tab, ...(mode === 'login' ? styles.tabActive : {}) }}
                   >
@@ -318,25 +338,25 @@ export default function LandingPage() {
                 )}
 
                 {mode === 'login' && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 2px 10px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', userSelect: 'none' }}>
+                  <div className="landing-remember-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 2px 10px', fontSize: '12px', color: 'var(--text-secondary, rgba(255, 255, 255, 0.8))' }}>
+                    <label className="landing-remember-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', userSelect: 'none' }}>
                       <input
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        style={{ accentColor: '#ffffff', cursor: 'pointer', width: '14px', height: '14px' }}
+                        style={{ cursor: 'pointer', width: '14px', height: '14px' }}
                       />
                       <span>Remember me</span>
                     </label>
-                    <Link to="/forgot-password" style={{ ...styles.backLink, margin: 0, fontSize: '12px' }}>Forgot password?</Link>
+                    <Link to="/forgot-password" className="landing-forgot-link" style={{ ...styles.backLink, margin: 0, fontSize: '12px' }}>Forgot password?</Link>
                   </div>
                 )}
 
-                <button style={styles.submitBtn} type="submit" disabled={loading}>
+                <button className="landing-submit-btn" style={styles.submitBtn} type="submit" disabled={loading}>
                   {loading ? 'Please wait…' : mode === 'join' ? 'Create account' : 'Log in'}
                 </button>
                 {mode === 'join' && (
-                  <Link to="/forgot-password" style={styles.backLink}>Forgot password?</Link>
+                  <Link to="/forgot-password" className="landing-forgot-link" style={styles.backLink}>Forgot password?</Link>
                 )}
               </form>
             </div>
@@ -382,7 +402,7 @@ const styles = {
     top: 'var(--space-4)',
     left: 'var(--space-4)',
     fontSize: '17px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     opacity: 0.95,
     zIndex: 2,
     lineHeight: '1.75',
@@ -397,7 +417,7 @@ const styles = {
     left: '50%',
     transform: 'translateX(-50%)',
     fontSize: '17px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     letterSpacing: '0.6px',
     opacity: 0.9,
     textAlign: 'center',
@@ -421,8 +441,8 @@ const styles = {
     flexDirection: 'column',
     gap: 'var(--space-3)',
     width: 'min(360px, 92vw)',
-    background: 'rgba(10, 12, 17, 0.88)',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
+    background: 'var(--card-bg, rgba(10, 12, 17, 0.88))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.12))',
     borderRadius: '14px',
     padding: 'var(--space-4)',
     boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
@@ -435,9 +455,9 @@ const styles = {
     flex: 1,
     minWidth: 0,
     background: 'transparent',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.12))',
     borderRadius: '8px',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     padding: '10px 6px',
     fontSize: '13px',
     fontFamily: "'Space Grotesk', sans-serif",
@@ -449,24 +469,24 @@ const styles = {
     transition: 'all 0.2s ease',
   },
   tabActive: {
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-    color: '#FFFFFF',
-    background: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'var(--border-hover, rgba(255, 255, 255, 0.35))',
+    color: 'var(--text, #FFFFFF)',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.08))',
     boxShadow: '0 0 16px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
   },
   input: {
-    background: 'rgba(10, 12, 16, 0.85)',
-    border: '1px solid rgba(255, 255, 255, 0.18)',
+    background: 'var(--input-bg, rgba(10, 12, 16, 0.85))',
+    border: '1px solid var(--input-border, rgba(255, 255, 255, 0.18))',
     borderRadius: '8px',
     padding: '12px 14px',
-    color: '#FFFFFF',
+    color: 'var(--input-text, #FFFFFF)',
     fontSize: '16px',
     fontFamily: "'Space Grotesk', sans-serif",
     outline: 'none',
   },
   submitBtn: {
-    background: '#FFFFFF',
-    color: '#0A0A0A',
+    background: 'var(--btn-primary-bg, #FFFFFF)',
+    color: 'var(--btn-primary-text, #0A0A0A)',
     border: 'none',
     borderRadius: '8px',
     padding: '12px',
@@ -491,14 +511,14 @@ const styles = {
     padding: '4px 0',
   },
   hint: {
-    color: '#FFFFFF',
+    color: 'var(--text-secondary, #FFFFFF)',
     fontSize: '12px',
     fontFamily: "'Space Grotesk', sans-serif",
     textAlign: 'center',
     opacity: 0.85,
   },
   backLink: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.7))',
     fontSize: '12px',
     fontFamily: "'Space Grotesk', sans-serif",
     textAlign: 'center',

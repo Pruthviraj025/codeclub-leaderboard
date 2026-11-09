@@ -725,6 +725,50 @@ export default function ProfilePage() {
                             grid-template-columns: 1fr !important;
                         }
                     }
+
+                    [data-theme="light"] .profile-back-btn {
+                        background: #FFFFFF !important;
+                        border-color: rgba(15, 23, 42, 0.14) !important;
+                        color: #334155 !important;
+                        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+                    }
+                    [data-theme="light"] .profile-back-btn:hover {
+                        background: #F8FAFC !important;
+                        border-color: #0D9488 !important;
+                        color: #0D9488 !important;
+                    }
+                    [data-theme="light"] .profile-input {
+                        background: #FFFFFF !important;
+                        border-color: rgba(15, 23, 42, 0.18) !important;
+                        color: #0F172A !important;
+                    }
+                    [data-theme="light"] .profile-solve-row {
+                        background: #FFFFFF !important;
+                        border-color: rgba(15, 23, 42, 0.08) !important;
+                        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+                    }
+                    [data-theme="light"] .profile-solve-row:hover {
+                        background: #F8FAFC !important;
+                        border-color: rgba(15, 23, 42, 0.16) !important;
+                        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+                    }
+                    [data-theme="light"] .profile-solve-problem-link {
+                        color: #0F172A !important;
+                    }
+                    [data-theme="light"] .profile-solve-row-cf:hover .profile-solve-problem-link {
+                        color: #0284C7 !important;
+                    }
+                    [data-theme="light"] .profile-solve-row-lc:hover .profile-solve-problem-link {
+                        color: #EA580C !important;
+                    }
+                    [data-theme="light"] .profile-solve-row-cc:hover .profile-solve-problem-link {
+                        color: #9333EA !important;
+                    }
+                    [data-theme="light"] .profile-stat-box {
+                        background: #FFFFFF !important;
+                        border-color: rgba(15, 23, 42, 0.08) !important;
+                        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+                    }
                 `}</style>
                 <div style={{ marginBottom: "16px" }}>
                     <button
@@ -768,13 +812,13 @@ export default function ProfilePage() {
                                         target="_blank"
                                         rel="noreferrer"
                                         className="profile-platform-link profile-platform-link-cf"
-                                        style={{ color: "#7DD3FC", textDecoration: "none" }}
+                                        style={{ color: "var(--cf-color, #7DD3FC)", textDecoration: "none" }}
                                         title="Open Codeforces profile"
                                     >
                                         {profile.cfHandle} ↗
                                     </a>
                                 ) : (
-                                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "15px", fontWeight: 500 }}>
+                                    <span style={{ color: "var(--text-subtle, rgba(255, 255, 255, 0.4))", fontSize: "15px", fontWeight: 500 }}>
                                         Not Connected
                                     </span>
                                 )
@@ -791,13 +835,13 @@ export default function ProfilePage() {
                                         target="_blank"
                                         rel="noreferrer"
                                         className="profile-platform-link profile-platform-link-lc"
-                                        style={{ color: "#FB923C", textDecoration: "none" }}
+                                        style={{ color: "var(--lc-color, #FB923C)", textDecoration: "none" }}
                                         title="Open LeetCode profile"
                                     >
                                         {profile.lcUsername} ↗
                                     </a>
                                 ) : (
-                                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "15px", fontWeight: 500 }}>
+                                    <span style={{ color: "var(--text-subtle, rgba(255, 255, 255, 0.4))", fontSize: "15px", fontWeight: 500 }}>
                                         Not Connected
                                     </span>
                                 )
@@ -814,13 +858,13 @@ export default function ProfilePage() {
                                         target="_blank"
                                         rel="noreferrer"
                                         className="profile-platform-link profile-platform-link-cc"
-                                        style={{ color: "#D8B4FE", textDecoration: "none" }}
+                                        style={{ color: "var(--cc-color, #D8B4FE)", textDecoration: "none" }}
                                         title="Open CodeChef profile"
                                     >
                                         {profile.ccHandle} ↗
                                     </a>
                                 ) : (
-                                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "15px", fontWeight: 500 }}>
+                                    <span style={{ color: "var(--text-subtle, rgba(255, 255, 255, 0.4))", fontSize: "15px", fontWeight: 500 }}>
                                         Not Connected
                                     </span>
                                 )
@@ -834,25 +878,25 @@ export default function ProfilePage() {
                             variant="total"
                             label="TOTAL POINTS"
                             value={profile.totalPoints || 0}
-                            color="#5EEAD4"
+                            color="var(--accent-green, #5EEAD4)"
                         />
                         <Stat
                             variant="cf"
                             label="CF POINTS"
                             value={profile.codeforcesPoints || 0}
-                            color="#7DD3FC"
+                            color="var(--cf-color, #7DD3FC)"
                         />
                         <Stat
                             variant="lc"
                             label="LC POINTS"
                             value={profile.leetcodePoints || 0}
-                            color="#FB923C"
+                            color="var(--lc-color, #FB923C)"
                         />
                         <Stat
                             variant="cc"
                             label="CC POINTS"
                             value={profile.codechefPoints || 0}
-                            color="#D8B4FE"
+                            color="var(--cc-color, #D8B4FE)"
                         />
                     </div>
 
@@ -868,14 +912,14 @@ export default function ProfilePage() {
                                     letterSpacing: "1px",
                                     padding: "2px 8px",
                                     borderRadius: "4px",
-                                    background: "rgba(255, 255, 255, 0.05)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                                    color: "rgba(255, 255, 255, 0.65)"
+                                    background: "var(--surface-raised, rgba(255, 255, 255, 0.05))",
+                                    border: "1px solid var(--border, rgba(255, 255, 255, 0.1))",
+                                    color: "var(--text-secondary, rgba(255, 255, 255, 0.65))"
                                 }}>
                                     USN
                                 </span>
 
-                                <span style={{ fontWeight: 600, color: "#FFFFFF", letterSpacing: "0.5px" }}>
+                                <span style={{ fontWeight: 600, color: "var(--text, #FFFFFF)", letterSpacing: "0.5px" }}>
                                     {profile.usn}
                                 </span>
 
@@ -891,14 +935,14 @@ export default function ProfilePage() {
                                         letterSpacing: "1px",
                                         padding: "2px 8px",
                                         borderRadius: "4px",
-                                        background: "rgba(255, 255, 255, 0.05)",
-                                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                                        color: "rgba(255, 255, 255, 0.65)"
+                                        background: "var(--surface-raised, rgba(255, 255, 255, 0.05))",
+                                        border: "1px solid var(--border, rgba(255, 255, 255, 0.1))",
+                                        color: "var(--text-secondary, rgba(255, 255, 255, 0.65))"
                                     }}>
                                         EMAIL
                                     </span>
 
-                                    <span style={{ fontWeight: 500, color: "rgba(255, 255, 255, 0.9)" }}>
+                                    <span style={{ fontWeight: 500, color: "var(--text, rgba(255, 255, 255, 0.9))" }}>
                                         {profile.email}
                                     </span>
 
@@ -1109,8 +1153,8 @@ export default function ProfilePage() {
                                 <div className="profile-connected-badge profile-connected-badge-cf">
 
                                     <span>✅</span>
-                                    <span style={{ color: "rgba(255, 255, 255, 0.75)" }}>Connected as</span>
-                                    <strong style={{ color: "#7DD3FC", fontWeight: 700 }}>
+                                    <span style={{ color: "var(--text-secondary, rgba(255, 255, 255, 0.75))" }}>Connected as</span>
+                                    <strong style={{ color: "var(--cf-color, #7DD3FC)", fontWeight: 700 }}>
                                         {profile.cfHandle}
                                     </strong>
 
@@ -1225,8 +1269,8 @@ export default function ProfilePage() {
                                     <div className="profile-connected-badge profile-connected-badge-lc">
 
                                         <span>✅</span>
-                                        <span style={{ color: "rgba(255, 255, 255, 0.75)" }}>Connected as</span>
-                                        <strong style={{ color: "#FB923C", fontWeight: 700 }}>
+                                        <span style={{ color: "var(--text-secondary, rgba(255, 255, 255, 0.75))" }}>Connected as</span>
+                                        <strong style={{ color: "var(--lc-color, #FB923C)", fontWeight: 700 }}>
                                             {profile.lcUsername}
                                         </strong>
 
@@ -1323,8 +1367,8 @@ export default function ProfilePage() {
                                 <>
                                     <div className="profile-connected-badge profile-connected-badge-cc">
                                         <span>✅</span>
-                                        <span style={{ color: "rgba(255, 255, 255, 0.75)" }}>Connected as</span>
-                                        <strong style={{ color: "#D8B4FE", fontWeight: 700 }}>{profile.ccHandle}</strong>
+                                        <span style={{ color: "var(--text-secondary, rgba(255, 255, 255, 0.75))" }}>Connected as</span>
+                                        <strong style={{ color: "var(--cc-color, #D8B4FE)", fontWeight: 700 }}>{profile.ccHandle}</strong>
                                     </div>
                                     <div style={{ marginTop: 14 }}>
                                         <button
@@ -1356,7 +1400,7 @@ export default function ProfilePage() {
                     </div>
 
                     {!profile.solvedSubmissions || profile.solvedSubmissions.length === 0 ? (
-                        <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "14px", padding: "20px 0", fontFamily: "'Space Grotesk', sans-serif" }}>
+                        <div style={{ color: "var(--text-dim, rgba(255, 255, 255, 0.5))", fontSize: "14px", padding: "20px 0", fontFamily: "'Space Grotesk', sans-serif" }}>
                             No solved problems recorded yet.
                         </div>
                     ) : (
@@ -1373,8 +1417,8 @@ export default function ProfilePage() {
                                             alignItems: "center",
                                             justifyContent: "space-between",
                                             padding: "12px 16px",
-                                            background: "rgba(255, 255, 255, 0.025)",
-                                            border: "1px solid rgba(255, 255, 255, 0.06)",
+                                            background: "var(--surface-raised, rgba(255, 255, 255, 0.025))",
+                                            border: "1px solid var(--border, rgba(255, 255, 255, 0.06))",
                                             borderRadius: "10px",
                                             gap: "12px",
                                             flexWrap: "wrap"
@@ -1415,7 +1459,7 @@ export default function ProfilePage() {
                                                     {sub.problemName} ↗
                                                 </a>
                                             ) : (
-                                                <span style={{ fontWeight: 600, fontSize: "15px", color: "#FFFFFF", fontFamily: "'Space Grotesk', sans-serif" }}>{sub.problemName}</span>
+                                                <span style={{ fontWeight: 600, fontSize: "15px", color: "var(--text, #FFFFFF)", fontFamily: "'Space Grotesk', sans-serif" }}>{sub.problemName}</span>
                                             )}
                                             {sub.problemRating != null && (
                                                 <span style={{
@@ -1435,9 +1479,9 @@ export default function ProfilePage() {
                                                 <span style={{
                                                     fontSize: "12px",
                                                     fontWeight: 500,
-                                                    color: "rgba(255, 255, 255, 0.7)",
-                                                    background: "rgba(255, 255, 255, 0.04)",
-                                                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                                                    color: "var(--text-dim, rgba(255, 255, 255, 0.7))",
+                                                    background: "var(--card-bg, rgba(255, 255, 255, 0.04))",
+                                                    border: "1px solid var(--border, rgba(255, 255, 255, 0.08))",
                                                     padding: "2px 8px",
                                                     borderRadius: "6px",
                                                     fontFamily: "'Space Grotesk', sans-serif"
@@ -1449,7 +1493,7 @@ export default function ProfilePage() {
 
                                         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                                             {sub.solvedAt && (
-                                                <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.55)", fontFamily: "'Space Grotesk', sans-serif" }}>
+                                                <span style={{ fontSize: "13px", color: "var(--text-dim, rgba(255, 255, 255, 0.55))", fontFamily: "'Space Grotesk', sans-serif" }}>
                                                     {new Date(sub.solvedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                                                 </span>
                                             )}
@@ -1491,34 +1535,34 @@ function Stat({
 }) {
     const variantStyles = {
         cf: {
-            bg: "rgba(56, 189, 248, 0.035)",
-            border: "rgba(56, 189, 248, 0.16)",
-            labelColor: "#7DD3FC"
+            bg: "var(--cf-dim, rgba(56, 189, 248, 0.035))",
+            border: "var(--cf-border, rgba(56, 189, 248, 0.16))",
+            labelColor: "var(--cf-accent, #7DD3FC)"
         },
         lc: {
-            bg: "rgba(251, 146, 60, 0.035)",
-            border: "rgba(251, 146, 60, 0.16)",
-            labelColor: "#FB923C"
+            bg: "var(--lc-dim, rgba(251, 146, 60, 0.035))",
+            border: "var(--lc-border, rgba(251, 146, 60, 0.16))",
+            labelColor: "var(--lc-accent, #FB923C)"
         },
         cc: {
-            bg: "rgba(216, 180, 254, 0.035)",
-            border: "rgba(216, 180, 254, 0.16)",
-            labelColor: "#D8B4FE"
+            bg: "var(--cc-dim, rgba(216, 180, 254, 0.035))",
+            border: "var(--cc-border, rgba(216, 180, 254, 0.16))",
+            labelColor: "var(--cc-accent, #D8B4FE)"
         },
         total: {
-            bg: "rgba(94, 234, 212, 0.035)",
-            border: "rgba(94, 234, 212, 0.18)",
-            labelColor: "#5EEAD4"
+            bg: "var(--accent-green-dim, rgba(94, 234, 212, 0.035))",
+            border: "var(--accent-green-dim, rgba(94, 234, 212, 0.18))",
+            labelColor: "var(--accent-green, #5EEAD4)"
         },
         default: {
-            bg: "rgba(255, 255, 255, 0.03)",
-            border: "rgba(255, 255, 255, 0.07)",
-            labelColor: "rgba(255, 255, 255, 0.6)"
+            bg: "var(--surface-raised, rgba(255, 255, 255, 0.03))",
+            border: "var(--border, rgba(255, 255, 255, 0.07))",
+            labelColor: "var(--text-dim, rgba(255, 255, 255, 0.6))"
         }
     }[variant] || {
-        bg: "rgba(255, 255, 255, 0.03)",
-        border: "rgba(255, 255, 255, 0.07)",
-        labelColor: "rgba(255, 255, 255, 0.6)"
+        bg: "var(--surface-raised, rgba(255, 255, 255, 0.03))",
+        border: "var(--border, rgba(255, 255, 255, 0.07))",
+        labelColor: "var(--text-dim, rgba(255, 255, 255, 0.6))"
     };
 
     return (
@@ -1563,16 +1607,16 @@ const styles = {
 
     header: {
         padding: "var(--space-3) var(--space-5)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)"
+        borderBottom: "1px solid var(--border, rgba(255, 255, 255, 0.08))"
     },
 
     backBtn: {
         display: "inline-flex",
         alignItems: "center",
         gap: "6px",
-        background: "rgba(255, 255, 255, 0.04)",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
-        color: "rgba(255, 255, 255, 0.85)",
+        background: "var(--card-bg, rgba(255, 255, 255, 0.04))",
+        border: "1px solid var(--border, rgba(255, 255, 255, 0.12))",
+        color: "var(--text, rgba(255, 255, 255, 0.85))",
         cursor: "pointer",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         fontSize: "14px",
@@ -1593,13 +1637,13 @@ const styles = {
     },
 
     card: {
-        background: "rgba(10, 13, 19, 0.72)",
-        border: "1px solid rgba(255, 255, 255, 0.08)",
+        background: "var(--card-bg, rgba(10, 13, 19, 0.72))",
+        border: "1px solid var(--card-border, rgba(255, 255, 255, 0.08))",
         borderRadius: "16px",
         padding: "28px 30px",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.09)"
+        boxShadow: "var(--card-shadow, 0 24px 60px rgba(0, 0, 0, 0.75))"
     },
 
     nameRow: {
@@ -1615,17 +1659,16 @@ const styles = {
         fontSize: "clamp(26px, 4.5vw, 34px)",
         fontWeight: 700,
         letterSpacing: "-0.3px",
-        color: "#FFFFFF",
-        textShadow: "0 0 24px rgba(255, 255, 255, 0.12)"
+        color: "var(--text, #FFFFFF)"
     },
 
     youTag: {
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         fontSize: "11.5px",
         fontWeight: 600,
-        color: "#FCD34D",
-        background: "rgba(252, 211, 77, 0.12)",
-        border: "1px solid rgba(252, 211, 77, 0.3)",
+        color: "var(--accent-orange, #FCD34D)",
+        background: "var(--accent-orange-dim, rgba(252, 211, 77, 0.12))",
+        border: "1px solid var(--accent-orange-dim, rgba(252, 211, 77, 0.3))",
         padding: "4px 12px",
         borderRadius: "999px",
         letterSpacing: "0.8px"
@@ -1640,8 +1683,8 @@ const styles = {
 
     stat: {
         minWidth: "120px",
-        background: "rgba(255, 255, 255, 0.03)",
-        border: "1px solid rgba(255, 255, 255, 0.07)",
+        background: "var(--surface-raised, rgba(255, 255, 255, 0.03))",
+        border: "1px solid var(--border, rgba(255, 255, 255, 0.07))",
         borderRadius: "12px",
         padding: "16px 18px",
         backdropFilter: "blur(12px)",
@@ -1652,7 +1695,7 @@ const styles = {
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         fontSize: "12px",
         fontWeight: 600,
-        color: "rgba(255, 255, 255, 0.6)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.6))",
         letterSpacing: "1px",
         marginBottom: "6px",
         textTransform: "uppercase"
@@ -1668,21 +1711,21 @@ const styles = {
     privateBlock: {
         marginTop: "26px",
         paddingTop: "20px",
-        borderTop: "1px solid rgba(255, 255, 255, 0.07)",
+        borderTop: "1px solid var(--border, rgba(255, 255, 255, 0.07))",
         fontFamily: "'Space Grotesk', sans-serif"
     },
 
     privateLine: {
         fontFamily: "'Space Grotesk', sans-serif",
         fontSize: "15px",
-        color: "#FFFFFF",
+        color: "var(--text, #FFFFFF)",
         marginBottom: "10px",
         lineHeight: 1.6,
         wordBreak: "break-word"
     },
 
     dim: {
-        color: "rgba(255, 255, 255, 0.6)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.6))",
         fontFamily: "'Space Grotesk', sans-serif",
         fontWeight: 500
     },
@@ -1690,7 +1733,7 @@ const styles = {
     editLink: {
         background: "transparent",
         border: "none",
-        color: "#5EEAD4",
+        color: "var(--accent-green, #5EEAD4)",
         cursor: "pointer",
         padding: 0,
         marginLeft: "8px",
@@ -1703,11 +1746,11 @@ const styles = {
     cfConnect: {
         marginTop: "24px",
         paddingTop: "20px",
-        borderTop: "1px solid rgba(255, 255, 255, 0.07)"
+        borderTop: "1px solid var(--border, rgba(255, 255, 255, 0.07))"
     },
 
     eyebrow: {
-        color: "#5EEAD4",
+        color: "var(--accent-green, #5EEAD4)",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         fontSize: "13px",
         fontWeight: 600,
@@ -1725,9 +1768,9 @@ const styles = {
     input: {
         flex: 1,
         minWidth: "180px",
-        background: "rgba(255, 255, 255, 0.03)",
-        color: "#FFFFFF",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        background: "var(--input-bg, rgba(255, 255, 255, 0.03))",
+        color: "var(--text, #FFFFFF)",
+        border: "1px solid var(--input-border, rgba(255, 255, 255, 0.1))",
         borderRadius: "10px",
         padding: "11px 16px",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -1738,9 +1781,9 @@ const styles = {
     },
 
     smallBtn: {
-        background: "rgba(94, 234, 212, 0.12)",
-        color: "#5EEAD4",
-        border: "1px solid rgba(94, 234, 212, 0.35)",
+        background: "var(--accent-green-dim, rgba(94, 234, 212, 0.12))",
+        color: "var(--accent-green, #5EEAD4)",
+        border: "1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.35))",
         borderRadius: "10px",
         padding: "11px 22px",
         cursor: "pointer",
@@ -1776,11 +1819,11 @@ const styles = {
         fontFamily: "'Space Grotesk', sans-serif",
         fontSize: "15px",
         lineHeight: 1.6,
-        color: "rgba(255, 255, 255, 0.9)"
+        color: "var(--text, rgba(255, 255, 255, 0.9))"
     },
 
     link: {
-        color: "#5EEAD4",
+        color: "var(--accent-green, #5EEAD4)",
         fontWeight: 600,
         textDecoration: "underline",
         fontFamily: "'Space Grotesk', sans-serif",
@@ -1790,7 +1833,7 @@ const styles = {
     verifyMsg: {
         marginTop: "14px",
         fontFamily: "'Space Grotesk', sans-serif",
-        color: "#FCD34D",
+        color: "var(--accent-orange, #FCD34D)",
         fontSize: "14px"
     },
 

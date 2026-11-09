@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, CalendarDays, BarChart3, Rocket, Shield, User, LogOut, Menu, X, MessageSquarePlus, MessageCircle } from 'lucide-react';
+import { Trophy, CalendarDays, BarChart3, Rocket, Shield, User, LogOut, Menu, X, MessageSquarePlus, MessageCircle, Sun, Moon } from 'lucide-react';
 import { getSessionUser, clearSession } from '../api';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import SidebarParticles from './SidebarParticles';
 
 const NAV_ITEMS = [
@@ -19,6 +20,7 @@ export default function SidebarLayout({ active, children }) {
   const user = getSessionUser();
   const navigate = useNavigate();
   const auth = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Lock body scrolling when mobile drawer is open
@@ -99,6 +101,30 @@ export default function SidebarLayout({ active, children }) {
     );
   }
 
+  function renderThemeToggle() {
+    return (
+      <button
+        style={styles.themeToggleBtn}
+        className="theme-toggle-btn"
+        onClick={toggleTheme}
+        title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        aria-label="Toggle dark and light theme"
+      >
+        <div style={styles.themeToggleLeft}>
+          {isDark ? (
+            <Sun size={17} strokeWidth={2} style={{ color: '#FCD34D' }} />
+          ) : (
+            <Moon size={17} strokeWidth={2} style={{ color: '#6D28D9' }} />
+          )}
+          <span style={styles.themeToggleText}>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+        </div>
+        <span className="theme-toggle-badge" style={styles.themeToggleBadge}>
+          {isDark ? 'Dark' : 'Light'}
+        </span>
+      </button>
+    );
+  }
+
   function renderSuggestionBtn() {
     return (
       <button
@@ -145,6 +171,7 @@ export default function SidebarLayout({ active, children }) {
         </nav>
 
         <div style={styles.sidebarBottom} className="app-sidebar-bottom">
+          {renderThemeToggle()}
           {renderSuggestionBtn()}
         </div>
       </aside>
@@ -152,7 +179,7 @@ export default function SidebarLayout({ active, children }) {
       {mobileOpen && (
         <div style={styles.mobileMenuPage} className="mobile-nav-page">
           <SidebarParticles />
-          <div style={styles.mobileMenuHeader}>
+          <div style={styles.mobileMenuHeader} className="mobile-nav-header">
             <div
               style={styles.logoMark}
               onClick={() => go('/leaderboard')}
@@ -178,6 +205,7 @@ export default function SidebarLayout({ active, children }) {
           </nav>
 
           <div style={styles.mobileMenuBottom}>
+            {renderThemeToggle()}
             {renderSuggestionBtn()}
           </div>
         </div>
@@ -196,18 +224,14 @@ const styles = {
   shell: {
     display: 'flex',
     minHeight: '100vh',
-    background: '#050608'
+    background: 'var(--bg-page, #050608)'
   },
   sidebar: {
     width: '220px',
     flexShrink: 0,
-    borderRight: '1px solid rgba(255, 255, 255, 0.055)',
-    background:
-      'radial-gradient(ellipse 220px 160px at 50% 0%, rgba(67, 0, 255, 0.07) 0%, transparent 75%), ' +
-      'radial-gradient(ellipse 180px 220px at 0% 55%, rgba(67, 0, 255, 0.035) 0%, transparent 70%), ' +
-      'radial-gradient(ellipse 160px 180px at 100% 90%, rgba(251, 146, 60, 0.015) 0%, transparent 70%), ' +
-      'linear-gradient(180deg, rgba(7, 9, 14, 0.88) 0%, rgba(3, 4, 7, 0.95) 55%, #020204 100%)',
-    boxShadow: 'inset -1px 0 0 rgba(255, 255, 255, 0.02), 6px 0 28px rgba(0, 0, 0, 0.65)',
+    borderRight: '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.055))',
+    background: 'var(--sidebar-bg, radial-gradient(ellipse 220px 160px at 50% 0%, rgba(67, 0, 255, 0.07) 0%, transparent 75%), linear-gradient(180deg, rgba(7, 9, 14, 0.88) 0%, rgba(3, 4, 7, 0.95) 55%, #020204 100%))',
+    boxShadow: 'var(--sidebar-shadow, inset -1px 0 0 rgba(255, 255, 255, 0.02), 6px 0 28px rgba(0, 0, 0, 0.65))',
     backdropFilter: 'blur(24px)',
     WebkitBackdropFilter: 'blur(24px)',
     padding: 'var(--space-4) var(--space-3)',
@@ -232,10 +256,10 @@ const styles = {
   },
   hamburgerBtn: {
     display: 'none',
-    background: 'rgba(255, 255, 255, 0.06)',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
+    background: 'var(--card-bg, rgba(255, 255, 255, 0.06))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.12))',
     borderRadius: '8px',
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     padding: '8px',
     minWidth: '42px',
     minHeight: '42px',
@@ -261,26 +285,74 @@ const styles = {
     zIndex: 2
   },
   sidebarBottom: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    borderTop: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     paddingTop: 'var(--space-3)',
     position: 'relative',
-    zIndex: 2
+    zIndex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
   },
   mobileMenuBottom: {
     marginTop: 'auto',
     padding: '14px 16px',
     paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    borderTop: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
+    position: 'relative',
+    zIndex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  },
+  themeToggleBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.025))',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.85))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
+    borderRadius: '10px',
+    padding: '9px 12px',
+    fontSize: '13.5px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontWeight: 500,
+    width: '100%',
+    cursor: 'pointer',
+    minHeight: '40px',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
     position: 'relative',
     zIndex: 2
+  },
+  themeToggleLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '9px'
+  },
+  themeToggleText: {
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '13.5px',
+    fontWeight: 500
+  },
+  themeToggleBadge: {
+    fontSize: '10.5px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.8px',
+    padding: '2px 7px',
+    borderRadius: '6px',
+    background: 'var(--card-bg, rgba(255, 255, 255, 0.06))',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.6))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))'
   },
   suggestionBtn: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    background: 'rgba(255, 255, 255, 0.025)',
-    color: 'rgba(255, 255, 255, 0.85)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--surface-raised, rgba(255, 255, 255, 0.025))',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.85))',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     borderRadius: '10px',
     padding: '11px 14px',
     fontSize: '14px',
@@ -301,9 +373,7 @@ const styles = {
     height: '100vh',
     maxHeight: '100dvh',
     zIndex: 9999,
-    background:
-      'radial-gradient(ellipse 260px 180px at 50% 0%, rgba(99, 223, 255, 0.08) 0%, transparent 75%), ' +
-      'linear-gradient(180deg, rgba(12, 16, 23, 0.98) 0%, rgba(6, 8, 12, 0.99) 100%)',
+    background: 'var(--sidebar-bg, radial-gradient(ellipse 260px 180px at 50% 0%, rgba(99, 223, 255, 0.08) 0%, transparent 75%), linear-gradient(180deg, rgba(12, 16, 23, 0.98) 0%, rgba(6, 8, 12, 0.99) 100%))',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     flexDirection: 'column',
@@ -315,8 +385,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '14px 16px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-    background: 'rgba(12, 16, 23, 0.9)',
+    borderBottom: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
+    background: 'var(--surface, rgba(12, 16, 23, 0.9))',
     position: 'relative',
     zIndex: 2
   },
@@ -340,11 +410,8 @@ const styles = {
   main: {
     flex: 1,
     padding: 'var(--space-4) var(--space-5)',
-    background:
-      'radial-gradient(ellipse 90% 50% at 50% -12%, rgba(99, 223, 255, 0.04) 0%, transparent 65%), ' +
-      'radial-gradient(ellipse 65% 45% at 88% 22%, rgba(216, 180, 254, 0.028) 0%, transparent 55%), ' +
-      'radial-gradient(ellipse 55% 40% at 12% 48%, rgba(252, 211, 77, 0.018) 0%, transparent 50%), ' +
-      'radial-gradient(ellipse at 50% 0%, #0D111A 0%, #06080C 55%, #000000 100%)',
-    minHeight: '100vh'
+    background: 'var(--bg-main-radial, radial-gradient(ellipse at 50% 0%, #0D111A 0%, #06080C 55%, #000000 100%))',
+    minHeight: '100vh',
+    color: 'var(--text)'
   }
 };

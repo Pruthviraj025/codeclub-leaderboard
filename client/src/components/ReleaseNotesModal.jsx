@@ -55,7 +55,7 @@ export default function ReleaseNotesModal() {
           </div>
 
           <div style={styles.featureItem}>
-            <div style={{ ...styles.iconBox, background: 'rgba(96, 165, 250, 0.12)', color: '#60A5FA' }}>
+            <div style={{ ...styles.iconBox, background: 'rgba(96, 165, 250, 0.12)', color: 'var(--cf-color, #60A5FA)' }}>
               <CalendarDays size={18} />
             </div>
             <div>
@@ -92,7 +92,7 @@ const styles = {
     position: 'fixed',
     inset: 0,
     zIndex: 1000,
-    background: 'rgba(0, 0, 0, 0.75)',
+    background: 'var(--modal-overlay, rgba(0, 0, 0, 0.75))',
     backdropFilter: 'blur(4px)',
     display: 'flex',
     alignItems: 'center',
@@ -103,11 +103,11 @@ const styles = {
     position: 'relative',
     width: '100%',
     maxWidth: '480px',
-    background: 'var(--surface)',
+    background: 'var(--card-bg, var(--surface))',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
     padding: '24px',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+    boxShadow: 'var(--card-shadow, 0 20px 40px rgba(0,0,0,0.5))',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px'
@@ -136,9 +136,9 @@ const styles = {
     fontSize: '11px',
     fontWeight: 700,
     letterSpacing: '1px',
-    color: '#5EEAD4',
-    background: 'rgba(94, 234, 212, 0.12)',
-    border: '1px solid rgba(94, 234, 212, 0.3)',
+    color: 'var(--accent-green, #5EEAD4)',
+    background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))',
+    border: '1px solid var(--accent-green-dim, rgba(94, 234, 212, 0.3))',
     padding: '3px 8px',
     borderRadius: '6px'
   },
@@ -146,7 +146,7 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '22px',
     fontWeight: 700,
-    color: '#FFF',
+    color: 'var(--text, #FFF)',
     margin: '4px 0 0'
   },
   subtitle: {
@@ -164,7 +164,7 @@ const styles = {
     display: 'flex',
     alignItems: 'flex-start',
     gap: '12px',
-    background: 'var(--bg)',
+    background: 'var(--surface-raised, var(--bg))',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius-sm)',
     padding: '12px'
@@ -182,7 +182,7 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '14px',
     fontWeight: 600,
-    color: '#FFF',
+    color: 'var(--text, #FFF)',
     marginBottom: '3px'
   },
   featureDesc: {
@@ -192,9 +192,9 @@ const styles = {
   },
   submitBtn: {
     width: '100%',
-    background: 'rgba(94, 234, 212, 0.12)',
-    border: '1px solid rgba(94, 234, 212, 0.35)',
-    color: '#5EEAD4',
+    background: 'var(--accent-green-dim, rgba(94, 234, 212, 0.12))',
+    border: '1px solid var(--accent-green, rgba(94, 234, 212, 0.35))',
+    color: 'var(--accent-green, #5EEAD4)',
     borderRadius: '10px',
     padding: '12px',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
