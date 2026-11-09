@@ -446,12 +446,12 @@ const styles = {
     textTransform: 'uppercase'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: 'clamp(22px, 5vw, 32px)',
-    fontWeight: 700,
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: 'clamp(24px, 5vw, 36px)',
+    fontWeight: 460,
+    letterSpacing: '-0.022em',
     margin: 0,
-    letterSpacing: '1px',
-    color: '#FFF'
+    color: 'var(--text)'
   },
   subtitle: {
     color: 'var(--text-dim)',
@@ -499,10 +499,10 @@ const styles = {
     flexShrink: 0
   },
   statValue: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '16px',
-    fontWeight: 700,
-    color: '#FFF'
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: '18px',
+    fontWeight: 540,
+    color: 'var(--text)'
   },
   statLabel: {
     fontSize: '11px',
@@ -542,9 +542,9 @@ const styles = {
     transition: 'all 0.2s ease'
   },
   tabActive: {
-    background: 'var(--border)',
-    color: '#FFF',
-    fontWeight: 600
+    background: 'var(--color-lilac-mist, #d4c7ff)',
+    color: 'var(--text)',
+    fontWeight: 540
   },
   tabActiveUnstop: {
     background: 'rgba(28, 73, 128, 0.4)',
@@ -702,8 +702,8 @@ const styles = {
   },
   cardTitle: {
     fontSize: '16px',
-    fontWeight: 700,
-    color: '#FFF',
+    fontWeight: 540,
+    color: 'var(--text)',
     margin: '0 0 8px 0',
     lineHeight: '1.3',
     display: '-webkit-box',

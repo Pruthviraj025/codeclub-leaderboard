@@ -2,38 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { api, warmUpServer } from "../api";
 import { useAuth } from "../context/AuthContext";
-import ccLogo from '../assets/cc-logo-white.png';
+import ccLogo from '../assets/cc-logo-black.png';
 import '../styles/LandingPage.css';
 
-const BOOT_LINES = [
-  '> initializing maximum productivity..... ',
-  '> loading leaderboard protocol.........',
-  '> syncing codeclub server...... ',
-  '> ready.',
-];
 
-const NUM_LIGHTS = 8;
-const LIGHT_STAGGER = 0.08;
-const NUM_PARTICLES = 61;
-
-const RING_LIGHTS = Array.from({ length: NUM_LIGHTS }).map((_, i) => {
-  const angle = (360 / NUM_LIGHTS) * i - 90;
-  const rad = (angle * Math.PI) / 180;
-  const radiusPercent = 43.75;
-  return {
-    x: 50 + radiusPercent * Math.cos(rad),
-    y: 50 + radiusPercent * Math.sin(rad),
-    delay: i * LIGHT_STAGGER,
-  };
-});
-
-const PARTICLES = Array.from({ length: NUM_PARTICLES }).map(() => ({
-  top: Math.random() * 100,
-  left: Math.random() * 100,
-  size: 2 + Math.random() * 3,
-  delay: Math.random() * 8,
-  duration: 6 + Math.random() * 6,
-}));
 
 function CodeClubLoader() {
   const [text, setText] = useState('');
@@ -107,47 +79,11 @@ export default function LandingPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [bootLines, setBootLines] = useState(isLoginModeFromUrl ? BOOT_LINES : []);
-  const [bootDone, setBootDone] = useState(isLoginModeFromUrl);
   const [slowHint, setSlowHint] = useState(false);
 
   useEffect(() => {
     warmUpServer();
   }, []);
-
-  useEffect(() => {
-    if (isLoginModeFromUrl) {
-      setBootLines(BOOT_LINES);
-      setBootDone(true);
-      return;
-    }
-    let lineIdx = 0;
-    let charIdx = 0;
-    let timeoutId;
-
-    function typeNext() {
-      if (lineIdx >= BOOT_LINES.length) {
-        setBootDone(true);
-        return;
-      }
-      const line = BOOT_LINES[lineIdx];
-      charIdx++;
-      setBootLines((prev) => {
-        const copy = [...prev];
-        copy[lineIdx] = line.slice(0, charIdx);
-        return copy;
-      });
-      if (charIdx === line.length) {
-        lineIdx++;
-        charIdx = 0;
-        timeoutId = setTimeout(typeNext, 300);
-      } else {
-        timeoutId = setTimeout(typeNext, 22);
-      }
-    }
-    typeNext();
-    return () => clearTimeout(timeoutId);
-  }, [isLoginModeFromUrl]);
 
   function handleJoinClick() {
     setJoinTransition(true);
@@ -197,29 +133,6 @@ export default function LandingPage() {
         <div className="ocean-gradient" />
         <div className="electric-wave-1" />
         <div className="electric-wave-2" />
-        {PARTICLES.map((p, i) => (
-          <div
-            key={i}
-            className="space-particle"
-            style={{
-              top: `${p.top}%`,
-              left: `${p.left}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div style={styles.bootLine} className="mono landing-boot-line">
-        {bootLines.map((line, i) => (
-          <div key={i}>
-            {line}
-            {!bootDone && i === bootLines.length - 1 && <span className="cursor-blink">▍</span>}
-          </div>
-        ))}
       </div>
 
       <div style={{ ...styles.corner, top: 'var(--space-4)', left: 'var(--space-4)', borderRight: 'none', borderBottom: 'none' }} />
@@ -234,17 +147,6 @@ export default function LandingPage() {
       <div style={styles.center}>
         <div className="stage">
           <div className={`ring-wrap ${showForm ? 'ring-hidden' : ''} ${joinTransition ? 'ring-burst' : ''}`}>
-            {RING_LIGHTS.map((l, i) => (
-              <div
-                key={i}
-                className="ring-light"
-                style={{
-                  left: `${l.x}%`,
-                  top: `${l.y}%`,
-                  animationDelay: `${l.delay}s`,
-                }}
-              />
-            ))}
             <img src={ccLogo} alt="CodeClub" className="ring-logo" />
             <div className={`ring-subtitle ${showForm ? 'ring-hidden' : ''}`}>
               LEADERBOARD
@@ -389,90 +291,103 @@ const styles = {
     justifyContent: 'center',
     padding: 'var(--space-4)',
     position: 'relative',
-    background: '#000',
+    backgroundColor: 'var(--color-warm-parchment, #f2f0eb)',
     overflow: 'hidden',
   },
   corner: {
-    position: 'absolute',
-    width: '20px',
-    height: '20px',
-    border: '1px solid var(--border-hover)',
-    opacity: 0.6,
-    pointerEvents: 'none'
-  },
-  bootLine: {
-    position: 'absolute',
-    top: 'var(--space-4)',
-    left: 'var(--space-4)',
-    fontSize: '12px',
-    color: 'var(--accent-green)',
-    opacity: 0.7
+    display: 'none'
   },
   quote: {
     position: 'absolute',
     bottom: 'var(--space-4)',
     left: '50%',
     transform: 'translateX(-50%)',
-    fontSize: '12px',
-    color: 'var(--accent-green)',
-    letterSpacing: '0.3px',
-    opacity: 0.85,
+    fontSize: '13px',
+    color: 'var(--color-stone-gray, #666666)',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontWeight: 460,
+    letterSpacing: '-0.01em',
     textAlign: 'center',
     maxWidth: '90vw',
     padding: '0 var(--space-3)'
   },
-  center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)', position: 'relative', zIndex: 1 },
+  center: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 'var(--space-5)',
+    position: 'relative',
+    zIndex: 1
+  },
   form: {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-3)',
-    width: 'min(320px, 100%)',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: 'var(--space-4)'
+    width: 'min(360px, 100%)',
+    background: 'var(--color-paper-white, #ffffff)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '16px',
+    padding: '28px',
+    boxShadow: '0 4px 20px rgba(41, 40, 39, 0.04)'
   },
-  tabRow: { display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' },
+  tabRow: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '8px'
+  },
   tab: {
     flex: 1,
     minWidth: 0,
-    background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text-dim)',
-    padding: '8px 4px',
-    fontSize: '12px',
+    background: 'var(--color-warm-parchment, #f2f0eb)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '8px',
+    color: 'var(--color-stone-gray, #666666)',
+    padding: '9px 12px',
+    fontSize: '13px',
+    fontWeight: 460,
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
   },
   tabActive: {
-    borderColor: 'var(--accent-green)',
-    color: 'var(--accent-green)'
+    background: 'var(--color-lilac-mist, #d4c7ff)',
+    borderColor: 'rgba(113, 76, 182, 0.4)',
+    color: 'var(--color-ink-charcoal, #292827)',
+    fontWeight: 540
   },
   input: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 12px',
-    color: 'var(--text)',
+    background: 'var(--color-paper-white, #ffffff)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '8px',
+    padding: '10px 14px',
+    color: 'var(--color-ink-charcoal, #292827)',
     fontSize: '14px',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
     outline: 'none'
   },
   submitBtn: {
-    background: 'var(--accent-green)',
-    color: '#0A1A10',
+    background: 'var(--color-midnight-wine, #421d24)',
+    color: '#ffffff',
     border: 'none',
-    borderRadius: 'var(--radius-sm)',
-    padding: '12px',
-    fontWeight: 600,
-    marginTop: 'var(--space-1)'
+    borderRadius: '16px',
+    padding: '12px 18px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontWeight: 460,
+    fontSize: '15px',
+    marginTop: '6px'
+  },
+  backLink: {
+    color: 'var(--color-royal-violet, #714cb6)',
+    fontSize: '13px',
+    textAlign: 'center',
+    textDecoration: 'none',
+    marginTop: '6px'
   },
   error: {
-    color: 'var(--accent-red)',
+    color: '#8a1f2d',
     fontSize: '13px',
-    fontFamily: 'var(--font-mono)'
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)"
   },
   loadingWrap: {
     display: 'flex',
@@ -482,9 +397,9 @@ const styles = {
     padding: '4px 0'
   },
   hint: {
-    color: 'var(--accent-gold)',
+    color: 'var(--color-stone-gray, #666666)',
     fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
     textAlign: 'center'
   }
 };

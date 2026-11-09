@@ -180,87 +180,88 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 'var(--space-4)'
+    padding: 'var(--space-4)',
+    backgroundColor: 'var(--color-warm-parchment, #f2f0eb)'
   },
   center: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)' },
   logoBlock: { textAlign: 'center' },
   logoText: {
-    fontFamily: 'var(--font-mono)',
-    fontWeight: 700,
-    fontSize: 'clamp(22px, 6vw, 30px)',
-    letterSpacing: '2px',
-    color: 'var(--text)'
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontWeight: 600,
+    fontSize: '24px',
+    letterSpacing: '-0.022em',
+    color: 'var(--color-ink-charcoal, #292827)'
   },
   logoRule: {
-    width: '80px',
-    height: '2px',
-    background: 'linear-gradient(90deg, transparent, var(--accent-green), transparent)',
-    margin: '18px auto 0',
-    opacity: 0.7
+    display: 'none'
   },
   logoSubtitle: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '11px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: '13px',
     fontWeight: 500,
-    letterSpacing: '4px',
-    color: 'var(--accent-green)',
-    opacity: 0.65,
-    marginTop: '12px'
+    letterSpacing: '0.5px',
+    color: 'var(--color-stone-gray, #666666)',
+    marginTop: '6px'
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-3)',
-    width: 'min(320px, 100%)',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: 'var(--space-4)'
+    width: 'min(360px, 100%)',
+    background: 'var(--color-paper-white, #ffffff)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '16px',
+    padding: '28px',
+    boxShadow: '0 4px 20px rgba(41, 40, 39, 0.04)'
   },
   input: {
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 12px',
-    color: 'var(--text)',
+    background: 'var(--color-paper-white, #ffffff)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '8px',
+    padding: '10px 14px',
+    color: 'var(--color-ink-charcoal, #292827)',
     fontSize: '14px',
-    fontFamily: 'var(--font-mono)',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
     outline: 'none'
   },
   submitBtn: {
-    background: 'var(--accent-green)',
-    color: '#0A1A10',
+    background: 'var(--color-midnight-wine, #421d24)',
+    color: '#ffffff',
     border: 'none',
-    borderRadius: 'var(--radius-sm)',
-    padding: '12px',
-    fontWeight: 600,
-    marginTop: 'var(--space-1)'
+    borderRadius: '16px',
+    padding: '12px 18px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontWeight: 460,
+    fontSize: '15px',
+    marginTop: '6px',
+    cursor: 'pointer'
   },
   linkBtn: {
     background: 'transparent',
     border: 'none',
-    color: 'var(--text-dim)',
-    fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
-    textDecoration: 'underline',
-    padding: '4px'
+    color: 'var(--color-royal-violet, #714cb6)',
+    fontSize: '13px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    padding: '4px',
+    cursor: 'pointer'
   },
   backLink: {
-    color: 'var(--text-dim)',
-    fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
+    color: 'var(--color-royal-violet, #714cb6)',
+    fontSize: '13px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
     textAlign: 'center',
-    textDecoration: 'underline'
+    textDecoration: 'none'
   },
   helper: {
-    color: 'var(--text-dim)',
-    fontSize: '12px',
-    fontFamily: 'var(--font-mono)',
-    margin: 0
+    color: 'var(--color-stone-gray, #666666)',
+    fontSize: '13.5px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    margin: 0,
+    lineHeight: 1.5
   },
   error: {
-    color: 'var(--accent-red)',
+    color: '#8a1f2d',
     fontSize: '13px',
-    fontFamily: 'var(--font-mono)'
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)"
   }
 };

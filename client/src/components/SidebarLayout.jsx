@@ -12,8 +12,6 @@ const NAV_ITEMS = [
   { key: 'discuss', label: 'Discuss', icon: MessageCircle, path: '/discuss' }
 ];
 
-
-
 export default function SidebarLayout({ active, children }) {
   const user = getSessionUser();
   const navigate = useNavigate();
@@ -46,8 +44,8 @@ export default function SidebarLayout({ active, children }) {
               className={`nav-link${isActive ? ' active' : ''}`}
               onClick={() => go(item.path)}
             >
-              <Icon size={17} strokeWidth={2} />
-              {item.label}
+              <Icon size={17} strokeWidth={isActive ? 2.2 : 1.7} />
+              <span>{item.label}</span>
             </button>
           );
         })}
@@ -56,7 +54,8 @@ export default function SidebarLayout({ active, children }) {
           className={`nav-link${active === 'profile' ? ' active' : ''}`}
           onClick={() => go(`/profile/${user?.id}`)}
         >
-          <User size={17} strokeWidth={2} /> My Profile
+          <User size={17} strokeWidth={active === 'profile' ? 2.2 : 1.7} />
+          <span>My Profile</span>
         </button>
 
         {user?.role === 'admin' && (
@@ -65,12 +64,14 @@ export default function SidebarLayout({ active, children }) {
             className={active === 'admin' ? 'admin-active' : ''}
             onClick={() => go('/admin')}
           >
-            <Shield size={15} /> Admin
+            <Shield size={16} strokeWidth={2} />
+            <span>Admin</span>
           </button>
         )}
 
-        <button className="nav-link" onClick={handleLogout}>
-          <LogOut size={17} strokeWidth={2} /> Log out
+        <button className="nav-link" onClick={handleLogout} style={{ marginTop: 'auto' }}>
+          <LogOut size={17} strokeWidth={1.7} />
+          <span>Log out</span>
         </button>
       </>
     );
@@ -83,7 +84,8 @@ export default function SidebarLayout({ active, children }) {
         className={active === 'suggestions' ? 'suggestion-active' : ''}
         onClick={() => go('/suggestions')}
       >
-        <MessageSquarePlus size={17} strokeWidth={2} /> Give a suggestion
+        <MessageSquarePlus size={16} strokeWidth={1.8} />
+        <span>Feedback & Ideas</span>
       </button>
     );
   }
@@ -93,7 +95,8 @@ export default function SidebarLayout({ active, children }) {
       <aside style={styles.sidebar} className="app-sidebar">
         <div style={styles.sidebarTop} className="app-sidebar-top">
           <div style={styles.logoMark} onClick={() => go('/leaderboard')}>
-            {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+            <span style={styles.logoText}>CodeClub</span>
+            <span style={styles.logoPill}>SUITE</span>
           </div>
 
           <button
@@ -102,7 +105,7 @@ export default function SidebarLayout({ active, children }) {
             aria-label="Open menu"
             onClick={() => setMobileOpen(true)}
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
         </div>
 
@@ -118,15 +121,16 @@ export default function SidebarLayout({ active, children }) {
       {mobileOpen && (
         <div style={styles.mobileMenuPage} className="mobile-nav-page">
           <div style={styles.mobileMenuHeader}>
-            <div style={styles.logoMark}>
-              {'<CODECLUB'}<span style={{ color: 'var(--accent-green)' }}>/</span>{'>'}
+            <div style={styles.logoMark} onClick={() => go('/leaderboard')}>
+              <span style={styles.logoText}>CodeClub</span>
+              <span style={styles.logoPill}>SUITE</span>
             </div>
             <button
               style={{ ...styles.hamburgerBtn, display: 'flex' }}
               aria-label="Close menu"
               onClick={() => setMobileOpen(false)}
             >
-              <X size={22} />
+              <X size={20} />
             </button>
           </div>
 
@@ -153,85 +157,119 @@ const styles = {
   shell: {
     display: 'flex',
     minHeight: '100vh',
-    background: 'var(--bg)'
+    backgroundColor: 'var(--color-warm-parchment, #f2f0eb)',
+    color: 'var(--color-ink-charcoal, #292827)'
   },
-sidebar: {
-  width: '220px',
-  flexShrink: 0,
-  borderRight: '1px solid var(--border)',
-  background: 'var(--surface)',
-  padding: 'var(--space-4) var(--space-3)',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'var(--space-5)',
-  position: 'sticky',
-  top: 0,
-  height: '100vh',
-  alignSelf: 'flex-start',
-  boxSizing: 'border-box'
-},
+  sidebar: {
+    width: '240px',
+    flexShrink: 0,
+    borderRight: '1px solid var(--color-soft-mist, #e3e3e2)',
+    backgroundColor: 'var(--color-warm-parchment, #f2f0eb)',
+    padding: '24px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+    position: 'sticky',
+    top: 0,
+    height: '100vh',
+    alignSelf: 'flex-start',
+    boxSizing: 'border-box'
+  },
   sidebarTop: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    padding: '0 4px'
+  },
+  logoMark: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+    userSelect: 'none'
+  },
+  logoText: {
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontWeight: 600,
+    fontSize: '18px',
+    letterSpacing: '-0.022em',
+    color: 'var(--color-ink-charcoal, #292827)'
+  },
+  logoPill: {
+    fontFamily: "var(--font-mono, monospace)",
+    fontSize: '10px',
+    fontWeight: 700,
+    letterSpacing: '0.5px',
+    background: 'var(--color-midnight-wine, #421d24)',
+    color: '#ffffff',
+    padding: '2px 6px',
+    borderRadius: '4px'
   },
   hamburgerBtn: {
     display: 'none',
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    color: 'var(--text)',
+    background: 'var(--color-paper-white, #ffffff)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '8px',
+    color: 'var(--color-ink-charcoal, #292827)',
     padding: '8px',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer'
   },
-  logoMark: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontWeight: 700,
-    fontSize: '16px',
-    color: '#fff',
-    padding: '0 var(--space-2)',
-    letterSpacing: '1px',
-    userSelect: 'none',
-    cursor: 'pointer'
+  nav: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    flex: 1,
+    overflowY: 'auto',
+    minHeight: 0
   },
-nav: {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'var(--space-1)',
-  flex: 1,
-  overflowY: 'auto',
-  minHeight: 0
-},
   sidebarBottom: {
-    borderTop: '1px solid var(--border)',
-    paddingTop: 'var(--space-3)'
+    borderTop: '1px solid var(--color-soft-mist, #e3e3e2)',
+    paddingTop: '16px'
   },
   mobileMenuBottom: {
     marginTop: 'auto',
-    padding: 'var(--space-4)',
-    borderTop: '1px solid var(--border)'
+    padding: '16px',
+    borderTop: '1px solid var(--color-soft-mist, #e3e3e2)'
   },
   suggestionBtn: {
-    display: 'flex', alignItems: 'center', gap: '8px',
-    background: 'transparent',
-    color: 'var(--text-dim)',
-    border: '1px dashed var(--border)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '12px 14px',
-    fontSize: '13px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    background: 'var(--color-paper-white, #ffffff)',
+    color: 'var(--color-ink-charcoal, #292827)',
+    border: '1px solid var(--color-soft-mist, #e3e3e2)',
+    borderRadius: '8px',
+    padding: '10px 14px',
+    fontSize: '13.5px',
+    fontWeight: 460,
     width: '100%',
     justifyContent: 'flex-start',
     cursor: 'pointer',
-    minHeight: '44px'
+    boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+  },
+  adminBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    background: 'var(--color-lilac-mist, #d4c7ff)',
+    color: 'var(--color-ink-charcoal, #292827)',
+    border: '1px solid rgba(113, 76, 182, 0.3)',
+    borderRadius: '8px',
+    padding: '10px 14px',
+    fontSize: '13.5px',
+    fontWeight: 540,
+    cursor: 'pointer',
+    width: '100%',
+    textAlign: 'left'
   },
   mobileMenuPage: {
     display: 'none',
     position: 'fixed',
     inset: 0,
     zIndex: 999,
-    background: 'rgba(16, 20, 28, 0.98)',
+    background: 'rgba(242, 240, 235, 0.98)',
     backdropFilter: 'blur(16px)',
     flexDirection: 'column'
   },
@@ -239,37 +277,30 @@ nav: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '14px 16px',
-    borderBottom: '1px solid var(--border)',
-    background: 'var(--surface)'
+    padding: '16px 20px',
+    borderBottom: '1px solid var(--color-soft-mist, #e3e3e2)',
+    background: 'var(--color-paper-white, #ffffff)'
   },
   mobileMenuNav: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--space-2)',
-    padding: 'var(--space-4)',
+    gap: '8px',
+    padding: '20px',
     overflowY: 'auto'
-  },
-  adminBtn: {
-    display: 'flex', alignItems: 'center', gap: '8px',
-    background: 'var(--accent-gold-dim)', color: 'var(--accent-gold)',
-    border: '1px solid var(--accent-gold)', borderRadius: 'var(--radius-sm)',
-    padding: '12px 14px',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px',
-    userSelect: 'none',
-    width: '100%',
-    justifyContent: 'flex-start',
-    minHeight: '44px'
   },
   contentCol: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    minWidth: 0
+    minWidth: 0,
+    backgroundColor: 'var(--color-warm-parchment, #f2f0eb)'
   },
   main: {
     flex: 1,
-    padding: 'var(--space-4) var(--space-5)'
+    padding: '32px 40px',
+    maxWidth: '1200px',
+    width: '100%',
+    margin: '0 auto',
+    boxSizing: 'border-box'
   }
 };

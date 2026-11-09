@@ -155,8 +155,12 @@ const styles = {
     color: 'var(--text-dim)', marginBottom: 'var(--space-1)', userSelect: 'none'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif", fontSize: '32px', fontWeight: 700, margin: 0,
-    letterSpacing: '1px'
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: '36px',
+    fontWeight: 460,
+    margin: 0,
+    letterSpacing: '-0.022em',
+    color: 'var(--text)'
   },
   controls: {
     display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)',
@@ -165,11 +169,11 @@ const styles = {
   tabRow: { display: 'flex', gap: 'var(--space-1)', background: 'var(--surface)', padding: '4px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' },
   tab: {
     background: 'transparent', border: 'none', color: 'var(--text-dim)',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px', fontWeight: 600, letterSpacing: '0.5px',
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: '13px', fontWeight: 460,
     padding: '8px 14px', borderRadius: 'var(--radius-sm)', userSelect: 'none'
   },
-  tabActive: { background: 'var(--surface-raised)', color: 'var(--text)' },
+  tabActive: { background: 'var(--color-lilac-mist, #d4c7ff)', color: 'var(--color-ink-charcoal, #292827)', fontWeight: 540 },
   select: {
     background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)',
     borderRadius: 'var(--radius-sm)', padding: '8px 12px', fontSize: '13px', fontFamily: 'var(--font-mono)'

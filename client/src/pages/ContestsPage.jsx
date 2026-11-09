@@ -371,12 +371,12 @@ const styles = {
     textTransform: 'uppercase'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: 'clamp(22px, 5vw, 32px)',
-    fontWeight: 700,
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: 'clamp(24px, 5vw, 36px)',
+    fontWeight: 460,
+    letterSpacing: '-0.022em',
     margin: 0,
-    letterSpacing: '1px',
-    color: '#FFF'
+    color: 'var(--text)'
   },
   subtitle: {
     color: 'var(--text-dim)',
@@ -424,10 +424,10 @@ const styles = {
     flexShrink: 0
   },
   statValue: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '16px',
-    fontWeight: 700,
-    color: '#FFF'
+    fontFamily: "var(--font-super-sans-vf, 'Inter', sans-serif)",
+    fontSize: '18px',
+    fontWeight: 540,
+    color: 'var(--text)'
   },
   statLabel: {
     fontSize: '11px',
@@ -467,19 +467,19 @@ const styles = {
     transition: 'all 0.2s ease'
   },
   tabActive: {
-    background: 'var(--border)',
-    color: '#FFF',
-    fontWeight: 600
+    background: 'var(--color-lilac-mist, #d4c7ff)',
+    color: 'var(--text)',
+    fontWeight: 540
   },
   tabActiveCF: {
-    background: 'rgba(59, 130, 246, 0.3)',
-    color: '#60A5FA',
-    fontWeight: 600
+    background: 'var(--color-lilac-mist, #d4c7ff)',
+    color: 'var(--text)',
+    fontWeight: 540
   },
   tabActiveLC: {
-    background: 'rgba(249, 115, 22, 0.3)',
-    color: '#F97316',
-    fontWeight: 600
+    background: 'var(--color-lilac-mist, #d4c7ff)',
+    color: 'var(--text)',
+    fontWeight: 540
   },
   searchAndFilters: {
     display: 'flex',
