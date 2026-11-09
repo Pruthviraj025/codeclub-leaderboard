@@ -1,83 +1,59 @@
-
-
-
 .landing-bg-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: grainEntrance 0.7s ease-out forwards;
 }
+
+@keyframes grainEntrance {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.landing-radial-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 45%, transparent 75%);
+  pointer-events: none;
+}
+
+.landing-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.5) 85%, #000000 100%);
+  pointer-events: none;
+}
+
 .landing-boot-line {
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 1px;
-  line-height: 1.6;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  color: #FFFFFF !important;
+  letter-spacing: 0.5px;
+  line-height: 1.75;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 12px rgba(255, 255, 255, 0.15);
 }
 
 .landing-quote {
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 0.5px;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  color: #FFFFFF !important;
+  letter-spacing: 0.6px;
+  line-height: 1.5;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(255, 255, 255, 0.15);
 }
-.ocean-gradient {
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(circle at 50% 42%, rgba(16, 75, 120, 0.18) 0%, rgba(12, 7, 26, 0.35) 45%, rgba(0, 0, 0, 0.96) 80%),
-    linear-gradient(180deg, #000000 0%, #05030a 30%, #080514 65%, #000000 100%);
-}
-
-.electric-wave-1,
-.electric-wave-2 {
-  position: absolute;
-  width: 150%;
-  height: 220px;
-  top: 32%;
-  left: -25%;
-  background: radial-gradient(ellipse at center, rgba(23, 111, 168, 0.09) 0%, rgba(17, 16, 42, 0.04) 50%, transparent 75%);
-  filter: blur(45px);
-  transform: rotate(-6deg);
-  animation: waveFlow1 8s ease-in-out infinite alternate;
-  opacity: 0.65;
-  pointer-events: none;
-}
-
-.electric-wave-2 {
-  top: 44%;
-  left: -15%;
-  background: radial-gradient(ellipse at center, rgba(44, 155, 214, 0.07) 0%, rgba(12, 7, 26, 0.05) 55%, transparent 80%);
-  filter: blur(55px);
-  transform: rotate(7deg);
-  animation: waveFlow2 8s ease-in-out infinite alternate;
-  opacity: 0.55;
-}
-
-@keyframes waveFlow1 {
-  0% { transform: translateY(-20px) rotate(-6deg) scaleX(1); opacity: 0.45; }
-  50% { transform: translateY(15px) rotate(-3deg) scaleX(1.15); opacity: 0.75; }
-  100% { transform: translateY(-10px) rotate(-8deg) scaleX(0.95); opacity: 0.45; }
-}
-
-@keyframes waveFlow2 {
-  0% { transform: translateY(15px) rotate(7deg) scaleX(1.1); opacity: 0.35; }
-  50% { transform: translateY(-25px) rotate(3deg) scaleX(0.9); opacity: 0.65; }
-  100% { transform: translateY(10px) rotate(9deg) scaleX(1.05); opacity: 0.35; }
-}
-
-.space-particle {
-  position: absolute;
-  border-radius: 50%;
-  background: #7dd8ff;
-  pointer-events: none;
-  box-shadow: 0 0 6px rgba(125, 216, 255, 0.6);
-  animation: floatParticle 8s ease-in-out infinite alternate;
-}
-
-@keyframes floatParticle {
-  0% { opacity: 0.12; transform: translateY(0px) scale(0.7); }
-  50% { opacity: 0.55; transform: translateY(-16px) scale(1.2); }
-  100% { opacity: 0.08; transform: translateY(-32px) scale(0.6); }
-}
-
 
 .stage {
   position: relative;
@@ -94,16 +70,77 @@
   z-index: 50;
   pointer-events: none;
   padding: var(--space-4);
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
+
 .form-overlay {
   pointer-events: auto;
   width: min(360px, 92vw);
 }
-.form-overlay > div:first-child button {
+
+.form-overlay>div:first-child button {
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 13px;
   padding: 10px 6px;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
+
+/* =========================================================================
+   Login & Signup Form Input Styles
+   Completely removes the blue outline / border / highlight on hover and focus
+   ========================================================================= */
+#auth-form input,
+.form-overlay input,
+input#join-name,
+input#join-usn,
+input#login-email,
+input#login-password {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 16px !important;
+  color: #FFFFFF !important;
+  background: rgba(10, 12, 16, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 8px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+#auth-form input::placeholder,
+.form-overlay input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+#auth-form input:hover,
+.form-overlay input:hover,
+input#join-name:hover,
+input#join-usn:hover,
+input#login-email:hover,
+input#login-password:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  outline: none !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.08) !important;
+}
+
+#auth-form input:focus,
+#auth-form input:focus-visible,
+#auth-form input:active,
+.form-overlay input:focus,
+.form-overlay input:focus-visible,
+.form-overlay input:active,
+input#join-name:focus,
+input#join-name:active,
+input#join-usn:focus,
+input#login-email:focus,
+input#login-password:focus,
+input#login-password:active {
+  border-color: #FFFFFF !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 12px rgba(255, 255, 255, 0.18) !important;
+}
+
 .ring-hidden {
   filter: blur(10px);
   opacity: 0.25;
@@ -111,134 +148,79 @@
   transition: filter 0.4s ease, opacity 0.4s ease;
 }
 
-
 .ring-wrap {
   position: relative;
-  width: 280px;
-  height: 280px;
-  margin: 0 auto 12px auto;
+  width: 260px;
+  height: 230px;
+  margin: 0 auto;
   transition: filter 0.4s ease, opacity 0.4s ease;
-}
-
-.ring-light {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  background: #061a35;
-  border-radius: 50%;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.3);
-  animation: ringLightFourLoop 3.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes ringLightFourLoop {
-  
-  0% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(0.3);
-    background: #104b78;
-    box-shadow: 0 0 6px rgba(23, 111, 168, 0.4);
-  }
-  20% {
-    opacity: 0.75;
-    transform: translate(-50%, -50%) scale(0.9);
-    background: #7dd8ff;
-    box-shadow: 0 0 12px #7dd8ff, 0 0 20px rgba(125, 216, 255, 0.5);
-  }
-
-  
-  25% {
-    opacity: 0.9;
-    transform: translate(-50%, -50%) scale(1);
-    background: #bde8ff;
-    box-shadow: 0 0 14px #bde8ff, 0 0 26px rgba(44, 155, 214, 0.6);
-  }
-  40% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.08);
-    background: #ffffff;
-    box-shadow:
-      0 0 8px #ffffff,
-      0 0 20px #7dd8ff,
-      0 0 36px #2c9bd6,
-      0 0 55px rgba(23, 111, 168, 0.8);
-  }
-
-  
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-    background: #e0f2fe;
-    box-shadow: 0 0 10px #ffffff, 0 0 24px rgba(23, 111, 168, 0.6);
-  }
-  60% {
-    opacity: 0.5;
-    transform: translate(-50%, -50%) scale(0.88);
-    background: #176fa8;
-    box-shadow: 0 0 6px rgba(23, 111, 168, 0.4);
-  }
-  70% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.06);
-    background: #ffffff;
-    box-shadow:
-      0 0 8px #ffffff,
-      0 0 18px #7dd8ff,
-      0 0 32px #2c9bd6,
-      0 0 48px rgba(23, 111, 168, 0.75);
-  }
-
-  
 }
 
 .ring-logo {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(85px, 58%, 200px);
+  width: clamp(85px, 58%, 180px);
   transform: translate(-50%, -50%);
   opacity: 0;
   filter: drop-shadow(0 0 0px transparent);
-  animation: ringLogoMaterialize 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 1.4s; 
+  animation: ringLogoEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.2s;
   user-select: none;
   pointer-events: none;
 }
 
-@keyframes ringLogoMaterialize {
+@keyframes ringLogoEntrance {
   0% {
     opacity: 0;
-    filter: blur(6px) drop-shadow(0 0 0px transparent);
-    transform: translate(-50%, -50%) scale(0.94);
+    filter: blur(5px) drop-shadow(0 0 0px transparent);
+    transform: translate(-50%, -50%) scale(0.96);
   }
+
   60% {
     opacity: 0.85;
-    filter: blur(1.5px) drop-shadow(0 0 14px rgb(251, 251, 251));
-    transform: translate(-50%, -50%) scale(0.98);
+    filter: blur(1px) drop-shadow(0 0 14px rgba(255, 255, 255, 0.7));
+    transform: translate(-50%, -50%) scale(0.99);
   }
+
   100% {
     opacity: 1;
-    filter: blur(0px) drop-shadow(0 0 20px #90d0da) drop-shadow(0 0 35px rgba(44, 155, 214, 0.55));
+    filter: blur(0px) drop-shadow(0 0 18px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.85));
     transform: translate(-50%, -50%) scale(1.0);
   }
 }
 
 .ring-subtitle {
   position: absolute;
-  top: 100%;
+  top: calc(50% + 102px);
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 14px;
   white-space: nowrap;
   user-select: none;
   text-align: center;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 500;
-  letter-spacing: 4px;
-  color: var(--accent-green);
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 7px;
+  color: #FFFFFF !important;
   opacity: 0;
-  animation: subtitleFadeIn 1s ease 1.2s both;
-  filter: drop-shadow(0px 3px 6px #5ecee2);
+  animation: subtitleEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.55s;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.4)) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95));
+}
+
+@keyframes subtitleEntrance {
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateX(-50%) translateY(3px);
+  }
+
+  100% {
+    opacity: 0.95;
+    filter: blur(0px);
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .ring-burst {
@@ -250,10 +232,12 @@
     filter: brightness(1) blur(0px);
     transform: scale(1);
   }
+
   35% {
-    filter: brightness(2.2) blur(1px);
+    filter: brightness(2) blur(1px);
     transform: scale(1.08);
   }
+
   100% {
     filter: brightness(0.3) blur(6px);
     transform: scale(0.9);
@@ -265,144 +249,194 @@
   position: absolute;
   inset: -40px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(125, 216, 255, 0.5) 0%, rgba(44, 155, 214, 0.2) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.15) 40%, transparent 70%);
   animation: joinFlash 0.55s ease-out forwards;
   pointer-events: none;
   z-index: 3;
 }
 
 @keyframes joinFlash {
-  0% { opacity: 0; transform: scale(0.6); }
-  40% { opacity: 1; transform: scale(1.15); }
-  100% { opacity: 0; transform: scale(1.6); }
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
 }
 
-
 .codeclub-loader {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 1px;
-  color: #ffffff;
+  color: #FFFFFF !important;
   user-select: none;
   text-align: center;
 }
 
 .codeclub-loader-slash {
-  color: var(--accent-green);
-}
-@keyframes subtitleFadeIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(0px); }
-  to { opacity: 0.65; transform: translateX(-50%) translateY(0); }
+  color: #FFFFFF;
+  opacity: 0.8;
 }
 
-.fade-in-btn {
+.join-btn-redesign {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.72);
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 12px 48px;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  overflow: hidden;
   opacity: 0;
-  transform: translateY(12px);
-  filter: blur(8px);
-  animation: buttonEntrance 1.0s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 1.231s;
+  animation: joinBtnEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.85s;
 }
 
-@keyframes buttonEntrance {
+@keyframes joinBtnEntrance {
   0% {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(8px);
+    filter: blur(3px);
+    transform: translateY(4px);
   }
+
   100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-.fade-in-btn:hover {
-  border-color: rgba(125, 216, 255, 0.7) !important;
-  box-shadow: 0 0 24px rgba(44, 155, 214, 0.5), 0 0 0 1px rgba(125, 216, 255, 0.3) !important;
-  transform: translateY(-1px) !important;
-}
-
-.fade-out-exit {
-  animation: landingExit 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-}
-
-@keyframes landingExit {
-  0% {
     opacity: 1;
     filter: blur(0px);
-    transform: scale(1);
+    transform: translateY(0);
   }
-  100% {
-    opacity: 0;
-    filter: blur(8px);
-    transform: scale(0.96);
-  }
-}
-.join-btn-redesign {
-  background: rgba(13, 27, 46, 0.6);
-  color: #e0f2fe;
-  border: 1px solid rgba(125, 216, 255, 0.4);
-  border-radius: 10px;
-  padding: 14px 52px;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  backdrop-filter: blur(8px);
-  box-shadow:
-    0 0 0 1px rgba(125, 216, 255, 0.15),
-    0 0 20px rgba(44, 155, 214, 0.25),
-    inset 0 0 12px rgba(125, 216, 255, 0.08);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  cursor: pointer;
 }
 
 .join-btn-redesign:hover {
-  border-color: rgba(125, 216, 255, 0.8);
-  color: #ffffff;
-
+  background: rgba(20, 20, 20, 0.85);
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #FFFFFF !important;
   transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 0 28px rgba(255, 255, 255, 0.25),
+    0 8px 30px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.join-btn-redesign:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 20px rgba(255, 255, 255, 0.25);
 }
 
 .join-btn-redesign:active {
   transform: translateY(0);
+  background: rgba(5, 5, 5, 0.9);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 14px rgba(255, 255, 255, 0.15),
+    0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+/* =========================================================================
+   Instant state when navigating back (prevents replay)
+   ========================================================================= */
+.entrance-done .ring-logo,
+.entrance-done .ring-subtitle,
+.entrance-done .join-btn-redesign,
+.entrance-done.landing-bg-overlay,
+.entrance-done .landing-bg-overlay {
+  animation: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.entrance-done .ring-logo {
+  transform: translate(-50%, -50%) scale(1) !important;
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 24px rgba(0, 0, 0, 0.85)) !important;
+}
+
+.entrance-done .ring-subtitle {
+  transform: translateX(-50%) !important;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.4)) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95)) !important;
+}
+
+.entrance-done .join-btn-redesign {
+  transform: none !important;
 }
 
 @media (max-width: 520px) {
   .ring-wrap {
     width: 220px;
-    height: 220px;
+    height: 190px;
   }
+
   .stage {
     width: 220px;
   }
-  .join-btn-redesign {
-    padding: 12px 36px;
-    font-size: 13px;
-    letter-spacing: 2px;
+
+  .ring-subtitle {
+    font-size: 16px !important;
+    letter-spacing: 5px !important;
+    top: calc(50% + 82px);
   }
+
+  .join-btn-redesign {
+    padding: 10px 38px;
+    font-size: 14px;
+    letter-spacing: 2.5px;
+  }
+
   .landing-quote {
-    font-size: 10px !important;
+    font-size: 13px !important;
     bottom: var(--space-2) !important;
   }
+
   .landing-boot-line {
-    font-size: 10px !important;
+    font-size: 13px !important;
+    max-width: calc(100vw - 32px);
   }
+
   .form-overlay-wrap {
     padding: 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring-light,
+
   .ring-logo,
-  .fade-in-btn,
-  .electric-wave-1,
-  .electric-wave-2,
-  .space-particle {
+  .join-btn-redesign,
+  .join-flash,
+  .ring-wrap,
+  .ring-burst,
+  .ring-subtitle,
+  .landing-bg-overlay {
     animation-duration: 0.01ms !important;
     animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
   }
 }

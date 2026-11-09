@@ -366,789 +366,1188 @@ export default function ProfilePage() {
     const isOwner =
         profile.id === sessionUser.id;
 
-        return (
+    return (
 
-    <SidebarLayout active={sidebarActive}>
-
-        <div
-            style={styles.main}
-        >
-            <div style={{ marginBottom: "14px" }}>
-                <button
-                    onClick={() => navigate("/leaderboard")}
-                    style={styles.backBtn}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.color = "#fff";
-                        e.currentTarget.style.borderColor = "var(--accent-gold, #f59e0b)";
-                        e.currentTarget.style.background = "var(--surface-raised, rgba(255, 255, 255, 0.05))";
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.color = "var(--text-dim)";
-                        e.currentTarget.style.borderColor = "var(--border)";
-                        e.currentTarget.style.background = "var(--surface)";
-                    }}
-                >
-                    ← Back to Leaderboard
-                </button>
-            </div>
+        <SidebarLayout active={sidebarActive}>
 
             <div
-                style={styles.card}
-                className="fade-up"
+                style={styles.main}
             >
+                <style>{`
+                    .profile-stat-box {
+                        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                                    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                                    background 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                                    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                        will-change: transform, box-shadow;
+                    }
+                    .profile-stat-box:hover {
+                        transform: translateY(-2px);
+                    }
+                    .profile-stat-box:active {
+                        transform: translateY(0) scale(0.99);
+                    }
+                    .profile-stat-box-cf:hover {
+                        background: rgba(56, 189, 248, 0.07) !important;
+                        border-color: rgba(56, 189, 248, 0.4) !important;
+                        box-shadow: 0 10px 24px rgba(56, 189, 248, 0.12), inset 0 1px 0 rgba(125, 211, 252, 0.15) !important;
+                    }
+                    .profile-stat-box-lc:hover {
+                        background: rgba(251, 146, 60, 0.07) !important;
+                        border-color: rgba(251, 146, 60, 0.4) !important;
+                        box-shadow: 0 10px 24px rgba(251, 146, 60, 0.12), inset 0 1px 0 rgba(251, 146, 60, 0.15) !important;
+                    }
+                    .profile-stat-box-cc:hover {
+                        background: rgba(216, 180, 254, 0.07) !important;
+                        border-color: rgba(216, 180, 254, 0.4) !important;
+                        box-shadow: 0 10px 24px rgba(216, 180, 254, 0.12), inset 0 1px 0 rgba(216, 180, 254, 0.15) !important;
+                    }
+                    .profile-stat-box-total:hover {
+                        background: rgba(94, 234, 212, 0.07) !important;
+                        border-color: rgba(94, 234, 212, 0.4) !important;
+                        box-shadow: 0 10px 24px rgba(94, 234, 212, 0.12), inset 0 1px 0 rgba(94, 234, 212, 0.15) !important;
+                    }
 
-                <div style={styles.nameRow}>
+                    .profile-platform-link {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                    }
+                    .profile-platform-link-cf:hover {
+                        color: #BAE6FD !important;
+                        text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+                        transform: translateX(1px);
+                    }
+                    .profile-platform-link-lc:hover {
+                        color: #FED7AA !important;
+                        text-shadow: 0 0 12px rgba(251, 146, 60, 0.5);
+                        transform: translateX(1px);
+                    }
+                    .profile-platform-link-cc:hover {
+                        color: #F3E8FF !important;
+                        text-shadow: 0 0 12px rgba(216, 180, 254, 0.5);
+                        transform: translateX(1px);
+                    }
+                    .profile-platform-link:active {
+                        transform: scale(0.97);
+                    }
 
-                    <h1 style={styles.name}>
-                        {profile.name}
-                    </h1>
+                    .profile-back-btn {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        background: rgba(255, 255, 255, 0.04);
+                        border: 1px solid rgba(255, 255, 255, 0.12);
+                        color: rgba(255, 255, 255, 0.85);
+                        cursor: pointer;
+                        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        font-size: 14px;
+                        font-weight: 500;
+                        letter-spacing: 0.2px;
+                        padding: 9px 18px;
+                        border-radius: 10px;
+                        backdrop-filter: blur(12px);
+                        -webkit-backdrop-filter: blur(12px);
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+                        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                        will-change: transform, box-shadow;
+                    }
+                    .profile-back-btn:hover {
+                        background: rgba(94, 234, 212, 0.08);
+                        border-color: rgba(94, 234, 212, 0.45);
+                        color: #5EEAD4;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 6px 20px rgba(94, 234, 212, 0.18), inset 0 1px 0 rgba(94, 234, 212, 0.2);
+                    }
+                    .profile-back-btn:active {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(94, 234, 212, 0.14);
+                    }
 
-                    {isOwner && (
+                    .profile-btn {
+                        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        font-size: 14px;
+                        font-weight: 600;
+                        min-height: 42px;
+                        padding: 10px 22px;
+                        border-radius: 10px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        outline: none;
+                        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                        will-change: transform, box-shadow;
+                    }
+                    .profile-btn-cf {
+                        background: rgba(56, 189, 248, 0.12);
+                        color: #7DD3FC;
+                        border: 1px solid rgba(56, 189, 248, 0.35);
+                        box-shadow: 0 4px 14px rgba(56, 189, 248, 0.12);
+                    }
+                    .profile-btn-cf:hover:not(:disabled) {
+                        background: rgba(56, 189, 248, 0.22);
+                        border-color: rgba(56, 189, 248, 0.65);
+                        color: #BAE6FD;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+                    }
+                    .profile-btn-cf:active:not(:disabled) {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(56, 189, 248, 0.3);
+                    }
 
-                        <span style={styles.youTag}>
-                            YOU
-                        </span>
+                    .profile-btn-lc {
+                        background: rgba(251, 146, 60, 0.12);
+                        color: #FB923C;
+                        border: 1px solid rgba(251, 146, 60, 0.35);
+                        box-shadow: 0 4px 14px rgba(251, 146, 60, 0.12);
+                    }
+                    .profile-btn-lc:hover:not(:disabled) {
+                        background: rgba(251, 146, 60, 0.22);
+                        border-color: rgba(251, 146, 60, 0.65);
+                        color: #FED7AA;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 8px 24px rgba(251, 146, 60, 0.25);
+                    }
+                    .profile-btn-lc:active:not(:disabled) {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(251, 146, 60, 0.3);
+                    }
 
-                    )}
+                    .profile-btn-cc {
+                        background: rgba(216, 180, 254, 0.12);
+                        color: #D8B4FE;
+                        border: 1px solid rgba(216, 180, 254, 0.35);
+                        box-shadow: 0 4px 14px rgba(216, 180, 254, 0.12);
+                    }
+                    .profile-btn-cc:hover:not(:disabled) {
+                        background: rgba(216, 180, 254, 0.22);
+                        border-color: rgba(216, 180, 254, 0.65);
+                        color: #F3E8FF;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 8px 24px rgba(216, 180, 254, 0.25);
+                    }
+                    .profile-btn-cc:active:not(:disabled) {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(216, 180, 254, 0.3);
+                    }
 
+                    .profile-btn-teal {
+                        background: rgba(94, 234, 212, 0.12);
+                        color: #5EEAD4;
+                        border: 1px solid rgba(94, 234, 212, 0.35);
+                        box-shadow: 0 4px 14px rgba(94, 234, 212, 0.12);
+                    }
+                    .profile-btn-teal:hover:not(:disabled) {
+                        background: rgba(94, 234, 212, 0.22);
+                        border-color: rgba(94, 234, 212, 0.65);
+                        color: #A7F3D0;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 8px 24px rgba(94, 234, 212, 0.25);
+                    }
+                    .profile-btn-teal:active:not(:disabled) {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(94, 234, 212, 0.3);
+                    }
+
+                    .profile-btn-disconnect {
+                        background: rgba(248, 113, 113, 0.08);
+                        color: #F87171;
+                        border: 1px solid rgba(248, 113, 113, 0.28);
+                        min-height: 38px;
+                        padding: 8px 18px;
+                        font-size: 13.5px;
+                    }
+                    .profile-btn-disconnect:hover:not(:disabled) {
+                        background: rgba(248, 113, 113, 0.18);
+                        border-color: rgba(248, 113, 113, 0.55);
+                        color: #FCA5A5;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 6px 18px rgba(248, 113, 113, 0.2);
+                    }
+                    .profile-btn-disconnect:active:not(:disabled) {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(248, 113, 113, 0.26);
+                    }
+
+                    .profile-connected-badge {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 9px 16px;
+                        border-radius: 9px;
+                        font-size: 14.5px;
+                        font-family: 'Space Grotesk', sans-serif;
+                    }
+                    .profile-connected-badge-cf {
+                        background: rgba(56, 189, 248, 0.06);
+                        border: 1px solid rgba(56, 189, 248, 0.22);
+                    }
+                    .profile-connected-badge-lc {
+                        background: rgba(251, 146, 60, 0.06);
+                        border: 1px solid rgba(251, 146, 60, 0.22);
+                    }
+                    .profile-connected-badge-cc {
+                        background: rgba(216, 180, 254, 0.06);
+                        border: 1px solid rgba(216, 180, 254, 0.22);
+                    }
+
+                    .profile-edit-email-btn {
+                        background: rgba(94, 234, 212, 0.08);
+                        border: 1px solid rgba(94, 234, 212, 0.25);
+                        color: #5EEAD4;
+                        border-radius: 6px;
+                        padding: 2px 10px;
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-family: 'Space Grotesk', sans-serif;
+                        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                        margin-left: 10px;
+                    }
+                    .profile-edit-email-btn:hover {
+                        background: rgba(94, 234, 212, 0.18);
+                        border-color: rgba(94, 234, 212, 0.5);
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 12px rgba(94, 234, 212, 0.15);
+                    }
+                    .profile-edit-email-btn:active {
+                        transform: translateY(1px) scale(0.96);
+                    }
+
+                    .profile-input {
+                        flex: 1;
+                        min-width: 180px;
+                        background: rgba(255, 255, 255, 0.03);
+                        color: #FFFFFF;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 10px;
+                        padding: 11px 16px;
+                        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        font-size: 15px;
+                        min-height: 44px;
+                        outline: none;
+                        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                    }
+                    .profile-input:hover {
+                        border-color: rgba(255, 255, 255, 0.22);
+                        background: rgba(255, 255, 255, 0.045);
+                    }
+                    .profile-input:focus {
+                        border-color: rgba(94, 234, 212, 0.65) !important;
+                        background: rgba(255, 255, 255, 0.05) !important;
+                        box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.14) !important;
+                    }
+
+                    .profile-solve-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 12px 16px;
+                        background: rgba(255, 255, 255, 0.025);
+                        border: 1px solid rgba(255, 255, 255, 0.06);
+                        border-radius: 10px;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                        will-change: transform, box-shadow;
+                    }
+                    .profile-solve-row:hover {
+                        transform: translateY(-1.5px);
+                        background: rgba(255, 255, 255, 0.05);
+                        border-color: rgba(255, 255, 255, 0.15);
+                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+                    }
+                    .profile-solve-row-cf:hover {
+                        border-color: rgba(56, 189, 248, 0.3) !important;
+                    }
+                    .profile-solve-row-lc:hover {
+                        border-color: rgba(251, 146, 60, 0.3) !important;
+                    }
+                    .profile-solve-row-cc:hover {
+                        border-color: rgba(216, 180, 254, 0.3) !important;
+                    }
+                    .profile-solve-problem-link {
+                        color: #FFFFFF;
+                        text-decoration: none;
+                        font-weight: 600;
+                        font-size: 15px;
+                        font-family: 'Space Grotesk', sans-serif;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        transition: color 0.15s ease, transform 0.15s ease;
+                    }
+                    .profile-solve-row-cf:hover .profile-solve-problem-link {
+                        color: #BAE6FD;
+                    }
+                    .profile-solve-row-lc:hover .profile-solve-problem-link {
+                        color: #FED7AA;
+                    }
+                    .profile-solve-row-cc:hover .profile-solve-problem-link {
+                        color: #F3E8FF;
+                    }
+                    .profile-solve-problem-link:active {
+                        transform: scale(0.98);
+                    }
+
+                    @media (max-width: 768px) {
+                        .profile-card-responsive {
+                            padding: 20px 16px !important;
+                            border-radius: 14px !important;
+                        }
+                        .profile-stats-grid {
+                            grid-template-columns: repeat(2, 1fr) !important;
+                            gap: 10px !important;
+                        }
+                        .profile-cf-form {
+                            flex-direction: column !important;
+                            gap: 10px !important;
+                        }
+                        .profile-cf-form input,
+                        .profile-cf-form button {
+                            width: 100% !important;
+                        }
+                        .profile-solve-row {
+                            flex-direction: column !important;
+                            align-items: flex-start !important;
+                            gap: 8px !important;
+                        }
+                    }
+
+                    @media (max-width: 400px) {
+                        .profile-card-responsive {
+                            padding: 16px 12px !important;
+                        }
+                        .profile-stats-grid {
+                            grid-template-columns: 1fr !important;
+                        }
+                    }
+                `}</style>
+                <div style={{ marginBottom: "16px" }}>
+                    <button
+                        onClick={() => navigate("/leaderboard")}
+                        className="profile-back-btn"
+                    >
+                        ← Back to Leaderboard
+                    </button>
                 </div>
 
-                <div style={styles.statRow}>
+                <div
+                    style={styles.card}
+                    className="fade-up profile-card-responsive"
+                >
 
-                    <Stat
-                        label="CODEFORCES"
-                        value={
-                            profile.cfHandle ? (
-                                <a
-                                    href={`https://codeforces.com/profile/${profile.cfHandle}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    style={{ color: "#3182CE", textDecoration: "none" }}
-                                    title="Open Codeforces profile"
-                                >
-                                    {profile.cfHandle} ↗
-                                </a>
-                            ) : (
-                                "Not Connected"
-                            )
-                        }
-                    />
+                    <div style={styles.nameRow}>
 
-                    <Stat
-                        label="LEETCODE"
-                        value={
-                            profile.lcUsername ? (
-                                <a
-                                    href={`https://leetcode.com/${profile.lcUsername}/`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    style={{ color: "#FFA116", textDecoration: "none" }}
-                                    title="Open LeetCode profile"
-                                >
-                                    {profile.lcUsername} ↗
-                                </a>
-                            ) : (
-                                "Not Connected"
-                            )
-                        }
-                    />
+                        <h1 style={styles.name}>
+                            {profile.name}
+                        </h1>
 
-                    <Stat
-                        label="CODECHEF"
-                        value={
-                            profile.ccHandle ? (
-                                <a
-                                    href={`https://www.codechef.com/users/${profile.ccHandle}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    style={{ color: "#8B4513", textDecoration: "none" }}
-                                    title="Open CodeChef profile"
-                                >
-                                    {profile.ccHandle} ↗
-                                </a>
-                            ) : (
-                                "Not Connected"
-                            )
-                        }
-                    />
+                        {isOwner && (
 
-                </div>
-
-                <div style={{ ...styles.statRow, marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
-                    <Stat
-                        label="TOTAL POINTS"
-                        value={profile.totalPoints || 0}
-                        color="var(--accent-green, #22C55E)"
-                    />
-                    <Stat
-                        label="CF POINTS"
-                        value={profile.codeforcesPoints || 0}
-                        color="#3182CE"
-                    />
-                    <Stat
-                        label="LC POINTS"
-                        value={profile.leetcodePoints || 0}
-                        color="#FFA116"
-                    />
-                    <Stat
-                        label="CC POINTS"
-                        value={profile.codechefPoints || 0}
-                        color="#8B4513"
-                    />
-                </div>
-
-                {isOwner && profile.usn && (
-
-                    <div style={styles.privateBlock}>
-
-                        <div style={styles.privateLine}>
-
-                            <span style={styles.dim}>
-                                USN
+                            <span style={styles.youTag}>
+                                YOU
                             </span>
 
-                            {" "}
-                            {profile.usn}
-
-                        </div>
-
-                        {!editingEmail ? (
-
-                            <div style={styles.privateLine}>
-
-                                <span style={styles.dim}>
-                                    Email
-                                </span>
-
-                                {" "}
-                                {profile.email}
-
-                                {" "}
-
-                                <button
-                                    style={styles.editLink}
-                                    onClick={() => {
-
-                                        setEditingEmail(true);
-
-                                        setNewEmail(
-                                            profile.email
-                                        );
-
-                                        setEmailMsg("");
-
-                                    }}
-                                >
-                                    edit
-                                </button>
-
-                            </div>
-
-                        ) : (
-
-                            <form
-                                onSubmit={handleUpdateEmail}
-                                style={styles.cfForm}
-                            >
-
-                                <input
-                                    type="email"
-                                    required
-                                    value={newEmail}
-                                    style={styles.input}
-                                    onChange={(e) =>
-                                        setNewEmail(
-                                            e.target.value
-                                        )
-                                    }
-                                />
-
-                                <button
-                                    style={styles.smallBtn}
-                                    disabled={savingEmail}
-                                >
-
-                                    {savingEmail
-                                        ? "Saving..."
-                                        : "Save"}
-
-                                </button>
-
-                                <button
-                                    type="button"
-                                    style={styles.editLink}
-                                    onClick={() => {
-
-                                        setEditingEmail(
-                                            false
-                                        );
-
-                                        setEmailMsg("");
-
-                                    }}
-                                >
-                                    cancel
-                                </button>
-
-                            </form>
-
-                        )}
-
-                        {emailMsg && (
-
-                            <div style={styles.verifyMsg}>
-                                {emailMsg}
-                            </div>
-
                         )}
 
                     </div>
 
-                )}
+                    <div style={styles.statRow} className="profile-stats-grid">
 
-
-                {isOwner &&
-                    !profile.cfConnected && (
-
-                    <div style={styles.cfConnect}>
-
-                        <div style={styles.eyebrow}>
-                            CONNECT CODEFORCES
-                        </div>
-
-                        {!verifyInfo ? (
-
-                            <form
-                                onSubmit={
-                                    handleStartVerification
-                                }
-                                style={styles.cfForm}
-                            >
-
-                                <input
-                                    style={styles.input}
-                                    placeholder="Codeforces Handle"
-                                    value={cfHandle}
-                                    onChange={(e) =>
-                                        setCfHandle(
-                                            e.target.value
-                                        )
-                                    }
-                                    required
-                                />
-
-                                <button
-                                    style={styles.smallBtn}
-                                >
-                                    Start
-                                </button>
-
-                            </form>
-
-                        ) : (
-
-                            <div>
-
-                                <p
-                                    style={
-                                        styles.instructions
-                                    }
-                                >
-
-                                    Submit one
-                                    intentionally
-                                    non-compiling
-                                    solution to
-
-                                    {" "}
-
+                        <Stat
+                            variant="cf"
+                            label="CODEFORCES"
+                            value={
+                                profile.cfHandle ? (
                                     <a
-                                        href={
-                                            verifyInfo.problemUrl
-                                        }
+                                        href={`https://codeforces.com/profile/${profile.cfHandle}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        style={styles.link}
+                                        className="profile-platform-link profile-platform-link-cf"
+                                        style={{ color: "#7DD3FC", textDecoration: "none" }}
+                                        title="Open Codeforces profile"
                                     >
-
-                                        {verifyInfo.contestId}
-                                        {verifyInfo.problemIndex}
-
+                                        {profile.cfHandle} ↗
                                     </a>
+                                ) : (
+                                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "15px", fontWeight: 500 }}>
+                                        Not Connected
+                                    </span>
+                                )
+                            }
+                        />
 
-                                    {" "}
+                        <Stat
+                            variant="lc"
+                            label="LEETCODE"
+                            value={
+                                profile.lcUsername ? (
+                                    <a
+                                        href={`https://leetcode.com/${profile.lcUsername}/`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="profile-platform-link profile-platform-link-lc"
+                                        style={{ color: "#FB923C", textDecoration: "none" }}
+                                        title="Open LeetCode profile"
+                                    >
+                                        {profile.lcUsername} ↗
+                                    </a>
+                                ) : (
+                                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "15px", fontWeight: 500 }}>
+                                        Not Connected
+                                    </span>
+                                )
+                            }
+                        />
 
-                                    within
-
-                                    {" "}
-
-                                    {
-                                        verifyInfo.windowMinutes
-                                    }
-
-                                    {" "}
-
-                                    minutes.
-
-                                </p>
-
-                                <button
-                                    style={styles.smallBtn}
-                                    onClick={
-                                        handleCheckVerification
-                                    }
-                                >
-
-                                    Verify
-
-                                </button>
-
-                            </div>
-
-                        )}
-
-                        {verifyMsg && (
-
-                            <div style={styles.verifyMsg}>
-                                {verifyMsg}
-                            </div>
-
-                        )}
-
-                    </div>
-
-                )}
-                                {isOwner &&
-                    profile.cfConnected && (
-
-                    <div style={styles.cfConnect}>
-
-                        <div style={styles.eyebrow}>
-                            CODEFORCES
-                        </div>
-
-                        <div style={styles.privateLine}>
-
-                            ✅ Connected as
-
-                            {" "}
-
-                            <strong>
-                                {profile.cfHandle}
-                            </strong>
-
-                        </div>
-
-                        <div style={{ marginTop: 14 }}>
-                            <button
-                                style={{
-                                    ...styles.smallBtn,
-                                    background: "var(--accent-red)",
-                                    color: "#fff"
-                                }}
-                                onClick={handleDisconnectCodeforces}
-                            >
-                                Disconnect
-                            </button>
-                        </div>
+                        <Stat
+                            variant="cc"
+                            label="CODECHEF"
+                            value={
+                                profile.ccHandle ? (
+                                    <a
+                                        href={`https://www.codechef.com/users/${profile.ccHandle}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="profile-platform-link profile-platform-link-cc"
+                                        style={{ color: "#D8B4FE", textDecoration: "none" }}
+                                        title="Open CodeChef profile"
+                                    >
+                                        {profile.ccHandle} ↗
+                                    </a>
+                                ) : (
+                                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "15px", fontWeight: 500 }}>
+                                        Not Connected
+                                    </span>
+                                )
+                            }
+                        />
 
                     </div>
 
-                )}
+                    <div style={{ ...styles.statRow, marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.07)" }} className="profile-stats-grid">
+                        <Stat
+                            variant="total"
+                            label="TOTAL POINTS"
+                            value={profile.totalPoints || 0}
+                            color="#5EEAD4"
+                        />
+                        <Stat
+                            variant="cf"
+                            label="CF POINTS"
+                            value={profile.codeforcesPoints || 0}
+                            color="#7DD3FC"
+                        />
+                        <Stat
+                            variant="lc"
+                            label="LC POINTS"
+                            value={profile.leetcodePoints || 0}
+                            color="#FB923C"
+                        />
+                        <Stat
+                            variant="cc"
+                            label="CC POINTS"
+                            value={profile.codechefPoints || 0}
+                            color="#D8B4FE"
+                        />
+                    </div>
 
+                    {isOwner && profile.usn && (
 
-                {isOwner && (
+                        <div style={styles.privateBlock}>
 
-                    <div style={styles.cfConnect}>
+                            <div style={{ ...styles.privateLine, display: "flex", alignItems: "center", gap: "10px" }}>
 
-                        <div style={styles.eyebrow}>
-                            CONNECT LEETCODE
-                        </div>
+                                <span style={{
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    letterSpacing: "1px",
+                                    padding: "2px 8px",
+                                    borderRadius: "4px",
+                                    background: "rgba(255, 255, 255, 0.05)",
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    color: "rgba(255, 255, 255, 0.65)"
+                                }}>
+                                    USN
+                                </span>
 
-                        {!profile.lcConnected ? (
+                                <span style={{ fontWeight: 600, color: "#FFFFFF", letterSpacing: "0.5px" }}>
+                                    {profile.usn}
+                                </span>
 
-                            <>
+                            </div>
 
-                                <div
-                                    style={{
-                                        ...styles.privateLine,
-                                        marginBottom: 12
-                                    }}
-                                >
+                            {!editingEmail ? (
 
-                                    Connect your LeetCode account
-                                    to earn leaderboard points.
+                                <div style={{ ...styles.privateLine, display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+
+                                    <span style={{
+                                        fontSize: "11px",
+                                        fontWeight: 700,
+                                        letterSpacing: "1px",
+                                        padding: "2px 8px",
+                                        borderRadius: "4px",
+                                        background: "rgba(255, 255, 255, 0.05)",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        color: "rgba(255, 255, 255, 0.65)"
+                                    }}>
+                                        EMAIL
+                                    </span>
+
+                                    <span style={{ fontWeight: 500, color: "rgba(255, 255, 255, 0.9)" }}>
+                                        {profile.email}
+                                    </span>
+
+                                    <button
+                                        className="profile-edit-email-btn"
+                                        onClick={() => {
+
+                                            setEditingEmail(true);
+
+                                            setNewEmail(
+                                                profile.email
+                                            );
+
+                                            setEmailMsg("");
+
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
 
                                 </div>
 
-                                <div style={styles.cfForm}>
+                            ) : (
+
+                                <form
+                                    onSubmit={handleUpdateEmail}
+                                    style={styles.cfForm}
+                                    className="profile-cf-form"
+                                >
 
                                     <input
-                                        style={styles.input}
-                                        placeholder="LeetCode Username"
-                                        value={lcUsername}
+                                        type="email"
+                                        required
+                                        value={newEmail}
+                                        className="profile-input"
                                         onChange={(e) =>
-                                            setLcUsername(
+                                            setNewEmail(
                                                 e.target.value
                                             )
                                         }
                                     />
 
                                     <button
-                                        style={styles.smallBtn}
-                                        onClick={
-                                            handleStartLeetCode
-                                        }
+                                        className="profile-btn profile-btn-teal"
+                                        disabled={savingEmail}
                                     >
 
-                                        Connect
+                                        {savingEmail
+                                            ? "Saving..."
+                                            : "Save"}
 
                                     </button>
 
+                                    <button
+                                        type="button"
+                                        className="profile-edit-email-btn"
+                                        onClick={() => {
+
+                                            setEditingEmail(
+                                                false
+                                            );
+
+                                            setEmailMsg("");
+
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+
+                                </form>
+
+                            )}
+
+                            {emailMsg && (
+
+                                <div style={styles.verifyMsg}>
+                                    {emailMsg}
                                 </div>
 
-                                {lcStatus && (
-    <div style={{ marginTop: 16 }}>
+                            )}
 
-        <div style={styles.instructions}>
-            {lcStatus.instructions}
-        </div>
+                        </div>
 
-        <div
-            style={{
-                marginTop: 12,
-                padding: "12px",
-                border: "1px solid var(--border)",
-                borderRadius: "6px",
-                fontFamily: "'Orbitron', sans-serif",
-                color: "#FFA116",
-                wordBreak: "break-all"
-            }}
-        >
-            {lcStatus.verificationCode}
-        </div>
+                    )}
 
-        <div style={{ marginTop: 16 }}>
-            <button
-                style={styles.smallBtn}
-                onClick={handleVerifyLeetCode}
-            >
-                Verify Account
-            </button>
-        </div>
 
-    </div>
-)}
+                    {isOwner &&
+                        !profile.cfConnected && (
 
-                            </>
+                            <div style={styles.cfConnect}>
 
-                        ) : (
+                                <div style={{ ...styles.eyebrow, color: "#7DD3FC" }}>
+                                    CONNECT CODEFORCES
+                                </div>
 
-                            <>
+                                {!verifyInfo ? (
 
-                                <div
-                                    style={styles.privateLine}
-                                >
+                                    <form
+                                        onSubmit={
+                                            handleStartVerification
+                                        }
+                                        style={styles.cfForm}
+                                        className="profile-cf-form"
+                                    >
 
-                                    ✅ Connected as
+                                        <input
+                                            className="profile-input"
+                                            placeholder="Codeforces Handle"
+                                            value={cfHandle}
+                                            onChange={(e) =>
+                                                setCfHandle(
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
 
-                                    {" "}
+                                        <button
+                                            className="profile-btn profile-btn-cf"
+                                        >
+                                            Start
+                                        </button>
 
-                                    <strong>
-                                        {profile.lcUsername}
+                                    </form>
+
+                                ) : (
+
+                                    <div>
+
+                                        <p
+                                            style={
+                                                styles.instructions
+                                            }
+                                        >
+
+                                            Submit one
+                                            intentionally
+                                            non-compiling
+                                            solution to
+
+                                            {" "}
+
+                                            <a
+                                                href={
+                                                    verifyInfo.problemUrl
+                                                }
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                style={{ ...styles.link, color: "#7DD3FC" }}
+                                            >
+
+                                                {verifyInfo.contestId}
+                                                {verifyInfo.problemIndex}
+
+                                            </a>
+
+                                            {" "}
+
+                                            within
+
+                                            {" "}
+
+                                            {
+                                                verifyInfo.windowMinutes
+                                            }
+
+                                            {" "}
+
+                                            minutes.
+
+                                        </p>
+
+                                        <button
+                                            className="profile-btn profile-btn-cf"
+                                            onClick={
+                                                handleCheckVerification
+                                            }
+                                        >
+
+                                            Verify
+
+                                        </button>
+
+                                    </div>
+
+                                )}
+
+                                {verifyMsg && (
+
+                                    <div style={styles.verifyMsg}>
+                                        {verifyMsg}
+                                    </div>
+
+                                )}
+
+                            </div>
+
+                        )}
+                    {isOwner &&
+                        profile.cfConnected && (
+
+                            <div style={styles.cfConnect}>
+
+                                <div style={{ ...styles.eyebrow, color: "#7DD3FC" }}>
+                                    CODEFORCES
+                                </div>
+
+                                <div className="profile-connected-badge profile-connected-badge-cf">
+
+                                    <span>✅</span>
+                                    <span style={{ color: "rgba(255, 255, 255, 0.75)" }}>Connected as</span>
+                                    <strong style={{ color: "#7DD3FC", fontWeight: 700 }}>
+                                        {profile.cfHandle}
                                     </strong>
 
                                 </div>
 
-                                <div
-                                    style={{
-                                        marginTop: 14
-                                    }}
-                                >
-
-                                    <button
-                                        style={{
-                                            ...styles.smallBtn,
-                                            background:
-                                                "var(--accent-red)",
-                                            color: "#fff"
-                                        }}
-                                        onClick={
-                                            handleDisconnectLeetCode
-                                        }
-                                    >
-
-                                        Disconnect
-
-                                    </button>
-
-                                </div>
-
-                            </>
-
-                        )}
-
-                        {lcMsg && (
-
-                            <div
-                                style={styles.verifyMsg}
-                            >
-
-                                {lcMsg}
-
-                            </div>
-
-                        )}
-
-                    </div>
-
-                )}
-
-                {isOwner && (
-                    <div style={styles.cfConnect}>
-                        <div style={styles.eyebrow}>
-                            CONNECT CODECHEF
-                        </div>
-
-                        {!profile.ccConnected ? (
-                            <>
-                                <div style={{ ...styles.privateLine, marginBottom: 12 }}>
-                                    Connect your CodeChef account to earn leaderboard points.
-                                </div>
-
-                                {!ccVerifyInfo ? (
-                                    <form onSubmit={handleStartCcVerification} style={styles.cfForm}>
-                                        <input
-                                            style={styles.input}
-                                            placeholder="CodeChef Handle"
-                                            value={ccHandle}
-                                            onChange={(e) => setCcHandle(e.target.value)}
-                                            required
-                                        />
-                                        <button style={styles.smallBtn}>
-                                            Connect
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <div style={{ marginTop: 12 }}>
-                                        <p style={styles.instructions}>
-                                            Submit one intentionally non-compiling (compile error) solution to{" "}
-                                            <a
-                                                href={ccVerifyInfo.problemUrl}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                style={styles.link}
-                                            >
-                                                problem {ccVerifyInfo.problemCode}
-                                            </a>{" "}
-                                            on CodeChef within {ccVerifyInfo.windowMinutes} minutes.
-                                        </p>
-                                        <button
-                                            style={styles.smallBtn}
-                                            onClick={handleCheckCcVerification}
-                                        >
-                                            Verify Submission
-                                        </button>
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                <div style={styles.privateLine}>
-                                    ✅ Connected as <strong>{profile.ccHandle}</strong>
-                                </div>
                                 <div style={{ marginTop: 14 }}>
                                     <button
-                                        style={{
-                                            ...styles.smallBtn,
-                                            background: "var(--accent-red)",
-                                            color: "#fff"
-                                        }}
-                                        onClick={handleDisconnectCodeChef}
+                                        className="profile-btn profile-btn-disconnect"
+                                        onClick={handleDisconnectCodeforces}
                                     >
                                         Disconnect
                                     </button>
                                 </div>
-                            </>
-                        )}
 
-                        {ccVerifyMsg && (
-                            <div style={styles.verifyMsg}>
-                                {ccVerifyMsg}
                             </div>
+
                         )}
-                    </div>
-                )}
 
-            </div>
 
-            <ProfileHeatmap activityMap={profile.activityMap} userCreatedAt={profile.createdAt} />
+                    {isOwner && (
 
-            <div style={{ ...styles.card, marginTop: "24px" }} className="fade-up">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <div style={styles.eyebrow}>RECENT SOLVED PROBLEMS</div>
-                    <div style={{ ...styles.dim, fontSize: "11px" }}>Last 5 across all platforms</div>
+                        <div style={styles.cfConnect}>
+
+                            <div style={{ ...styles.eyebrow, color: "#FB923C" }}>
+                                {profile.lcConnected ? "LEETCODE" : "CONNECT LEETCODE"}
+                            </div>
+
+                            {!profile.lcConnected ? (
+
+                                <>
+
+                                    <div
+                                        style={{
+                                            ...styles.privateLine,
+                                            marginBottom: 12
+                                        }}
+                                    >
+
+                                        Connect your LeetCode account
+                                        to earn leaderboard points.
+
+                                    </div>
+
+                                    <div style={styles.cfForm} className="profile-cf-form">
+
+                                        <input
+                                            className="profile-input"
+                                            placeholder="LeetCode Username"
+                                            value={lcUsername}
+                                            onChange={(e) =>
+                                                setLcUsername(
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+
+                                        <button
+                                            className="profile-btn profile-btn-lc"
+                                            onClick={
+                                                handleStartLeetCode
+                                            }
+                                        >
+
+                                            Connect
+
+                                        </button>
+
+                                    </div>
+
+                                    {lcStatus && (
+                                        <div style={{ marginTop: 16 }}>
+
+                                            <div style={styles.instructions}>
+                                                {lcStatus.instructions}
+                                            </div>
+
+                                            <div
+                                                style={{
+                                                    marginTop: 12,
+                                                    padding: "12px 16px",
+                                                    border: "1px solid rgba(251, 146, 60, 0.3)",
+                                                    borderRadius: "10px",
+                                                    background: "rgba(251, 146, 60, 0.08)",
+                                                    fontFamily: "'Space Grotesk', sans-serif",
+                                                    color: "#FB923C",
+                                                    fontSize: "14px",
+                                                    fontWeight: 600,
+                                                    wordBreak: "break-all"
+                                                }}
+                                            >
+                                                {lcStatus.verificationCode}
+                                            </div>
+
+                                            <div style={{ marginTop: 16 }}>
+                                                <button
+                                                    className="profile-btn profile-btn-lc"
+                                                    onClick={handleVerifyLeetCode}
+                                                >
+                                                    Verify Account
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    )}
+
+                                </>
+
+                            ) : (
+
+                                <>
+
+                                    <div className="profile-connected-badge profile-connected-badge-lc">
+
+                                        <span>✅</span>
+                                        <span style={{ color: "rgba(255, 255, 255, 0.75)" }}>Connected as</span>
+                                        <strong style={{ color: "#FB923C", fontWeight: 700 }}>
+                                            {profile.lcUsername}
+                                        </strong>
+
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            marginTop: 14
+                                        }}
+                                    >
+
+                                        <button
+                                            className="profile-btn profile-btn-disconnect"
+                                            onClick={
+                                                handleDisconnectLeetCode
+                                            }
+                                        >
+
+                                            Disconnect
+
+                                        </button>
+
+                                    </div>
+
+                                </>
+
+                            )}
+
+                            {lcMsg && (
+
+                                <div
+                                    style={styles.verifyMsg}
+                                >
+
+                                    {lcMsg}
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    )}
+
+                    {isOwner && (
+                        <div style={styles.cfConnect}>
+                            <div style={{ ...styles.eyebrow, color: "#D8B4FE" }}>
+                                {profile.ccConnected ? "CODECHEF" : "CONNECT CODECHEF"}
+                            </div>
+
+                            {!profile.ccConnected ? (
+                                <>
+                                    <div style={{ ...styles.privateLine, marginBottom: 12 }}>
+                                        Connect your CodeChef account to earn leaderboard points.
+                                    </div>
+
+                                    {!ccVerifyInfo ? (
+                                        <form onSubmit={handleStartCcVerification} style={styles.cfForm} className="profile-cf-form">
+                                            <input
+                                                className="profile-input"
+                                                placeholder="CodeChef Handle"
+                                                value={ccHandle}
+                                                onChange={(e) => setCcHandle(e.target.value)}
+                                                required
+                                            />
+                                            <button className="profile-btn profile-btn-cc">
+                                                Connect
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <div style={{ marginTop: 12 }}>
+                                            <p style={styles.instructions}>
+                                                Submit one intentionally non-compiling (compile error) solution to{" "}
+                                                <a
+                                                    href={ccVerifyInfo.problemUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    style={{ ...styles.link, color: "#D8B4FE" }}
+                                                >
+                                                    problem {ccVerifyInfo.problemCode}
+                                                </a>{" "}
+                                                on CodeChef within {ccVerifyInfo.windowMinutes} minutes.
+                                            </p>
+                                            <button
+                                                className="profile-btn profile-btn-cc"
+                                                onClick={handleCheckCcVerification}
+                                            >
+                                                Verify Submission
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <div className="profile-connected-badge profile-connected-badge-cc">
+                                        <span>✅</span>
+                                        <span style={{ color: "rgba(255, 255, 255, 0.75)" }}>Connected as</span>
+                                        <strong style={{ color: "#D8B4FE", fontWeight: 700 }}>{profile.ccHandle}</strong>
+                                    </div>
+                                    <div style={{ marginTop: 14 }}>
+                                        <button
+                                            className="profile-btn profile-btn-disconnect"
+                                            onClick={handleDisconnectCodeChef}
+                                        >
+                                            Disconnect
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
+                            {ccVerifyMsg && (
+                                <div style={styles.verifyMsg}>
+                                    {ccVerifyMsg}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                 </div>
 
-                {!profile.solvedSubmissions || profile.solvedSubmissions.length === 0 ? (
-                    <div style={{ color: "var(--text-dim)", fontSize: "13px", padding: "16px 0", fontFamily: "'Orbitron', sans-serif" }}>
-                        No solved problems recorded yet.
-                    </div>
-                ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {profile.solvedSubmissions.slice(0, 5).map(sub => {
-                            const isCf = sub.platform === "codeforces";
-                            const isCc = sub.platform === "codechef";
-                            return (
-                                <div
-                                    key={sub._id}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        padding: "10px 14px",
-                                        background: "var(--surface-raised)",
-                                        border: "1px solid var(--border)",
-                                        borderRadius: "var(--radius-sm)",
-                                        gap: "12px",
-                                        flexWrap: "wrap"
-                                    }}
-                                >
-                                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "220px", flexWrap: "wrap" }}>
-                                        <span
-                                            style={{
-                                                fontSize: "10px",
-                                                fontWeight: 700,
-                                                padding: "2px 6px",
-                                                borderRadius: "4px",
-                                                fontFamily: "'Orbitron', sans-serif",
-                                                color: isCf ? "#3182CE" : isCc ? "#8B4513" : "#FFA116",
-                                                background: isCf ? "rgba(49, 130, 206, 0.12)" : isCc ? "rgba(139, 69, 19, 0.18)" : "rgba(255, 161, 22, 0.12)",
-                                                border: `1px solid ${isCf ? "#3182CE" : isCc ? "#8B4513" : "#FFA116"}`
-                                            }}
-                                        >
-                                            {isCf ? "CF" : isCc ? "CC" : "LC"}
-                                        </span>
-                                        {sub.problemUrl ? (
-                                            <a
-                                                href={sub.problemUrl}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                style={{
-                                                    color: "var(--text)",
-                                                    textDecoration: "none",
-                                                    fontWeight: 600,
-                                                    fontSize: "13px",
-                                                    display: "inline-flex",
-                                                    alignItems: "center",
-                                                    gap: "4px"
-                                                }}
-                                                title="Open problem in new tab"
-                                            >
-                                                {sub.problemName} ↗
-                                            </a>
-                                        ) : (
-                                            <span style={{ fontWeight: 600, fontSize: "13px" }}>{sub.problemName}</span>
-                                        )}
-                                        {sub.problemRating != null && (
-                                            <span style={{
-                                                fontSize: "11px",
-                                                color: "var(--accent-gold)",
-                                                background: "rgba(230, 180, 80, 0.12)",
-                                                border: "1px solid rgba(230, 180, 80, 0.3)",
-                                                padding: "1px 6px",
-                                                borderRadius: "3px",
-                                                fontFamily: "'Orbitron', sans-serif"
-                                            }}>
-                                                ★ {sub.problemRating}
-                                            </span>
-                                        )}
-                                        {sub.difficulty && (
-                                            <span style={{
-                                                fontSize: "11px",
-                                                color: "var(--text-dim)",
-                                                background: "var(--surface)",
-                                                border: "1px solid var(--border)",
-                                                padding: "1px 6px",
-                                                borderRadius: "3px",
-                                                fontFamily: "'Orbitron', sans-serif"
-                                            }}>
-                                                {sub.difficulty}
-                                            </span>
-                                        )}
-                                    </div>
+                <ProfileHeatmap activityMap={profile.activityMap} userCreatedAt={profile.createdAt} />
 
-                                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                                        {sub.solvedAt && (
-                                            <span style={{ fontSize: "11px", color: "var(--text-dim)", fontFamily: "'Orbitron', sans-serif" }}>
-                                                {new Date(sub.solvedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                                            </span>
-                                        )}
-                                        <span
-                                            style={{
-                                                color: "var(--accent-green)",
-                                                background: "var(--accent-green-dim)",
-                                                border: "1px solid var(--accent-green)",
-                                                borderRadius: "4px",
-                                                padding: "2px 8px",
-                                                fontSize: "11px",
-                                                fontFamily: "'Orbitron', sans-serif"
-                                            }}
-                                        >
-                                            +{sub.points} pts
-                                        </span>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                <div style={{ ...styles.card, marginTop: "24px" }} className="fade-up profile-card-responsive">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+                        <div style={styles.eyebrow}>RECENT SOLVED PROBLEMS</div>
+                        <div style={{ ...styles.dim, fontSize: "12px" }}>Last 5 across all platforms</div>
                     </div>
-                )}
+
+                    {!profile.solvedSubmissions || profile.solvedSubmissions.length === 0 ? (
+                        <div style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "14px", padding: "20px 0", fontFamily: "'Space Grotesk', sans-serif" }}>
+                            No solved problems recorded yet.
+                        </div>
+                    ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                            {profile.solvedSubmissions.slice(0, 5).map(sub => {
+                                const isCf = sub.platform === "codeforces";
+                                const isCc = sub.platform === "codechef";
+                                return (
+                                    <div
+                                        key={sub._id}
+                                        className={`profile-solve-row profile-solve-row-${isCf ? "cf" : isCc ? "cc" : "lc"}`}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            padding: "12px 16px",
+                                            background: "rgba(255, 255, 255, 0.025)",
+                                            border: "1px solid rgba(255, 255, 255, 0.06)",
+                                            borderRadius: "10px",
+                                            gap: "12px",
+                                            flexWrap: "wrap"
+                                        }}
+                                    >
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: "220px", flexWrap: "wrap" }}>
+                                            <span
+                                                style={{
+                                                    fontSize: "11px",
+                                                    fontWeight: 700,
+                                                    padding: "3px 8px",
+                                                    borderRadius: "6px",
+                                                    fontFamily: "'Space Grotesk', sans-serif",
+                                                    color: isCf ? "#7DD3FC" : isCc ? "#D8B4FE" : "#FB923C",
+                                                    background: isCf ? "rgba(99, 223, 255, 0.12)" : isCc ? "rgba(216, 180, 254, 0.12)" : "rgba(251, 146, 60, 0.12)",
+                                                    border: `1px solid ${isCf ? "rgba(99, 223, 255, 0.25)" : isCc ? "rgba(216, 180, 254, 0.25)" : "rgba(251, 146, 60, 0.25)"}`
+                                                }}
+                                            >
+                                                {isCf ? "CF" : isCc ? "CC" : "LC"}
+                                            </span>
+                                            {sub.problemUrl ? (
+                                                <a
+                                                    href={sub.problemUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="profile-solve-problem-link"
+                                                    style={{
+                                                        textDecoration: "none",
+                                                        fontWeight: 600,
+                                                        fontSize: "15px",
+                                                        fontFamily: "'Space Grotesk', sans-serif",
+                                                        display: "inline-flex",
+                                                        alignItems: "center",
+                                                        gap: "4px"
+                                                    }}
+                                                    title="Open problem in new tab"
+                                                >
+                                                    {sub.problemName} ↗
+                                                </a>
+                                            ) : (
+                                                <span style={{ fontWeight: 600, fontSize: "15px", color: "#FFFFFF", fontFamily: "'Space Grotesk', sans-serif" }}>{sub.problemName}</span>
+                                            )}
+                                            {sub.problemRating != null && (
+                                                <span style={{
+                                                    fontSize: "12px",
+                                                    fontWeight: 600,
+                                                    color: "#FCD34D",
+                                                    background: "rgba(252, 211, 77, 0.12)",
+                                                    border: "1px solid rgba(252, 211, 77, 0.25)",
+                                                    padding: "2px 8px",
+                                                    borderRadius: "6px",
+                                                    fontFamily: "'Space Grotesk', sans-serif"
+                                                }}>
+                                                    ★ {sub.problemRating}
+                                                </span>
+                                            )}
+                                            {sub.difficulty && (
+                                                <span style={{
+                                                    fontSize: "12px",
+                                                    fontWeight: 500,
+                                                    color: "rgba(255, 255, 255, 0.7)",
+                                                    background: "rgba(255, 255, 255, 0.04)",
+                                                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                                                    padding: "2px 8px",
+                                                    borderRadius: "6px",
+                                                    fontFamily: "'Space Grotesk', sans-serif"
+                                                }}>
+                                                    {sub.difficulty}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                                            {sub.solvedAt && (
+                                                <span style={{ fontSize: "13px", color: "rgba(255, 255, 255, 0.55)", fontFamily: "'Space Grotesk', sans-serif" }}>
+                                                    {new Date(sub.solvedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                                </span>
+                                            )}
+                                            <span
+                                                style={{
+                                                    color: "#5EEAD4",
+                                                    background: "rgba(94, 234, 212, 0.12)",
+                                                    border: "1px solid rgba(94, 234, 212, 0.3)",
+                                                    borderRadius: "6px",
+                                                    padding: "3px 10px",
+                                                    fontSize: "13px",
+                                                    fontWeight: 600,
+                                                    fontFamily: "'Space Grotesk', sans-serif"
+                                                }}
+                                            >
+                                                +{sub.points} pts
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
             </div>
 
-        </div>
+        </SidebarLayout>
 
-    </SidebarLayout>
-
-);
+    );
 
 }
 
 function Stat({
-
     label,
     value,
-    color
-
+    color,
+    variant = "default"
 }) {
+    const variantStyles = {
+        cf: {
+            bg: "rgba(56, 189, 248, 0.035)",
+            border: "rgba(56, 189, 248, 0.16)",
+            labelColor: "#7DD3FC"
+        },
+        lc: {
+            bg: "rgba(251, 146, 60, 0.035)",
+            border: "rgba(251, 146, 60, 0.16)",
+            labelColor: "#FB923C"
+        },
+        cc: {
+            bg: "rgba(216, 180, 254, 0.035)",
+            border: "rgba(216, 180, 254, 0.16)",
+            labelColor: "#D8B4FE"
+        },
+        total: {
+            bg: "rgba(94, 234, 212, 0.035)",
+            border: "rgba(94, 234, 212, 0.18)",
+            labelColor: "#5EEAD4"
+        },
+        default: {
+            bg: "rgba(255, 255, 255, 0.03)",
+            border: "rgba(255, 255, 255, 0.07)",
+            labelColor: "rgba(255, 255, 255, 0.6)"
+        }
+    }[variant] || {
+        bg: "rgba(255, 255, 255, 0.03)",
+        border: "rgba(255, 255, 255, 0.07)",
+        labelColor: "rgba(255, 255, 255, 0.6)"
+    };
 
     return (
-
-        <div style={styles.stat}>
-
-            <div style={styles.statLabel}>
-
-                {label}
-
-            </div>
-
+        <div
+            className={`profile-stat-box profile-stat-box-${variant}`}
+            style={{
+                ...styles.stat,
+                background: variantStyles.bg,
+                borderColor: variantStyles.border
+            }}
+        >
             <div
-                className="mono"
                 style={{
-                    ...styles.statValue,
-                    color:
-                        color ||
-                        "var(--text)"
+                    ...styles.statLabel,
+                    color: variantStyles.labelColor
                 }}
             >
-
-                {value}
-
+                {label}
             </div>
-
+            <div
+                style={{
+                    ...styles.statValue,
+                    color: color || "var(--text)"
+                }}
+            >
+                {value}
+            </div>
         </div>
-
     );
-
 }
 const styles = {
     page: {
@@ -1164,36 +1563,43 @@ const styles = {
 
     header: {
         padding: "var(--space-3) var(--space-5)",
-        borderBottom: "1px solid var(--border)"
+        borderBottom: "1px solid rgba(255, 255, 255, 0.08)"
     },
 
     backBtn: {
         display: "inline-flex",
         alignItems: "center",
         gap: "6px",
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        color: "var(--text-dim)",
+        background: "rgba(255, 255, 255, 0.04)",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        color: "rgba(255, 255, 255, 0.85)",
         cursor: "pointer",
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "12px",
-        letterSpacing: "0.5px",
-        padding: "6px 14px",
-        borderRadius: "6px",
-        transition: "all 0.15s ease"
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "14px",
+        fontWeight: 500,
+        letterSpacing: "0.2px",
+        padding: "9px 18px",
+        borderRadius: "10px",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
+        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
     },
 
     main: {
-        maxWidth: "860px",
+        maxWidth: "940px",
         margin: "0 auto",
-        padding: "var(--space-4) var(--space-3)"
+        padding: "var(--space-4) var(--space-3) 48px"
     },
 
     card: {
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius)",
-        padding: "var(--space-4)"
+        background: "rgba(10, 13, 19, 0.72)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+        borderRadius: "16px",
+        padding: "28px 30px",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.09)"
     },
 
     nameRow: {
@@ -1205,96 +1611,109 @@ const styles = {
 
     name: {
         margin: 0,
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "clamp(20px, 5vw, 28px)",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "clamp(26px, 4.5vw, 34px)",
         fontWeight: 700,
-        letterSpacing: "0.5px"
+        letterSpacing: "-0.3px",
+        color: "#FFFFFF",
+        textShadow: "0 0 24px rgba(255, 255, 255, 0.12)"
     },
 
     youTag: {
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "10px",
-        color: "var(--accent-gold)",
-        border: "1px solid var(--accent-gold)",
-        padding: "2px 6px",
-        borderRadius: "4px",
-        letterSpacing: "1px"
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "11.5px",
+        fontWeight: 600,
+        color: "#FCD34D",
+        background: "rgba(252, 211, 77, 0.12)",
+        border: "1px solid rgba(252, 211, 77, 0.3)",
+        padding: "4px 12px",
+        borderRadius: "999px",
+        letterSpacing: "0.8px"
     },
 
     statRow: {
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-        gap: "16px",
+        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: "14px",
         marginTop: "22px"
     },
 
     stat: {
         minWidth: "120px",
-        background: "var(--surface-raised)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius-sm)",
-        padding: "12px 14px"
+        background: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid rgba(255, 255, 255, 0.07)",
+        borderRadius: "12px",
+        padding: "16px 18px",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)"
     },
 
     statLabel: {
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "10px",
-        color: "var(--text-dim)",
-        letterSpacing: "1.5px",
-        marginBottom: "5px"
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "12px",
+        fontWeight: 600,
+        color: "rgba(255, 255, 255, 0.6)",
+        letterSpacing: "1px",
+        marginBottom: "6px",
+        textTransform: "uppercase"
     },
 
     statValue: {
-        fontSize: "16px",
+        fontSize: "18px",
         fontWeight: 700,
-        fontFamily: "'Orbitron', sans-serif",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         wordBreak: "break-all"
     },
 
     privateBlock: {
-        marginTop: "24px",
+        marginTop: "26px",
         paddingTop: "20px",
-        borderTop: "1px solid var(--border)",
-        fontFamily: "'Orbitron', sans-serif"
+        borderTop: "1px solid rgba(255, 255, 255, 0.07)",
+        fontFamily: "'Space Grotesk', sans-serif"
     },
 
     privateLine: {
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "13px",
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "15px",
+        color: "#FFFFFF",
         marginBottom: "10px",
         lineHeight: 1.6,
         wordBreak: "break-word"
     },
 
     dim: {
-        color: "var(--text-dim)",
-        fontFamily: "'Orbitron', sans-serif"
+        color: "rgba(255, 255, 255, 0.6)",
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontWeight: 500
     },
 
     editLink: {
         background: "transparent",
         border: "none",
-        color: "var(--accent-green)",
+        color: "#5EEAD4",
         cursor: "pointer",
         padding: 0,
         marginLeft: "8px",
         textDecoration: "underline",
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "12px"
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "14px",
+        fontWeight: 500
     },
 
     cfConnect: {
         marginTop: "24px",
         paddingTop: "20px",
-        borderTop: "1px solid var(--border)"
+        borderTop: "1px solid rgba(255, 255, 255, 0.07)"
     },
 
     eyebrow: {
-        color: "var(--accent-green)",
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "11px",
+        color: "#5EEAD4",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "13px",
+        fontWeight: 600,
         letterSpacing: "2px",
-        marginBottom: "14px"
+        marginBottom: "12px",
+        textTransform: "uppercase"
     },
 
     cfForm: {
@@ -1306,55 +1725,78 @@ const styles = {
     input: {
         flex: 1,
         minWidth: "180px",
-        background: "var(--surface-raised)",
-        color: "var(--text)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius-sm)",
-        padding: "11px 14px",
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "13px",
-        minHeight: "44px"
+        background: "rgba(255, 255, 255, 0.03)",
+        color: "#FFFFFF",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+        borderRadius: "10px",
+        padding: "11px 16px",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "15px",
+        minHeight: "44px",
+        outline: "none",
+        transition: "border-color 0.2s ease"
     },
 
     smallBtn: {
-        background: "var(--accent-green)",
-        color: "#0A1A10",
-        border: "none",
-        borderRadius: "var(--radius-sm)",
-        padding: "11px 18px",
+        background: "rgba(94, 234, 212, 0.12)",
+        color: "#5EEAD4",
+        border: "1px solid rgba(94, 234, 212, 0.35)",
+        borderRadius: "10px",
+        padding: "11px 22px",
         cursor: "pointer",
         fontWeight: 600,
-        fontSize: "13px",
-        fontFamily: "'Orbitron', sans-serif",
+        fontSize: "14px",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         minHeight: "44px",
         display: "inline-flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        boxShadow: "0 4px 14px rgba(94, 234, 212, 0.15)",
+        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+    },
+
+    disconnectBtn: {
+        background: "rgba(248, 113, 113, 0.1)",
+        color: "#F87171",
+        border: "1px solid rgba(248, 113, 113, 0.3)",
+        borderRadius: "10px",
+        padding: "9px 20px",
+        cursor: "pointer",
+        fontWeight: 600,
+        fontSize: "13.5px",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        minHeight: "40px",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
     },
 
     instructions: {
-        fontFamily: "'Orbitron', sans-serif",
-        fontSize: "13px",
-        lineHeight: 1.7,
-        color: "var(--text)"
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "15px",
+        lineHeight: 1.6,
+        color: "rgba(255, 255, 255, 0.9)"
     },
 
     link: {
-        color: "var(--accent-green)",
+        color: "#5EEAD4",
         fontWeight: 600,
         textDecoration: "underline",
-        fontFamily: "'Orbitron', sans-serif"
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "15px"
     },
 
     verifyMsg: {
         marginTop: "14px",
-        fontFamily: "'Orbitron', sans-serif",
-        color: "var(--accent-gold)",
-        fontSize: "12px"
+        fontFamily: "'Space Grotesk', sans-serif",
+        color: "#FCD34D",
+        fontSize: "14px"
     },
 
     error: {
         color: "var(--accent-red)",
-        fontFamily: "'Orbitron', sans-serif"
+        fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "14px"
     }
 };

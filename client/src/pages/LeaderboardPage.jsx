@@ -92,6 +92,7 @@ export default function LeaderboardPage() {
             <h1 style={styles.title}>Leaderboard</h1>
             <button
               style={styles.infoBtn}
+              className="info-btn"
               onClick={() => setShowInfo(true)}
               aria-label="How scoring works"
               title="How scoring works"
@@ -101,48 +102,48 @@ export default function LeaderboardPage() {
           </div>
         </div>
         <div style={styles.refreshBtnGroup} className="refresh-btn-group">
-          <button style={styles.refreshBtnCf} className="refresh-btn" onClick={handleRefreshCf} disabled={refreshingCf}>
+          <button style={styles.refreshBtnCf} className="refresh-btn refresh-btn-cf" onClick={handleRefreshCf} disabled={refreshingCf}>
             {refreshingCf ? 'Checking…' : '↻ Refresh CF'}
           </button>
-          <button style={styles.refreshBtnLc} className="refresh-btn" onClick={handleRefreshLc} disabled={refreshingLc}>
+          <button style={styles.refreshBtnLc} className="refresh-btn refresh-btn-lc" onClick={handleRefreshLc} disabled={refreshingLc}>
             {refreshingLc ? 'Checking…' : '↻ Refresh LC'}
           </button>
-          <button style={styles.refreshBtnCc} className="refresh-btn" onClick={handleRefreshCc} disabled={refreshingCc}>
+          <button style={styles.refreshBtnCc} className="refresh-btn refresh-btn-cc" onClick={handleRefreshCc} disabled={refreshingCc}>
             {refreshingCc ? 'Checking…' : '↻ Refresh CC'}
           </button>
         </div>
       </div>
 
-      {cfMsg && <div style={styles.refreshMsg}>{cfMsg}</div>}
-      {lcMsg && <div style={{ ...styles.refreshMsg, color: '#FFA116' }}>{lcMsg}</div>}
-      {ccMsg && <div style={{ ...styles.refreshMsg, color: '#D48843' }}>{ccMsg}</div>}
+      {cfMsg && <div style={{ ...styles.refreshMsg, color: '#7DD3FC' }}>{cfMsg}</div>}
+      {lcMsg && <div style={{ ...styles.refreshMsg, color: '#FCD34D' }}>{lcMsg}</div>}
+      {ccMsg && <div style={{ ...styles.refreshMsg, color: '#D8B4FE' }}>{ccMsg}</div>}
       {error && <div style={styles.error}>{error}</div>}
 
-      <div style={styles.queue}>
-        <div style={styles.queueHeader}>
+      <div style={styles.queue} className="leaderboard-queue">
+        <div style={styles.queueHeader} className="leaderboard-queue-header">
           <span style={{ ...styles.col, width: '48px' }} className="queue-col-rank">RANK</span>
           <span style={{ ...styles.col, flex: 1 }}>USER</span>
           <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cf">CF</span>
           <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-lc">LC</span>
           <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cc">CC</span>
-          <span style={{ ...styles.col, width: '85px', textAlign: 'right' }} className="queue-col-points">TOTAL</span>
+          <span style={{ ...styles.col, width: '85px', textAlign: 'right', color: '#FFFFFF' }} className="queue-col-points">TOTAL</span>
         </div>
 
         {loadingBoard ? (
-          <div style={styles.empty} className="fade-up">Loading standings…</div>
+          <div style={styles.empty}>Loading standings…</div>
         ) : data?.leaderboard?.length ? (
           data.leaderboard.map((row, idx) => (
             <div
               key={row.userId}
-              className="row-hover fade-up"
+              className="row-hover leaderboard-queue-row"
               style={{
                 ...styles.queueRow,
                 ...(row.userId === user.id ? styles.queueRowSelf : {}),
-                animationDelay: `${idx * 0.03}s`
+                ...(idx === data.leaderboard.length - 1 ? { borderBottom: 'none' } : {})
               }}
               onClick={() => navigate(`/profile/${row.userId}`)}
             >
-              <span style={{ ...styles.col, width: '48px' }} className="mono queue-col-rank">
+              <span style={{ ...styles.col, width: '48px' }} className="queue-col-rank">
                 <RankBadge rank={row.rank} />
               </span>
 
@@ -154,6 +155,7 @@ export default function LeaderboardPage() {
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     style={styles.cfIconLink}
+                    className="platform-icon-link"
                     title={`Open ${row.cfHandle} on Codeforces`}
                   >
                     <CfIcon />
@@ -166,6 +168,7 @@ export default function LeaderboardPage() {
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     style={styles.cfIconLink}
+                    className="platform-icon-link"
                     title={`Open ${row.lcUsername} on LeetCode`}
                   >
                     <LeetCodeIcon />
@@ -178,33 +181,34 @@ export default function LeaderboardPage() {
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     style={styles.cfIconLink}
+                    className="platform-icon-link"
                     title={`Open ${row.ccHandle} on CodeChef`}
                   >
                     <CodeChefIcon />
                   </a>
                 )}
                 <span
-                  className="mono"
                   style={styles.nameLink}
+                  className="user-name-link"
                   onClick={(e) => { e.stopPropagation(); navigate(`/profile/${row.userId}`); }}
                 >
                   {row.cfHandle || row.lcUsername || row.ccHandle || row.name}
                 </span>
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--accent-green)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cf">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#7DD3FC', fontWeight: 600, fontSize: '15px' }} className="queue-col-cf">
                 {row.codeforcesPoints}
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#FFA116', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-lc">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#FCD34D', fontWeight: 600, fontSize: '15px' }} className="queue-col-lc">
                 {row.leetcodePoints}
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#D48843', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-cc">
+              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: '#D8B4FE', fontWeight: 600, fontSize: '15px' }} className="queue-col-cc">
                 {row.codechefPoints || 0}
               </span>
 
-              <span style={{ ...styles.col, width: '85px', textAlign: 'right', fontWeight: 700, color: 'var(--text)', fontFamily: "'Orbitron', sans-serif" }} className="queue-col-points">
+              <span style={{ ...styles.col, width: '85px', textAlign: 'right', fontWeight: 700, color: '#FFFFFF', fontSize: '16px' }} className="queue-col-points">
                 {row.totalPoints}
               </span>
             </div>
@@ -228,9 +232,9 @@ const MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
 function RankBadge({ rank }) {
   if (MEDALS[rank]) {
-    return <span>{MEDALS[rank]} <span style={{ color: 'var(--text-dim)', fontSize: '11px' }}>#{rank}</span></span>;
+    return <span>{MEDALS[rank]} <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '13px', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" }}>#{rank}</span></span>;
   }
-  return <span style={{ color: 'var(--text-dim)', fontWeight: 600 }}>#{rank}</span>;
+  return <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontWeight: 600, fontSize: '14px', fontFamily: "'Space Grotesk', sans-serif" }}>#{rank}</span>;
 }
 
 function CfIcon() {
@@ -392,7 +396,7 @@ function InfoModal({ onClose }) {
               {CODECHEF_MAP.map(([range, points]) => (
                 <div key={range} style={styles.ratingCell}>
                   <span className="mono" style={{ ...styles.ratingNum, fontSize: '9px' }}>{range}</span>
-                  <span className="mono" style={{ ...styles.ratingPts, color: '#D48843' }}>{points}</span>
+                  <span className="mono" style={{ ...styles.ratingPts, color: '#D8B4FE' }}>{points}</span>
                 </div>
               ))}
             </div>
@@ -439,10 +443,10 @@ const styles = {
   page: { minHeight: '100vh' },
   footer: {
     textAlign: 'center',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px',
-    color: 'var(--text-dim)',
-    padding: 'var(--space-4) 0',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '14px',
+    color: 'rgba(255, 255, 255, 0.45)',
+    padding: '40px 0 24px',
     lineHeight: 1.8
   },
   headerRight: { display: 'flex', gap: 'var(--space-2)' },
@@ -451,46 +455,54 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: 'var(--space-2)',
-    marginTop: 'var(--space-4)', 
+    marginBottom: 'var(--space-4)',
+    marginTop: 0,
     gap: '16px',
     flexWrap: 'wrap'
   },
   eyebrow: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '11px',
-    color: 'var(--accent-green)',
-    letterSpacing: '4px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '12px',
+    color: '#5EEAD4',
+    letterSpacing: '3.5px',
+    fontWeight: 600,
+    textTransform: 'uppercase',
     marginBottom: 'var(--space-1)'
   },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '28px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '34px',
     margin: 0,
-    letterSpacing: '4px',
-    fontWeight: 700
+    letterSpacing: '0.5px',
+    fontWeight: 700,
+    color: '#FFFFFF',
+    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
   },
-  titleWithInfo: { display: 'flex', alignItems: 'center', gap: '10px' },
+  titleWithInfo: { display: 'flex', alignItems: 'center', gap: '12px' },
   infoBtn: {
-    width: '22px',
-    height: '22px',
+    width: '26px',
+    height: '26px',
     borderRadius: '50%',
-    border: '1px solid var(--border)',
-    background: 'var(--surface-raised)',
-    color: 'var(--text-dim)',
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    background: 'rgba(255, 255, 255, 0.05)',
+    color: '#FFFFFF',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '13px',
+    fontWeight: 600,
     fontStyle: 'italic',
     lineHeight: 1,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   overlay: {
     position: 'fixed',
     inset: 0,
-    background: 'rgba(0,0,0,0.6)',
+    background: 'rgba(0,0,0,0.7)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -498,35 +510,40 @@ const styles = {
     zIndex: 100
   },
   modal: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
+    background: 'rgba(10, 12, 17, 0.95)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    borderRadius: '14px',
     maxWidth: '620px',
     width: '100%',
     maxHeight: '85vh',
     overflowY: 'auto',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-    fontFamily: "'Orbitron', sans-serif"
+    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
   },
   modalHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 'var(--space-4)',
-    borderBottom: '1px solid var(--border)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
     position: 'sticky',
     top: 0,
-    background: 'var(--surface)'
+    background: 'rgba(11, 14, 20, 0.98)',
+    backdropFilter: 'blur(12px)',
+    zIndex: 10
   },
-  modalTitle: { margin: 0, fontSize: '18px', fontFamily: "'Orbitron', sans-serif" },
-  closeBtn: { background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: '16px', cursor: 'pointer', fontFamily: "'Orbitron', sans-serif" },
+  modalTitle: { margin: 0, fontSize: '18px', fontWeight: 700, color: '#FFFFFF', fontFamily: "'Space Grotesk', sans-serif" },
+  closeBtn: { background: 'transparent', border: 'none', color: 'rgba(255, 255, 255, 0.6)', fontSize: '16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" },
   modalBody: { padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' },
   section: {},
   sectionTitle: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px',
-    letterSpacing: '1.5px',
-    color: 'var(--accent-green)',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontSize: '13px',
+    letterSpacing: '1px',
+    fontWeight: 600,
+    color: '#5EEAD4',
     marginBottom: 'var(--space-2)'
   },
   list: {
@@ -536,9 +553,9 @@ const styles = {
     flexDirection: 'column',
     gap: '8px',
     fontSize: '13px',
-    color: 'var(--text)',
-    lineHeight: 1.5,
-    fontFamily: "'Orbitron', sans-serif"
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: 1.6,
+    fontFamily: "'Space Grotesk', sans-serif"
   },
   ratingGrid: {
     display: 'grid',
@@ -556,29 +573,30 @@ const styles = {
     alignItems: 'center',
     gap: '2px',
     padding: '6px 4px',
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--border)',
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: 'var(--radius-sm)'
   },
-  ratingNum: { fontSize: '11px', color: 'var(--text-dim)' },
-  ratingPts: { fontSize: '13px', color: 'var(--accent-green)', fontWeight: 700 },
+  ratingNum: { fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', fontFamily: "'Space Grotesk', sans-serif" },
+  ratingPts: { fontSize: '13px', color: '#7DD3FC', fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" },
   formulaBox: {
     marginTop: '10px',
     padding: '12px',
-    border: '1px solid var(--border)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: 'var(--radius-sm)',
-    background: 'var(--surface-raised)',
+    background: 'rgba(255, 255, 255, 0.03)',
     overflowX: 'auto',
     fontSize: '13px',
     lineHeight: 1.8,
-    color: 'var(--text-dim)'
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontFamily: "'Space Grotesk', monospace"
   },
   formulaNote: {
     marginTop: '14px',
-    color: 'var(--text-dim)',
+    color: 'rgba(255, 255, 255, 0.65)',
     lineHeight: 1.7,
     fontSize: '13px',
-    fontFamily: "'Orbitron', sans-serif"
+    fontFamily: "'Space Grotesk', sans-serif"
   },
   refreshBtnGroup: {
     display: 'flex',
@@ -591,80 +609,110 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    background: 'var(--surface-raised)',
-    border: '1px solid var(--accent-green)',
-    color: 'var(--accent-green)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 16px',
-    fontSize: '13px',
-    letterSpacing: '2px',
-    fontFamily: "'Orbitron', sans-serif"
+    background: 'rgba(99, 223, 255, 0.04)',
+    border: '1px solid rgba(99, 223, 255, 0.22)',
+    color: '#7DD3FC',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 600,
+    letterSpacing: '0.4px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    cursor: 'pointer'
   },
   refreshBtnLc: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    background: 'var(--surface-raised)',
-    border: '1px solid #FFA116',
-    color: '#FFA116',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 16px',
-    fontSize: '13px',
-    letterSpacing: '2px',
-    fontFamily: "'Orbitron', sans-serif"
+    background: 'rgba(252, 211, 77, 0.04)',
+    border: '1px solid rgba(252, 211, 77, 0.22)',
+    color: '#FCD34D',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 600,
+    letterSpacing: '0.4px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    cursor: 'pointer'
   },
   refreshBtnCc: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    background: 'var(--surface-raised)',
-    border: '1px solid #D48843',
-    color: '#D48843',
-    borderRadius: 'var(--radius-sm)',
-    padding: '10px 16px',
-    fontSize: '13px',
-    letterSpacing: '2px',
-    fontFamily: "'Orbitron', sans-serif"
+    background: 'rgba(216, 180, 254, 0.04)',
+    border: '1px solid rgba(216, 180, 254, 0.22)',
+    color: '#D8B4FE',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 600,
+    letterSpacing: '0.4px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    cursor: 'pointer'
   },
   refreshMsg: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '12px',
-    color: 'var(--accent-gold)',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#FCD34D',
     marginBottom: 'var(--space-3)'
   },
-  error: { color: 'var(--accent-red)', marginBottom: 'var(--space-3)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' },
+  error: { color: '#F87171', marginBottom: 'var(--space-3)', fontFamily: "'Space Grotesk', sans-serif", fontSize: '13px' },
   queue: {
-    marginTop: 'var(--space-4)',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    overflow: 'hidden'
+    marginTop: 0,
+    background: 'rgba(10, 12, 17, 0.72)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '14px',
+    overflow: 'hidden',
+    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.09), inset 0 0 20px rgba(255, 255, 255, 0.015)'
   },
   queueHeader: {
     display: 'flex',
     gap: '10px',
-    padding: '10px 16px',
-    background: 'var(--surface-raised)',
-    borderBottom: '1px solid var(--border)'
+    padding: '14px 22px',
+    background: 'rgba(255, 255, 255, 0.025)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
   },
   col: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '11px',
-    color: 'var(--text-dim)',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '13px',
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontWeight: 600,
     letterSpacing: '1px'
   },
   queueRow: {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    padding: '14px 16px',
-    background: 'var(--surface)',
-    borderBottom: '1px solid var(--border)',
+    padding: '16px 22px',
+    background: 'transparent',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
     cursor: 'pointer'
   },
-  queueRowSelf: { background: 'var(--accent-green-dim)' },
+  queueRowSelf: {
+    background: 'rgba(99, 223, 255, 0.04)',
+    borderLeft: '2px solid rgba(99, 223, 255, 0.7)'
+  },
   cfIconLink: { display: 'flex', alignItems: 'center', flexShrink: 0 },
-  nameLink: { cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-dim)', fontFamily: "'Orbitron', sans-serif", fontSize: '13px' }
+  nameLink: {
+    color: '#FFFFFF',
+    fontWeight: 600,
+    fontSize: '15px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    cursor: 'pointer',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  empty: { padding: 'var(--space-5)', textAlign: 'center', color: 'rgba(255, 255, 255, 0.55)', fontFamily: "'Space Grotesk', sans-serif", fontSize: '14px' }
 };

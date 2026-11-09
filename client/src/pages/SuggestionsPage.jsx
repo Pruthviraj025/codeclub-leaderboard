@@ -5,7 +5,7 @@ import { api, getSessionUser } from '../api';
 import SidebarLayout from '../components/SidebarLayout';
 
 const MAX_LEN = 2000;
-const EDIT_WINDOW_MS = 5 * 60 * 1000; 
+const EDIT_WINDOW_MS = 5 * 60 * 1000;
 
 function canEdit(iso) {
   return Date.now() - new Date(iso).getTime() <= EDIT_WINDOW_MS;
@@ -35,7 +35,7 @@ export default function SuggestionsPage() {
   const [savingPanel, setSavingPanel] = useState(false);
   const [panelError, setPanelError] = useState('');
 
-  const [, setTick] = useState(0); 
+  const [, setTick] = useState(0);
 
   const user = getSessionUser();
   const navigate = useNavigate();
@@ -358,8 +358,8 @@ const styles = {
   wrap: { maxWidth: '680px', margin: '0 auto', paddingBottom: '40px' },
   header: { marginBottom: '20px' },
   title: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '24px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '26px',
     fontWeight: 700,
     color: 'var(--text)',
     margin: '0 0 6px'
@@ -417,14 +417,14 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(16, 185, 129, 0.15)',
-    border: '1px solid var(--accent-green)',
-    color: 'var(--accent-green)',
-    borderRadius: 'var(--radius-sm)',
+    background: 'rgba(94, 234, 212, 0.12)',
+    border: '1px solid rgba(94, 234, 212, 0.35)',
+    color: '#5EEAD4',
+    borderRadius: '10px',
     padding: '12px 24px',
-    fontSize: '13px',
+    fontSize: '14px',
     fontWeight: 600,
-    fontFamily: "'Orbitron', sans-serif",
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     transition: 'all 0.2s ease',
     minHeight: '44px',
     cursor: 'pointer'
@@ -433,20 +433,20 @@ const styles = {
     marginTop: '16px',
     display: 'flex',
     alignItems: 'center',
-    background: 'rgba(16, 185, 129, 0.15)',
-    border: '1px solid var(--accent-green)',
-    color: 'var(--accent-green)',
+    background: 'rgba(94, 234, 212, 0.12)',
+    border: '1px solid rgba(94, 234, 212, 0.35)',
+    color: '#5EEAD4',
     padding: '12px 16px',
-    borderRadius: 'var(--radius-sm)',
+    borderRadius: '10px',
     fontSize: '13px'
   },
   error: {
     marginTop: '16px',
-    color: '#ff6b6b',
-    background: 'rgba(255, 107, 107, 0.1)',
-    border: '1px solid rgba(255, 107, 107, 0.3)',
+    color: '#F87171',
+    background: 'rgba(248, 113, 113, 0.1)',
+    border: '1px solid rgba(248, 113, 113, 0.3)',
     padding: '12px 16px',
-    borderRadius: 'var(--radius-sm)',
+    borderRadius: '10px',
     fontSize: '13px'
   },
   mineHeader: {
@@ -458,8 +458,8 @@ const styles = {
     borderTop: '1px solid var(--border)'
   },
   mineTitle: {
-    fontFamily: "'Orbitron', sans-serif",
-    fontSize: '16px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: '17px',
     fontWeight: 700,
     color: 'var(--text)',
     margin: 0
