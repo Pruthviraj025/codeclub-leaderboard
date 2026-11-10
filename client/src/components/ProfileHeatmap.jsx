@@ -1,43 +1,70 @@
 import { useMemo, useState, useRef, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 // Platform-specific colour shades matching the Homepage buttons:
-// Codeforces: Blue (#7DD3FC / #38BDF8)
+// Codeforces: Blue (#7DD3FC / #38BDF8 in dark, #0284C7 in light)
 // LeetCode: Orange (#FB923C / #EA580C)
-// CodeChef: Purple (#D8B4FE / #C084FC)
+// CodeChef: Purple (#D8B4FE / #C084FC in dark, #9333EA in light)
 // Activity tiers: light (1 solve), dark (2 solves), darker (3+ solves)
-const COLOR_EMPTY = "rgba(255, 255, 255, 0.035)";
-const BORDER_EMPTY = "rgba(255, 255, 255, 0.065)";
+const COLOR_EMPTY_DARK = "rgba(255, 255, 255, 0.035)";
+const BORDER_EMPTY_DARK = "rgba(255, 255, 255, 0.065)";
 
-const PALETTES = {
+const COLOR_EMPTY_LIGHT = "rgba(15, 23, 42, 0.06)";
+const BORDER_EMPTY_LIGHT = "rgba(15, 23, 42, 0.1)";
+
+const PALETTES_DARK = {
     cf: {
-        // Codeforces Blue
         light: { bg: "rgba(56, 189, 248, 0.4)", border: "rgba(56, 189, 248, 0.65)", glow: "#38BDF8" },
         dark: { bg: "#38BDF8", border: "#0284C7", glow: "#38BDF8" },
         darker: { bg: "#0284C7", border: "#7DD3FC", glow: "#0284C7" }
     },
     lc: {
-        // LeetCode Orange
         light: { bg: "rgba(251, 146, 60, 0.45)", border: "rgba(251, 146, 60, 0.7)", glow: "#FB923C" },
         dark: { bg: "#FB923C", border: "#EA580C", glow: "#FB923C" },
         darker: { bg: "#EA580C", border: "#FED7AA", glow: "#EA580C" }
     },
     cc: {
-        // CodeChef Purple
         light: { bg: "rgba(192, 132, 252, 0.4)", border: "rgba(192, 132, 252, 0.65)", glow: "#C084FC" },
         dark: { bg: "#C084FC", border: "#9333EA", glow: "#C084FC" },
         darker: { bg: "#9333EA", border: "#E9D5FF", glow: "#9333EA" }
     },
     twoPlats: {
-        // 2 Platforms (Soft Aqua/Teal)
         light: { bg: "rgba(94, 234, 212, 0.45)", border: "rgba(94, 234, 212, 0.7)", glow: "#5EEAD4" },
         dark: { bg: "#2DD4BF", border: "#0D9488", glow: "#2DD4BF" },
         darker: { bg: "#0D9488", border: "#5EEAD4", glow: "#0D9488" }
     },
     threePlats: {
-        // 3 Platforms (Emerald Green)
         light: { bg: "rgba(52, 211, 153, 0.45)", border: "rgba(52, 211, 153, 0.7)", glow: "#34D399" },
         dark: { bg: "#34D399", border: "#059669", glow: "#34D399" },
         darker: { bg: "#059669", border: "#A7F3D0", glow: "#059669" }
+    }
+};
+
+const PALETTES_LIGHT = {
+    cf: {
+        light: { bg: "rgba(2, 132, 199, 0.28)", border: "rgba(2, 132, 199, 0.5)", glow: "#0284C7" },
+        dark: { bg: "#38BDF8", border: "#0284C7", glow: "#38BDF8" },
+        darker: { bg: "#0284C7", border: "#0369A1", glow: "#0284C7" }
+    },
+    lc: {
+        light: { bg: "rgba(234, 88, 12, 0.28)", border: "rgba(234, 88, 12, 0.5)", glow: "#EA580C" },
+        dark: { bg: "#FB923C", border: "#EA580C", glow: "#FB923C" },
+        darker: { bg: "#EA580C", border: "#C2410C", glow: "#EA580C" }
+    },
+    cc: {
+        light: { bg: "rgba(147, 51, 234, 0.26)", border: "rgba(147, 51, 234, 0.5)", glow: "#9333EA" },
+        dark: { bg: "#C084FC", border: "#9333EA", glow: "#C084FC" },
+        darker: { bg: "#9333EA", border: "#7E22CE", glow: "#9333EA" }
+    },
+    twoPlats: {
+        light: { bg: "rgba(13, 148, 136, 0.28)", border: "rgba(13, 148, 136, 0.5)", glow: "#0D9488" },
+        dark: { bg: "#2DD4BF", border: "#0D9488", glow: "#2DD4BF" },
+        darker: { bg: "#0D9488", border: "#0F766E", glow: "#0D9488" }
+    },
+    threePlats: {
+        light: { bg: "rgba(16, 185, 129, 0.28)", border: "rgba(16, 185, 129, 0.5)", glow: "#10B981" },
+        dark: { bg: "#34D399", border: "#059669", glow: "#34D399" },
+        darker: { bg: "#059669", border: "#047857", glow: "#059669" }
     }
 };
 
@@ -69,8 +96,13 @@ function formatRangeText(start, end) {
 export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null }) {
     const cardRef = useRef(null);
     const scrollWrapperRef = useRef(null);
+    const { isDark } = useTheme();
     const [selectedYear, setSelectedYear] = useState("current");
     const [hoveredCell, setHoveredCell] = useState(null);
+
+    const PALETTES = isDark ? PALETTES_DARK : PALETTES_LIGHT;
+    const COLOR_EMPTY = isDark ? COLOR_EMPTY_DARK : COLOR_EMPTY_LIGHT;
+    const BORDER_EMPTY = isDark ? BORDER_EMPTY_DARK : BORDER_EMPTY_LIGHT;
 
     // Compute available years: ONLY from the year they registered on the leaderboard up to current year
     const availableYears = useMemo(() => {
@@ -559,6 +591,62 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 .profile-heatmap-mobile-cue {
                     display: none;
                 }
+
+                [data-theme="light"] .profile-heatmap-card {
+                    background: #FFFFFF !important;
+                    border-color: rgba(15, 23, 42, 0.08) !important;
+                    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03) !important;
+                }
+                [data-theme="light"] .profile-heatmap-stat-box {
+                    background: #F8FAFC !important;
+                    border-color: rgba(15, 23, 42, 0.08) !important;
+                }
+                [data-theme="light"] .stat-box-current-streak {
+                    background: rgba(234, 88, 12, 0.04) !important;
+                    border-color: rgba(234, 88, 12, 0.2) !important;
+                }
+                [data-theme="light"] .stat-box-current-streak:hover {
+                    background: rgba(234, 88, 12, 0.08) !important;
+                    border-color: #EA580C !important;
+                    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.12) !important;
+                }
+                [data-theme="light"] .stat-box-longest-streak {
+                    background: rgba(217, 119, 6, 0.04) !important;
+                    border-color: rgba(217, 119, 6, 0.2) !important;
+                }
+                [data-theme="light"] .stat-box-longest-streak:hover {
+                    background: rgba(217, 119, 6, 0.08) !important;
+                    border-color: #D97706 !important;
+                    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.12) !important;
+                }
+                [data-theme="light"] .stat-box-active-days {
+                    background: rgba(13, 148, 136, 0.04) !important;
+                    border-color: rgba(13, 148, 136, 0.2) !important;
+                }
+                [data-theme="light"] .stat-box-active-days:hover {
+                    background: rgba(13, 148, 136, 0.08) !important;
+                    border-color: #0D9488 !important;
+                    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.12) !important;
+                }
+                [data-theme="light"] .stat-box-solves {
+                    background: rgba(147, 51, 234, 0.04) !important;
+                    border-color: rgba(147, 51, 234, 0.2) !important;
+                }
+                [data-theme="light"] .stat-box-solves:hover {
+                    background: rgba(147, 51, 234, 0.08) !important;
+                    border-color: #9333EA !important;
+                    box-shadow: 0 8px 20px rgba(147, 51, 234, 0.12) !important;
+                }
+                [data-theme="light"] .profile-year-select {
+                    background: #FFFFFF !important;
+                    border-color: rgba(15, 23, 42, 0.16) !important;
+                    color: #0F172A !important;
+                }
+                [data-theme="light"] .profile-year-select:hover {
+                    background: #F8FAFC !important;
+                    border-color: #0D9488 !important;
+                }
+
                 @media (max-width: 860px) {
                     .profile-heatmap-stats-bar {
                         grid-template-columns: repeat(2, 1fr);
@@ -585,7 +673,7 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                         justify-content: flex-end;
                         gap: 4px;
                         font-size: 11px;
-                        color: rgba(255, 255, 255, 0.5);
+                        color: var(--text-dim, rgba(255, 255, 255, 0.5));
                         font-family: 'Space Grotesk', sans-serif;
                         margin-bottom: 6px;
                     }
@@ -595,6 +683,26 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                         grid-template-columns: 1fr;
                         gap: 8px;
                     }
+                }
+                [data-theme="light"] .profile-year-select {
+                    background: #FFFFFF !important;
+                    border-color: rgba(15, 23, 42, 0.16) !important;
+                    color: #0F172A !important;
+                }
+                [data-theme="light"] .profile-year-select:hover {
+                    background: #F8FAFC !important;
+                    border-color: #0D9488 !important;
+                }
+                [data-theme="light"] .profile-heatmap-mobile-cue {
+                    color: #64748B !important;
+                }
+                [data-theme="light"] .profile-heatmap-stat-box {
+                    background: #FFFFFF !important;
+                    border-color: rgba(15, 23, 42, 0.08) !important;
+                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+                }
+                [data-theme="light"] .profile-stat-platform-pill {
+                    background: rgba(15, 23, 42, 0.04) !important;
                 }
             `}</style>
 
@@ -631,10 +739,10 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 {/* 1. Current Streak */}
                 <div className="profile-heatmap-stat-box stat-box-current-streak">
                     <div style={styles.statBoxHeader}>
-                        <span style={{ ...styles.statBoxLabel, color: "#FB923C" }}>CURRENT STREAK</span>
+                        <span style={{ ...styles.statBoxLabel, color: "var(--lc-color, #FB923C)" }}>CURRENT STREAK</span>
                         <span style={{ fontSize: "14px" }}>🔥</span>
                     </div>
-                    <div style={{ ...styles.statBoxValue, color: currentStreak > 0 ? "#FB923C" : "rgba(255, 255, 255, 0.45)" }}>
+                    <div style={{ ...styles.statBoxValue, color: currentStreak > 0 ? "var(--lc-color, #FB923C)" : "var(--text-subtle, rgba(255, 255, 255, 0.45))" }}>
                         {currentStreak} <span style={styles.statBoxUnit}>{currentStreak === 1 ? "day" : "days"}</span>
                     </div>
                     <div style={styles.statBoxCaption}>
@@ -645,10 +753,10 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 {/* 2. Longest Streak */}
                 <div className="profile-heatmap-stat-box stat-box-longest-streak">
                     <div style={styles.statBoxHeader}>
-                        <span style={{ ...styles.statBoxLabel, color: "#FCD34D" }}>LONGEST STREAK</span>
+                        <span style={{ ...styles.statBoxLabel, color: "var(--accent-gold, #FCD34D)" }}>LONGEST STREAK</span>
                         <span style={{ fontSize: "14px" }}>⚡</span>
                     </div>
-                    <div style={{ ...styles.statBoxValue, color: longestStreak > 0 ? "#FCD34D" : "rgba(255, 255, 255, 0.45)" }}>
+                    <div style={{ ...styles.statBoxValue, color: longestStreak > 0 ? "var(--accent-gold, #FCD34D)" : "var(--text-subtle, rgba(255, 255, 255, 0.45))" }}>
                         {longestStreak} <span style={styles.statBoxUnit}>{longestStreak === 1 ? "day" : "days"}</span>
                     </div>
                     <div style={styles.statBoxCaption}>
@@ -659,10 +767,10 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 {/* 3. Active Days */}
                 <div className="profile-heatmap-stat-box stat-box-active-days">
                     <div style={styles.statBoxHeader}>
-                        <span style={{ ...styles.statBoxLabel, color: "#5EEAD4" }}>ACTIVE DAYS</span>
+                        <span style={{ ...styles.statBoxLabel, color: "var(--accent-green, #5EEAD4)" }}>ACTIVE DAYS</span>
                         <span style={{ fontSize: "14px" }}>📅</span>
                     </div>
-                    <div style={{ ...styles.statBoxValue, color: activeDays > 0 ? "#5EEAD4" : "rgba(255, 255, 255, 0.45)" }}>
+                    <div style={{ ...styles.statBoxValue, color: activeDays > 0 ? "var(--accent-green, #5EEAD4)" : "var(--text-subtle, rgba(255, 255, 255, 0.45))" }}>
                         {activeDays} <span style={styles.statBoxUnit}>{activeDays === 1 ? "day" : "days"}</span>
                     </div>
                     <div style={styles.statBoxCaption}>
@@ -673,20 +781,20 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 {/* 4. Solves Breakdown */}
                 <div className="profile-heatmap-stat-box stat-box-solves">
                     <div style={styles.statBoxHeader}>
-                        <span style={{ ...styles.statBoxLabel, color: "#D8B4FE" }}>PLATFORM SOLVES</span>
+                        <span style={{ ...styles.statBoxLabel, color: "var(--cc-color, #D8B4FE)" }}>PLATFORM SOLVES</span>
                         <span style={{ fontSize: "14px" }}>🎯</span>
                     </div>
-                    <div style={{ ...styles.statBoxValue, color: "#FFFFFF" }}>
+                    <div style={{ ...styles.statBoxValue, color: "var(--text, #FFFFFF)" }}>
                         {totalSolves} <span style={styles.statBoxUnit}>{totalSolves === 1 ? "solve" : "solves"}</span>
                     </div>
                     <div style={styles.statBoxPlatformPills}>
-                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_CF, borderColor: "rgba(56, 189, 248, 0.3)" }}>
+                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_CF, borderColor: "var(--cf-border, rgba(56, 189, 248, 0.3))" }}>
                             CF {platformTotals.cf}
                         </span>
-                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_LC, borderColor: "rgba(251, 146, 60, 0.3)" }}>
+                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_LC, borderColor: "var(--lc-border, rgba(251, 146, 60, 0.3))" }}>
                             LC {platformTotals.lc}
                         </span>
-                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_CC, borderColor: "rgba(192, 132, 252, 0.3)" }}>
+                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_CC, borderColor: "var(--cc-border, rgba(192, 132, 252, 0.3))" }}>
                             CC {platformTotals.cc}
                         </span>
                     </div>
@@ -716,7 +824,7 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                                         position: "absolute",
                                         left: `${m.colIndex * 13}px`,
                                         fontSize: "12px",
-                                        color: "rgba(255, 255, 255, 0.6)",
+                                        color: "var(--text-dim, rgba(255, 255, 255, 0.6))",
                                         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
                                     }}
                                 >
@@ -818,12 +926,12 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 </div>
 
                 <div style={styles.legendScale}>
-                    <span style={styles.legendScaleLabel}>Less</span>
+                    <span style={{ ...styles.legendScaleLabel, color: isDark ? "rgba(255, 255, 255, 0.5)" : "#64748B" }}>Less</span>
                     <span style={{ ...styles.legendCell, background: COLOR_EMPTY, border: `1px solid ${BORDER_EMPTY}` }} title="0 solves" />
-                    <span style={{ ...styles.legendCell, background: "rgba(255, 255, 255, 0.18)", border: "1px solid rgba(255, 255, 255, 0.3)" }} title="1 solve" />
-                    <span style={{ ...styles.legendCell, background: "rgba(255, 255, 255, 0.5)", border: "1px solid rgba(255, 255, 255, 0.7)" }} title="2 solves" />
-                    <span style={{ ...styles.legendCell, background: "#FFFFFF", border: "1px solid #FFFFFF" }} title="3+ solves" />
-                    <span style={styles.legendScaleLabel}>More</span>
+                    <span style={{ ...styles.legendCell, background: isDark ? "rgba(255, 255, 255, 0.18)" : "rgba(15, 23, 42, 0.15)", border: `1px solid ${isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(15, 23, 42, 0.25)"}` }} title="1 solve" />
+                    <span style={{ ...styles.legendCell, background: isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(15, 23, 42, 0.45)", border: `1px solid ${isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(15, 23, 42, 0.6)"}` }} title="2 solves" />
+                    <span style={{ ...styles.legendCell, background: isDark ? "#FFFFFF" : "#0F172A", border: `1px solid ${isDark ? "#FFFFFF" : "#0F172A"}` }} title="3+ solves" />
+                    <span style={{ ...styles.legendScaleLabel, color: isDark ? "rgba(255, 255, 255, 0.5)" : "#64748B" }}>More</span>
                 </div>
             </div>
 
@@ -837,49 +945,49 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                         transform: "translate(-50%, -100%)",
                         zIndex: 100,
                         pointerEvents: "none",
-                        background: "rgba(12, 16, 23, 0.96)",
+                        background: isDark ? "rgba(12, 16, 23, 0.96)" : "#FFFFFF",
                         backdropFilter: "blur(14px)",
                         WebkitBackdropFilter: "blur(14px)",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        border: isDark ? "1px solid rgba(255, 255, 255, 0.12)" : "1px solid rgba(15, 23, 42, 0.12)",
                         borderRadius: "10px",
                         padding: "12px 16px",
-                        boxShadow: "0 14px 34px rgba(0, 0, 0, 0.8)",
+                        boxShadow: isDark ? "0 14px 34px rgba(0, 0, 0, 0.8)" : "0 14px 34px rgba(15, 23, 42, 0.12)",
                         width: "225px",
                         maxWidth: "calc(100% - 24px)",
                         boxSizing: "border-box"
                     }}
                 >
-                    <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "12px", color: isDark ? "rgba(255, 255, 255, 0.6)" : "#64748B", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "4px" }}>
                         {hoveredCell.day.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
                     </div>
 
-                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "6px" }}>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: isDark ? "#fff" : "#0F172A", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "6px" }}>
                         {hoveredCell.day.total === 0
                             ? "No questions solved"
                             : `${hoveredCell.day.total} question${hoveredCell.day.total === 1 ? "" : "s"} solved`}
                     </div>
 
                     {hoveredCell.day.total > 0 && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "13px", fontFamily: "'Space Grotesk', sans-serif", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "8px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "13px", fontFamily: "'Space Grotesk', sans-serif", borderTop: isDark ? "1px solid rgba(255, 255, 255, 0.08)" : "1px solid rgba(15, 23, 42, 0.08)", paddingTop: "8px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
                                 <span style={{ color: COLOR_CF, fontWeight: 500 }}>
                                     Codeforces:
                                 </span>
-                                <strong style={{ color: "#fff" }}>{hoveredCell.day.codeforces || 0}</strong>
+                                <strong style={{ color: isDark ? "#fff" : "#0F172A" }}>{hoveredCell.day.codeforces || 0}</strong>
                             </div>
 
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
                                 <span style={{ color: COLOR_LC, fontWeight: 500 }}>
                                     LeetCode:
                                 </span>
-                                <strong style={{ color: "#fff" }}>{hoveredCell.day.leetcode || 0}</strong>
+                                <strong style={{ color: isDark ? "#fff" : "#0F172A" }}>{hoveredCell.day.leetcode || 0}</strong>
                             </div>
 
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
                                 <span style={{ color: COLOR_CC, fontWeight: 500 }}>
                                     CodeChef:
                                 </span>
-                                <strong style={{ color: "#fff" }}>{hoveredCell.day.codechef || 0}</strong>
+                                <strong style={{ color: isDark ? "#fff" : "#0F172A" }}>{hoveredCell.day.codechef || 0}</strong>
                             </div>
                         </div>
                     )}
@@ -893,9 +1001,9 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                             transform: "translateX(-50%) rotate(45deg)",
                             width: "8px",
                             height: "8px",
-                            background: "rgba(12, 16, 23, 0.96)",
-                            borderRight: "1px solid rgba(255, 255, 255, 0.12)",
-                            borderBottom: "1px solid rgba(255, 255, 255, 0.12)"
+                            background: isDark ? "rgba(12, 16, 23, 0.96)" : "#FFFFFF",
+                            borderRight: isDark ? "1px solid rgba(255, 255, 255, 0.12)" : "1px solid rgba(15, 23, 42, 0.12)",
+                            borderBottom: isDark ? "1px solid rgba(255, 255, 255, 0.12)" : "1px solid rgba(15, 23, 42, 0.12)"
                         }}
                     />
                 </div>
@@ -916,13 +1024,13 @@ const styles = {
     },
     subtitle: {
         fontSize: "15px",
-        color: "rgba(255, 255, 255, 0.75)",
+        color: "var(--text-secondary, rgba(255, 255, 255, 0.75))",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         marginTop: "4px"
     },
     statBox: {
-        background: "rgba(255, 255, 255, 0.025)",
-        border: "1px solid rgba(255, 255, 255, 0.07)",
+        background: "var(--card-bg, rgba(255, 255, 255, 0.025))",
+        border: "1px solid var(--card-border, rgba(255, 255, 255, 0.07))",
         borderRadius: "12px",
         padding: "12px 14px",
         display: "flex",
@@ -940,7 +1048,7 @@ const styles = {
         fontSize: "11px",
         fontWeight: 600,
         letterSpacing: "1px",
-        color: "rgba(255, 255, 255, 0.55)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.55))",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         textTransform: "uppercase"
     },
@@ -954,12 +1062,12 @@ const styles = {
     statBoxUnit: {
         fontSize: "13px",
         fontWeight: 500,
-        color: "rgba(255, 255, 255, 0.55)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.55))",
         marginLeft: "2px"
     },
     statBoxCaption: {
         fontSize: "11.5px",
-        color: "rgba(255, 255, 255, 0.5)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.5))",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         whiteSpace: "nowrap",
         overflow: "hidden",
@@ -979,7 +1087,7 @@ const styles = {
         padding: "1px 6px",
         borderRadius: "4px",
         border: "1px solid",
-        background: "rgba(255, 255, 255, 0.03)"
+        background: "var(--surface-raised, rgba(255, 255, 255, 0.03))"
     },
     yearSelectWrap: {
         position: "relative",
@@ -990,10 +1098,10 @@ const styles = {
         appearance: "none",
         WebkitAppearance: "none",
         MozAppearance: "none",
-        background: "rgba(10, 13, 19, 0.72)",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        background: "var(--input-bg, rgba(10, 13, 19, 0.72))",
+        border: "1px solid var(--input-border, rgba(255, 255, 255, 0.1))",
         borderRadius: "8px",
-        color: "#fff",
+        color: "var(--input-text, #fff)",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         fontSize: "12.5px",
         fontWeight: 500,
@@ -1008,12 +1116,12 @@ const styles = {
         position: "absolute",
         right: "10px",
         fontSize: "10px",
-        color: "rgba(255, 255, 255, 0.5)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.5))",
         pointerEvents: "none"
     },
     yearOption: {
-        background: "#0c1017",
-        color: "#fff",
+        background: "var(--dropdown-bg, #0c1017)",
+        color: "var(--input-text, #fff)",
         fontFamily: "'Space Grotesk', sans-serif"
     },
     scrollWrapper: {
@@ -1053,7 +1161,7 @@ const styles = {
     },
     weekdayLabel: {
         fontSize: "11px",
-        color: "rgba(255, 255, 255, 0.55)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.55))",
         lineHeight: "11px",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         userSelect: "none"
@@ -1082,7 +1190,7 @@ const styles = {
         gap: "14px",
         marginTop: "16px",
         paddingTop: "14px",
-        borderTop: "1px solid rgba(255, 255, 255, 0.06)"
+        borderTop: "1px solid var(--border, rgba(255, 255, 255, 0.06))"
     },
     legendPlatforms: {
         display: "flex",
@@ -1104,7 +1212,7 @@ const styles = {
     },
     legendText: {
         fontSize: "12px",
-        color: "rgba(255, 255, 255, 0.7)",
+        color: "var(--text-secondary, rgba(255, 255, 255, 0.7))",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         fontWeight: 500
     },
@@ -1115,7 +1223,7 @@ const styles = {
     },
     legendScaleLabel: {
         fontSize: "11px",
-        color: "rgba(255, 255, 255, 0.5)",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.5))",
         fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         padding: "0 4px"
     },

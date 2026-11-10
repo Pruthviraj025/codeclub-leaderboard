@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * SidebarParticles
  * Lightweight, atmospheric background particle effect inspired by Grain Mass.
  * Fully isolated from Grain Mass source/shaders.
  * Features:
- * - Grain Mass palette: aqua/cyan, violet/purple, golden amber, coral pink, starlight white
+ * - Grain Mass palette: aqua/cyan, violet/purple, golden amber, starlight white in dark mode; rich saturated jewel tones in light mode
  * - Slow organic harmonic drift with soft twinkle
  * - Auto-pauses when tab is inactive (Visibility API)
  * - Honors prefers-reduced-motion
@@ -13,6 +14,7 @@ import { useEffect, useRef } from 'react';
  */
 export default function SidebarParticles() {
   const canvasRef = useRef(null);
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,14 +32,20 @@ export default function SidebarParticles() {
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Palette directly matching Grain Mass DEFAULT_COLORS (#4300FF indigo, #AA00FF violet, #FFC12B gold, #63BAFF cyan)
-    const COLOR_PALETTE = [
+    // Palette matching Grain Mass in dark vs light mode
+    const COLOR_PALETTE = isDark ? [
       { r: 67, g: 0, b: 255 },    // Grain Mass Indigo (#4300FF)
       { r: 112, g: 66, b: 255 },  // Lighter Indigo Spark (#7042FF)
       { r: 170, g: 0, b: 255 },   // Grain Mass Violet (#AA00FF)
       { r: 255, g: 193, b: 43 },  // Grain Mass Amber Gold (#FFC12B)
       { r: 99, g: 186, b: 255 },  // Grain Mass Sky Blue (#63BAFF)
       { r: 255, g: 255, b: 255 }  // Starlight White
+    ] : [
+      { r: 67, g: 0, b: 255 },    // Grain Mass Deep Indigo (#4300FF)
+      { r: 124, g: 58, b: 237 },  // Violet (#7C3AED)
+      { r: 217, g: 119, b: 6 },   // Amber Gold (#D97706)
+      { r: 2, g: 132, b: 199 },   // Sky Blue (#0284C7)
+      { r: 13, g: 148, b: 136 }   // Teal (#0D9488)
     ];
 
     let width = 0;
@@ -205,7 +213,7 @@ export default function SidebarParticles() {
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <canvas

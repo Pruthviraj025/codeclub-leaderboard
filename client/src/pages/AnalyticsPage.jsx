@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import { api, getSessionUser } from '../api';
+import { useTheme } from '../context/ThemeContext';
 import SidebarLayout from '../components/SidebarLayout';
 
 const MODES = [
@@ -11,6 +12,7 @@ const MODES = [
 ];
 
 export default function AnalyticsPage() {
+  const { isDark } = useTheme();
   const [mode, setMode] = useState('range');
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState('');
@@ -73,7 +75,7 @@ export default function AnalyticsPage() {
         <div style={styles.titleRow}>
           <div>
             <div style={styles.eyebrow}>
-              <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
+              <Sparkles size={13} style={{ marginRight: '6px', color: 'var(--accent-green, #5EEAD4)' }} />
               YOUR ACTIVITY
             </div>
             <h1 style={styles.title}>Analytics &amp; Insights</h1>
@@ -133,36 +135,36 @@ export default function AnalyticsPage() {
             <div style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}>
               <ResponsiveContainer width="100%" height={340}>
                 <BarChart data={chartData} margin={{ top: 20, right: 15, left: -10, bottom: 25 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(15, 23, 42, 0.08)"} vertical={false} />
                   <XAxis
                     dataKey="label"
-                    tick={{ fill: 'rgba(255, 255, 255, 0.65)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
-                    stroke="rgba(255, 255, 255, 0.15)"
-                    label={{ value: xLabel, position: 'insideBottom', offset: -14, fill: 'rgba(255, 255, 255, 0.55)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
+                    tick={{ fill: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(51, 65, 85, 0.85)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
+                    stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(15, 23, 42, 0.15)"}
+                    label={{ value: xLabel, position: 'insideBottom', offset: -14, fill: isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(100, 116, 139, 0.9)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
                   />
                   <YAxis
-                    tick={{ fill: 'rgba(255, 255, 255, 0.65)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
-                    stroke="rgba(255, 255, 255, 0.15)"
-                    label={{ value: yLabel, angle: -90, position: 'insideLeft', offset: 15, fill: 'rgba(255, 255, 255, 0.55)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
+                    tick={{ fill: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(51, 65, 85, 0.85)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
+                    stroke={isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(15, 23, 42, 0.15)"}
+                    label={{ value: yLabel, angle: -90, position: 'insideLeft', offset: 15, fill: isDark ? 'rgba(255, 255, 255, 0.55)' : 'rgba(100, 116, 139, 0.9)', fontSize: 12, fontFamily: "'Space Grotesk', sans-serif" }}
                     allowDecimals={false}
                   />
 
                   <Tooltip
-                    cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }}
+                    cursor={{ fill: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.04)' }}
                     contentStyle={{
-                      background: 'rgba(12, 16, 23, 0.95)',
-                      border: '1px solid rgba(255, 255, 255, 0.14)',
+                      background: isDark ? 'rgba(12, 16, 23, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.14)' : '1px solid rgba(15, 23, 42, 0.12)',
                       borderRadius: 10,
-                      color: '#FFFFFF',
+                      color: isDark ? '#FFFFFF' : '#0F172A',
                       fontSize: 13,
                       fontFamily: "'Space Grotesk', sans-serif",
-                      boxShadow: '0 12px 30px rgba(0, 0, 0, 0.7)'
+                      boxShadow: isDark ? '0 12px 30px rgba(0, 0, 0, 0.7)' : '0 8px 24px rgba(15, 23, 42, 0.08)'
                     }}
                     formatter={(value) => [value, yLabel]}
                   />
                   <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                     {chartData.map((_, i) => (
-                      <Cell key={i} fill="#5EEAD4" />
+                      <Cell key={i} fill={isDark ? "#5EEAD4" : "#0D9488"} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -189,7 +191,7 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
     letterSpacing: '2.5px',
-    color: '#5EEAD4',
+    color: 'var(--accent-green, #5EEAD4)',
     marginBottom: '8px',
     textTransform: 'uppercase',
     userSelect: 'none'
@@ -200,12 +202,11 @@ const styles = {
     fontWeight: 700,
     margin: 0,
     letterSpacing: '-0.3px',
-    color: '#FFFFFF',
-    textShadow: '0 0 24px rgba(255, 255, 255, 0.12)'
+    color: 'var(--text, #FFFFFF)'
   },
   subtitle: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-secondary, rgba(255, 255, 255, 0.65))',
     fontSize: '14px',
     lineHeight: '1.5',
     margin: '8px 0 0 0',
@@ -222,18 +223,18 @@ const styles = {
   tabRow: {
     display: 'flex',
     gap: '4px',
-    background: 'rgba(10, 13, 19, 0.72)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
     padding: '5px',
     borderRadius: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.08))',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+    boxShadow: 'var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.4))'
   },
   tab: {
     background: 'transparent',
     border: '1px solid transparent',
-    color: 'rgba(255, 255, 255, 0.65)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.65))',
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     fontWeight: 500,
@@ -245,16 +246,16 @@ const styles = {
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
   },
   tabActive: {
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: '1px solid rgba(255, 255, 255, 0.18)',
-    color: '#FFFFFF',
+    background: 'rgba(67, 0, 255, 0.12)',
+    border: '1px solid rgba(67, 0, 255, 0.35)',
+    color: 'var(--text, #FFFFFF)',
     fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
   },
   select: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    color: '#FFFFFF',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: 'var(--input-bg, rgba(10, 13, 19, 0.72))',
+    color: 'var(--text, #FFFFFF)',
+    border: '1px solid var(--border, rgba(255, 255, 255, 0.1))',
     borderRadius: '10px',
     padding: '9px 14px',
     fontSize: '13px',
@@ -262,16 +263,15 @@ const styles = {
     outline: 'none',
     cursor: 'pointer',
     backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+    WebkitBackdropFilter: 'blur(16px)'
   },
   expireBadge: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
     fontWeight: 500,
-    color: 'rgba(255, 255, 255, 0.8)',
-    background: 'rgba(248, 113, 113, 0.1)',
-    border: '1px solid rgba(248, 113, 113, 0.3)',
+    color: 'var(--text, rgba(255, 255, 255, 0.8))',
+    background: 'var(--accent-red-dim, rgba(248, 113, 113, 0.1))',
+    border: '1px solid var(--accent-red, rgba(248, 113, 113, 0.3))',
     borderRadius: '10px',
     padding: '9px 16px',
     userSelect: 'none',
@@ -280,7 +280,7 @@ const styles = {
     gap: '8px'
   },
   expireValue: {
-    color: '#F87171',
+    color: 'var(--accent-red, #F87171)',
     fontWeight: 700,
     fontSize: '14px'
   },
@@ -293,13 +293,13 @@ const styles = {
     fontFamily: "'Space Grotesk', sans-serif"
   },
   chartCard: {
-    background: 'rgba(10, 13, 19, 0.72)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'var(--card-bg, rgba(10, 13, 19, 0.72))',
+    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.08))',
     borderRadius: '16px',
     padding: '24px 28px',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.09)'
+    boxShadow: 'var(--card-shadow, 0 24px 60px rgba(0, 0, 0, 0.75))'
   },
   chartHeader: {
     marginBottom: '20px'
@@ -308,18 +308,18 @@ const styles = {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '16px',
     fontWeight: 700,
-    color: '#FFFFFF',
+    color: 'var(--text, #FFFFFF)',
     letterSpacing: '0.2px',
     margin: '0 0 4px 0'
   },
   chartSubtitle: {
     fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: '13px',
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     margin: 0
   },
   empty: {
-    color: 'rgba(255, 255, 255, 0.55)',
+    color: 'var(--text-dim, rgba(255, 255, 255, 0.55))',
     textAlign: 'center',
     padding: '60px 0',
     fontFamily: "'Space Grotesk', sans-serif",
