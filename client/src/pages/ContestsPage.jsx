@@ -6,6 +6,18 @@ import SidebarLayout from '../components/SidebarLayout';
 
 const CF_DIVISION_ORDER = ['Div. 1', 'Div. 2', 'Div. 3', 'Div. 4', 'Div. 1 + 2', 'Educational', 'Global', 'Other'];
 const LC_CATEGORY_ORDER = ['Upcoming & Live', 'Weekly Contest', 'Biweekly Contest', 'Past Contests'];
+const CC_CATEGORY_ORDER = ['Upcoming & Live', 'Starters', 'Cook-Off', 'Lunchtime', 'DSA Challenges', 'Other Contests'];
+
+function CodeChefIcon({ size = 18, color = '#D48843', style = {} }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style} xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3C8.5 3 6.5 5.5 6.5 8.5C5.5 8.8 4 9.8 4 12C4 14.5 6 15.5 7 15.8V19C7 19.6 7.4 20 8 20H16C16.6 20 17 19.6 17 19V15.8C18 15.5 20 14.5 20 12C20 9.8 18.5 8.8 17.5 8.5C17.5 5.5 15.5 3 12 3Z" fill={color} />
+      <circle cx="9.5" cy="11.5" r="1.3" fill="#1A1815" />
+      <circle cx="14.5" cy="11.5" r="1.3" fill="#1A1815" />
+      <path d="M10 15C11 15.8 13 15.8 14 15" stroke="#1A1815" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export default function ContestsPage() {
   const [data, setData] = useState(null);
@@ -39,10 +51,12 @@ export default function ContestsPage() {
 
   const cfGrouped = data?.codeforces?.grouped || {};
   const lcGrouped = data?.leetcode?.grouped || {};
-  const stats = data?.stats || { totalCount: 0, cfCount: 0, lcCount: 0, upcomingCount: 0, liveCount: 0 };
+  const ccGrouped = data?.codechef?.grouped || {};
+  const stats = data?.stats || { totalCount: 0, cfCount: 0, lcCount: 0, ccCount: 0, upcomingCount: 0, liveCount: 0 };
 
   const cfDivisions = CF_DIVISION_ORDER.filter(d => cfGrouped[d]?.length);
   const lcCategories = LC_CATEGORY_ORDER.filter(c => lcGrouped[c]?.length);
+  const ccCategories = CC_CATEGORY_ORDER.filter(c => ccGrouped[c]?.length);
 
   function filterContest(c) {
     if (statusFilter === 'upcoming' && c.phase !== 'BEFORE') return false;
@@ -71,11 +85,11 @@ export default function ContestsPage() {
           <div>
             <div style={styles.eyebrow}>
               <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
-              CODEFORCES &amp; LEETCODE CONTESTS
+              CODEFORCES, LEETCODE &amp; CODECHEF CONTESTS
             </div>
             <h1 style={styles.title}>Contests &amp; Competitions</h1>
             <p style={styles.subtitle}>
-              Track upcoming and live programming contests across Codeforces and LeetCode. Never miss a round!
+              Track upcoming and live programming contests across Codeforces, LeetCode, and CodeChef. Never miss a round!
             </p>
           </div>
 
@@ -151,6 +165,23 @@ export default function ContestsPage() {
             </div>
           </div>
 
+          <div
+            style={{
+              ...styles.statCard,
+              borderColor: platform === 'codechef' ? '#D48843' : 'var(--border)',
+              cursor: 'pointer'
+            }}
+            onClick={() => setPlatform(platform === 'codechef' ? 'all' : 'codechef')}
+          >
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(212, 136, 67, 0.15)', color: '#D48843' }}>
+              <CodeChefIcon size={18} />
+            </div>
+            <div>
+              <div style={styles.statValue}>{loading ? '-' : stats.ccCount || 0}</div>
+              <div style={styles.statLabel}>CodeChef</div>
+            </div>
+          </div>
+
           <div style={styles.statCard}>
             <div style={{ ...styles.statIconWrapper, background: 'rgba(216, 180, 254, 0.12)', color: '#D8B4FE' }}>
               <Clock size={18} />
@@ -185,6 +216,13 @@ export default function ContestsPage() {
             >
               <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#FCD34D', marginRight: '6px' }}></span>
               LeetCode
+            </button>
+            <button
+              style={{ ...styles.tab, ...(platform === 'codechef' ? styles.tabActiveCC : {}) }}
+              onClick={() => setPlatform('codechef')}
+            >
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#D48843', marginRight: '6px' }}></span>
+              CodeChef
             </button>
           </div>
 
@@ -327,6 +365,69 @@ export default function ContestsPage() {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })
+                              : 'TBA'}
+                          </div>
+                          <div style={styles.durationPill}>
+                            {formatDuration(c.durationSeconds)}
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        )}
+
+        {!loading && (platform === 'all' || platform === 'codechef') && (
+          <div style={{ marginBottom: '40px' }}>
+            <div style={styles.platformHeader}>
+              <CodeChefIcon size={18} color="#D48843" style={{ marginRight: '8px' }} />
+              <span style={{ color: '#D48843' }}>CodeChef Contests</span>
+            </div>
+
+            {ccCategories.map(cat => {
+              const list = ccGrouped[cat].filter(filterContest);
+              if (list.length === 0) return null;
+
+              return (
+                <section key={cat} style={styles.section}>
+                  <div style={styles.sectionTitle}>{cat}</div>
+                  <div style={styles.grid}>
+                    {list.map(c => (
+                      <a
+                        key={c.id}
+                        href={c.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ ...styles.card, borderColor: 'rgba(212, 136, 67, 0.25)' }}
+                        className="row-hover"
+                      >
+                        <div style={styles.cardTop}>
+                          <div style={styles.badgeRow}>
+                            <span style={{ ...styles.platformBadge, background: 'rgba(212, 136, 67, 0.2)', color: '#D48843' }}>
+                              CodeChef
+                            </span>
+                            <span style={{ ...styles.phaseBadge, ...phaseStyle(c.phase) }}>
+                              {phaseLabel(c.phase)}
+                            </span>
+                          </div>
+                          <ExternalLink size={13} color="var(--text-dim)" />
+                        </div>
+
+                        <div style={styles.cardName}>{c.name}</div>
+
+                        <div style={styles.cardMetaRow}>
+                          <div style={styles.cardMeta} className="mono">
+                            {c.startTimeSeconds
+                              ? new Date(c.startTimeSeconds * 1000).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })
                               : 'TBA'}
                           </div>
                           <div style={styles.durationPill}>
@@ -520,6 +621,11 @@ const styles = {
     color: 'var(--lc-color, #FCD34D)',
     fontWeight: 600,
     boxShadow: '0 2px 10px rgba(252, 211, 77, 0.15)'
+  },
+  tabActiveCC: {
+    background: 'rgba(212, 136, 67, 0.3)',
+    color: '#D48843',
+    fontWeight: 600
   },
   searchAndFilters: {
     display: 'flex',

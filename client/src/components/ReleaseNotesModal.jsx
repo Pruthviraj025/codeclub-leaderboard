@@ -55,13 +55,13 @@ export default function ReleaseNotesModal() {
           </div>
 
           <div style={styles.featureItem}>
-            <div style={{ ...styles.iconBox, background: 'rgba(96, 165, 250, 0.12)', color: 'var(--cf-color, #60A5FA)' }}>
+            <div style={{ ...styles.iconBox, background: 'rgba(212, 136, 67, 0.12)', color: 'var(--cc-color, #D48843)' }}>
               <CalendarDays size={18} />
             </div>
             <div>
-              <div style={styles.featureTitle}>LeetCode Contests</div>
+              <div style={styles.featureTitle}>Contests Hub: CodeChef, LeetCode &amp; Codeforces</div>
               <div style={styles.featureDesc}>
-                Track upcoming and live LeetCode Weekly &amp; Biweekly Contests alongside Codeforces rounds.
+                Track Starters, Cook-Off, LeetCode Weekly/Biweekly, and Codeforces rounds with real-time status and direct links.
               </div>
             </div>
           </div>
