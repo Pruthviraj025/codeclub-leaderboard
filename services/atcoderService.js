@@ -99,7 +99,7 @@ async function fetchAtCoderSubmissions(handle, fromSecond = 0) {
     throw lastError;
 }
 
-async function getAtCoderProblemDetails(problemId) {
+async function getAtCoderProblemDetails(problemId, taskPoint = null) {
     const cleanId = (problemId || "").trim();
 
     // Check DB cache
@@ -124,7 +124,7 @@ async function getAtCoderProblemDetails(problemId) {
     const difficultyRating = (model && typeof model.difficulty === "number") ? model.difficulty : null;
     const problemName = info ? (info.title || info.name || cleanId) : cleanId;
     const contestId = info ? info.contest_id : cleanId.split("_")[0];
-    const points = resolveAtCoderPoints(difficultyRating);
+    const points = resolveAtCoderPoints(taskPoint, difficultyRating);
 
     const questionDoc = await AtCoderQuestion.findOneAndUpdate(
         { problemId: cleanId },
@@ -132,6 +132,7 @@ async function getAtCoderProblemDetails(problemId) {
             $set: {
                 problemName,
                 contestId,
+                taskPoints: taskPoint != null ? Number(taskPoint) : null,
                 difficultyRating,
                 points,
                 lastFetchedAt: new Date()
@@ -188,7 +189,7 @@ async function refreshAtcoderScore(user) {
         highestSubmissionId = Math.max(highestSubmissionId, submission.id);
 
         try {
-            const details = await getAtCoderProblemDetails(submission.problem_id);
+            const details = await getAtCoderProblemDetails(submission.problem_id, submission.point);
             const points = details.points;
             if (points == null) continue;
 

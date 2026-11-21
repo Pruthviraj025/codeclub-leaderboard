@@ -364,22 +364,19 @@ const CODECHEF_MAP = [
 ];
 
 const ATCODER_MAP = [
-  ['< 200 / Unrated', 100],
-  ['200–399', 200],
-  ['400–599', 300],
-  ['600–799', 450],
-  ['800–999', 700],
-  ['1000–1199', 1000],
-  ['1200–1399', 1300],
-  ['1400–1599', 1600],
-  ['1600–1799', 2000],
-  ['1800–1999', 2400],
-  ['2000–2199', 2800],
-  ['2200–2399', 3400],
-  ['2400–2599', 4000],
-  ['2600–2799', 4500],
-  ['2800–2999', 5000],
-  ['3000+', 5500]
+  ['< 100 pt / Unrated', 100],
+  ['100 pt', 200],
+  ['200 pt', 400],
+  ['300 pt', 500],
+  ['400 pt', 800],
+  ['500 pt', 1400],
+  ['600 pt', 2000],
+  ['700 pt', 2600],
+  ['800 pt', 3200],
+  ['900 pt', 3800],
+  ['1000 pt', 4400],
+  ['1100 pt', 5000],
+  ['1200+ pt', 5500]
 ];
 
 function InfoModal({ onClose }) {
@@ -427,10 +424,10 @@ function InfoModal({ onClose }) {
           <section style={styles.section}>
             <div style={styles.sectionTitle}>AtCoder scoring</div>
             <ul style={styles.list}>
-              <li>Connect your AtCoder handle on your Profile page by setting your Affiliation or submitting broken code to problem practice_1.</li>
+              <li>Connect your AtCoder handle on your Profile page by setting your Affiliation in profile settings.</li>
               <li>Only <strong>Accepted (AC)</strong> solutions count.</li>
               <li>Each problem awards points once within the 7-day rolling window.</li>
-              <li>Points scale based on problem difficulty rating intervals (see table below).</li>
+              <li>Points scale based on problem task points: 100 pt → 200, 200 pt → 400, 300 pt → 500, 400 pt → 800, 500 pt → 1400, etc. (see table below).</li>
             </ul>
           </section>
 
@@ -482,7 +479,7 @@ function InfoModal({ onClose }) {
           </section>
 
           <section style={styles.section}>
-            <div style={styles.sectionTitle}>AtCoder rating → points</div>
+            <div style={styles.sectionTitle}>AtCoder points → leaderboard points</div>
             <div style={styles.ratingGrid}>
               {ATCODER_MAP.map(([range, points]) => (
                 <div key={range} style={styles.ratingCell}>

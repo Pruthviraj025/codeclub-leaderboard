@@ -1526,7 +1526,7 @@ export default function ProfilePage() {
                                     ) : (
                                         <div style={{ marginTop: 12 }}>
                                             <p style={styles.instructions}>
-                                                Set your AtCoder <strong>Affiliation (所属)</strong> in your{" "}
+                                                Set your AtCoder <strong>Affiliation</strong> in your{" "}
                                                 <a
                                                     href={acVerifyInfo.settingsUrl || "https://atcoder.jp/settings"}
                                                     target="_blank"
@@ -1553,24 +1553,14 @@ export default function ProfilePage() {
                                             >
                                                 {acVerifyInfo.verificationCode}
                                             </div>
-                                            <p style={{ ...styles.instructions, fontSize: "12px", color: "var(--text-dim, rgba(255, 255, 255, 0.5))" }}>
-                                                Or submit broken code (Compile Error) to{" "}
-                                                <a
-                                                    href={acVerifyInfo.problemUrl}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    style={{ ...styles.link, color: "#4ADE80" }}
+                                            <div style={{ marginTop: 6, marginBottom: 12 }}>
+                                                <button
+                                                    className="profile-btn profile-btn-ac"
+                                                    onClick={handleCheckAcVerification}
                                                 >
-                                                    problem {acVerifyInfo.problemCode}
-                                                </a>{" "}
-                                                within {acVerifyInfo.windowMinutes} minutes.
-                                            </p>
-                                            <button
-                                                className="profile-btn profile-btn-ac"
-                                                onClick={handleCheckAcVerification}
-                                            >
-                                                Verify Account
-                                            </button>
+                                                    Verify Account
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
                                 </>

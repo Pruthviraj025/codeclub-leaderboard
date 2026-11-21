@@ -20,6 +20,11 @@ const AtCoderQuestionSchema = new mongoose.Schema(
             default: null
         },
 
+        taskPoints: {
+            type: Number,
+            default: null
+        },
+
         difficultyRating: {
             type: Number,
             default: null
