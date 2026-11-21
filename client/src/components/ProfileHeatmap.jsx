@@ -28,6 +28,11 @@ const PALETTES_DARK = {
         dark: { bg: "#C084FC", border: "#9333EA", glow: "#C084FC" },
         darker: { bg: "#9333EA", border: "#E9D5FF", glow: "#9333EA" }
     },
+    ac: {
+        light: { bg: "rgba(74, 222, 128, 0.4)", border: "rgba(74, 222, 128, 0.65)", glow: "#4ADE80" },
+        dark: { bg: "#4ADE80", border: "#16A34A", glow: "#4ADE80" },
+        darker: { bg: "#16A34A", border: "#BBF7D0", glow: "#16A34A" }
+    },
     twoPlats: {
         light: { bg: "rgba(94, 234, 212, 0.45)", border: "rgba(94, 234, 212, 0.7)", glow: "#5EEAD4" },
         dark: { bg: "#2DD4BF", border: "#0D9488", glow: "#2DD4BF" },
@@ -56,6 +61,11 @@ const PALETTES_LIGHT = {
         dark: { bg: "#C084FC", border: "#9333EA", glow: "#C084FC" },
         darker: { bg: "#9333EA", border: "#7E22CE", glow: "#9333EA" }
     },
+    ac: {
+        light: { bg: "rgba(22, 163, 74, 0.28)", border: "rgba(22, 163, 74, 0.5)", glow: "#16A34A" },
+        dark: { bg: "#22C55E", border: "#16A34A", glow: "#22C55E" },
+        darker: { bg: "#16A34A", border: "#15803D", glow: "#16A34A" }
+    },
     twoPlats: {
         light: { bg: "rgba(13, 148, 136, 0.28)", border: "rgba(13, 148, 136, 0.5)", glow: "#0D9488" },
         dark: { bg: "#2DD4BF", border: "#0D9488", glow: "#2DD4BF" },
@@ -71,6 +81,7 @@ const PALETTES_LIGHT = {
 const COLOR_CF = "#7DD3FC";
 const COLOR_LC = "#FB923C";
 const COLOR_CC = "#D8B4FE";
+const COLOR_AC = "#4ADE80";
 const COLOR_2PLATS = "#5EEAD4";
 const COLOR_3PLATS = "#34D399";
 
@@ -204,13 +215,14 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
         let cfTotal = 0;
         let lcTotal = 0;
         let ccTotal = 0;
+        let acTotal = 0;
 
         const cursor = new Date(startDay);
         let colIndex = 0;
 
         while (cursor <= endDate) {
             const dateStr = formatYMD(cursor);
-            const emptyDay = { total: 0, codeforces: 0, leetcode: 0, codechef: 0 };
+            const emptyDay = { total: 0, codeforces: 0, leetcode: 0, codechef: 0, atcoder: 0 };
             // Server buckets by local date key
             const inRange = cursor >= startDate && cursor <= endDate;
             const dayData = inRange ? (activityMap[dateStr] || emptyDay) : emptyDay;
@@ -224,6 +236,7 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 cfTotal += dayData.codeforces || 0;
                 lcTotal += dayData.leetcode || 0;
                 ccTotal += dayData.codechef || 0;
+                acTotal += dayData.atcoder || 0;
             }
 
             const currentMonth = cursor.getMonth();
@@ -241,6 +254,7 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 codeforces: dayData.codeforces || 0,
                 leetcode: dayData.leetcode || 0,
                 codechef: dayData.codechef || 0,
+                atcoder: dayData.atcoder || 0,
                 inRange
             });
 
@@ -336,7 +350,8 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
             platformTotals: {
                 cf: cfTotal,
                 lc: lcTotal,
-                cc: ccTotal
+                cc: ccTotal,
+                ac: acTotal
             }
         };
     }, [activityMap, selectedYear]);
@@ -353,7 +368,8 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
         const hasCf = day.codeforces > 0;
         const hasLc = day.leetcode > 0;
         const hasCc = day.codechef > 0;
-        const activeCount = (hasCf ? 1 : 0) + (hasLc ? 1 : 0) + (hasCc ? 1 : 0);
+        const hasAc = day.atcoder > 0;
+        const activeCount = (hasCf ? 1 : 0) + (hasLc ? 1 : 0) + (hasCc ? 1 : 0) + (hasAc ? 1 : 0);
 
         // Light for 1 question, Dark for 2 questions, Darker for 3+ questions
         const shade = getShadeKey(day.total);
@@ -361,7 +377,7 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
         if (activeCount >= 3) {
             return {
                 ...PALETTES.threePlats[shade],
-                label: "3 Platforms"
+                label: "3+ Platforms"
             };
         }
 
@@ -389,6 +405,12 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
             return {
                 ...PALETTES.cc[shade],
                 label: "CodeChef"
+            };
+        }
+        if (hasAc) {
+            return {
+                ...PALETTES.ac[shade],
+                label: "AtCoder"
             };
         }
 
@@ -797,6 +819,9 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                         <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_CC, borderColor: "var(--cc-border, rgba(192, 132, 252, 0.3))" }}>
                             CC {platformTotals.cc}
                         </span>
+                        <span className="profile-stat-platform-pill" style={{ ...styles.statPlatformPill, color: COLOR_AC, borderColor: "var(--ac-border, rgba(74, 222, 128, 0.3))" }}>
+                            AC {platformTotals.ac}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -920,6 +945,10 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                         <span style={styles.legendText}>CodeChef</span>
                     </div>
                     <div className="profile-legend-item" style={styles.legendItem}>
+                        <span style={{ ...styles.legendDot, background: "#4ADE80", border: "1px solid #16A34A" }} />
+                        <span style={styles.legendText}>AtCoder</span>
+                    </div>
+                    <div className="profile-legend-item" style={styles.legendItem}>
                         <span style={{ ...styles.legendDot, background: "#2DD4BF", border: "1px solid #0D9488" }} />
                         <span style={styles.legendText}>Multi-Platform</span>
                     </div>
@@ -988,6 +1017,13 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                                     CodeChef:
                                 </span>
                                 <strong style={{ color: isDark ? "#fff" : "#0F172A" }}>{hoveredCell.day.codechef || 0}</strong>
+                            </div>
+
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+                                <span style={{ color: COLOR_AC, fontWeight: 500 }}>
+                                    AtCoder:
+                                </span>
+                                <strong style={{ color: isDark ? "#fff" : "#0F172A" }}>{hoveredCell.day.atcoder || 0}</strong>
                             </div>
                         </div>
                     )}

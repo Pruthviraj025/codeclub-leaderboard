@@ -70,6 +70,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
     let codeforcesPoints = 0;
     let leetcodePoints = 0;
     let codechefPoints = 0;
+    let atcoderPoints = 0;
 
     for (const row of stats) {
 
@@ -85,12 +86,17 @@ router.get('/:userId', requireAuth, async (req, res) => {
         codechefPoints = row.points;
       }
 
+      if (row._id === "atcoder") {
+        atcoderPoints = row.points;
+      }
+
     }
 
     const totalPoints =
       codeforcesPoints +
       leetcodePoints +
-      codechefPoints;
+      codechefPoints +
+      atcoderPoints;
 
     const submissions = await ScoredSubmission.find({
       userId: user._id
@@ -104,6 +110,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
       let problemIndex = s.problemIndex || null;
       const isCf = s.platform === 'codeforces' || !s.platform;
       const isCc = s.platform === 'codechef';
+      const isAc = s.platform === 'atcoder';
 
       if (isCf && s.problemId) {
         const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
@@ -127,6 +134,11 @@ router.get('/:userId', requireAuth, async (req, res) => {
       } else if (isCc) {
         if (s.problemId) {
           problemUrl = `https://www.codechef.com/problems/${s.problemId}`;
+        }
+      } else if (isAc) {
+        if (s.problemId) {
+          const cid = s.contestId || s.problemId.split('_')[0];
+          problemUrl = `https://atcoder.jp/contests/${cid}/tasks/${s.problemId}`;
         }
       } else {
         if (s.problemId) {
@@ -178,6 +190,7 @@ router.get('/:userId', requireAuth, async (req, res) => {
           codeforces: 0,
           leetcode: 0,
           codechef: 0,
+          atcoder: 0,
           platforms: []
         };
       }
@@ -204,9 +217,13 @@ router.get('/:userId', requireAuth, async (req, res) => {
       ccHandle: user.ccHandle,
       ccConnected: user.ccConnected,
 
+      atcoderHandle: user.atcoderHandle,
+      atcoderConnected: user.atcoderConnected,
+
       codeforcesPoints,
       leetcodePoints,
       codechefPoints,
+      atcoderPoints,
       totalPoints,
       solvedSubmissions,
       activityMap

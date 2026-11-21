@@ -7,6 +7,7 @@ import SidebarLayout from '../components/SidebarLayout';
 const CF_DIVISION_ORDER = ['Div. 1', 'Div. 2', 'Div. 3', 'Div. 4', 'Div. 1 + 2', 'Educational', 'Global', 'Other'];
 const LC_CATEGORY_ORDER = ['Upcoming & Live', 'Weekly Contest', 'Biweekly Contest', 'Past Contests'];
 const CC_CATEGORY_ORDER = ['Upcoming & Live', 'Starters', 'Cook-Off', 'Lunchtime', 'DSA Challenges', 'Other Contests'];
+const AC_CATEGORY_ORDER = ['Upcoming & Live', 'ABC', 'ARC', 'AGC', 'AHC', 'Other Contests'];
 
 function CodeChefIcon({ size = 18, color = '#D48843', style = {} }) {
   return (
@@ -15,6 +16,16 @@ function CodeChefIcon({ size = 18, color = '#D48843', style = {} }) {
       <circle cx="9.5" cy="11.5" r="1.3" fill="#1A1815" />
       <circle cx="14.5" cy="11.5" r="1.3" fill="#1A1815" />
       <path d="M10 15C11 15.8 13 15.8 14 15" stroke="#1A1815" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function AtCoderIcon({ size = 18, color = '#4ADE80', style = {} }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style} xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" fill="#202020" stroke={color} strokeWidth="1.5" />
+      <path d="M12 6L6.5 18H9.5L10.8 15H13.2L14.5 18H17.5L12 6Z" fill={color} />
+      <path d="M11.2 13H12.8" stroke="#202020" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -52,11 +63,13 @@ export default function ContestsPage() {
   const cfGrouped = data?.codeforces?.grouped || {};
   const lcGrouped = data?.leetcode?.grouped || {};
   const ccGrouped = data?.codechef?.grouped || {};
-  const stats = data?.stats || { totalCount: 0, cfCount: 0, lcCount: 0, ccCount: 0, upcomingCount: 0, liveCount: 0 };
+  const acGrouped = data?.atcoder?.grouped || {};
+  const stats = data?.stats || { totalCount: 0, cfCount: 0, lcCount: 0, ccCount: 0, acCount: 0, upcomingCount: 0, liveCount: 0 };
 
   const cfDivisions = CF_DIVISION_ORDER.filter(d => cfGrouped[d]?.length);
   const lcCategories = LC_CATEGORY_ORDER.filter(c => lcGrouped[c]?.length);
   const ccCategories = CC_CATEGORY_ORDER.filter(c => ccGrouped[c]?.length);
+  const acCategories = AC_CATEGORY_ORDER.filter(c => acGrouped[c]?.length);
 
   function filterContest(c) {
     if (statusFilter === 'upcoming' && c.phase !== 'BEFORE') return false;
@@ -85,11 +98,11 @@ export default function ContestsPage() {
           <div>
             <div style={styles.eyebrow}>
               <Sparkles size={13} style={{ marginRight: '6px', color: '#5EEAD4' }} />
-              CODEFORCES, LEETCODE &amp; CODECHEF CONTESTS
+              CODEFORCES, LEETCODE, CODECHEF &amp; ATCODER CONTESTS
             </div>
             <h1 style={styles.title}>Contests &amp; Competitions</h1>
             <p style={styles.subtitle}>
-              Track upcoming and live programming contests across Codeforces, LeetCode, and CodeChef. Never miss a round!
+              Track upcoming and live programming contests across Codeforces, LeetCode, CodeChef, and AtCoder. Never miss a round!
             </p>
           </div>
 
@@ -182,6 +195,23 @@ export default function ContestsPage() {
             </div>
           </div>
 
+          <div
+            style={{
+              ...styles.statCard,
+              borderColor: platform === 'atcoder' ? '#4ADE80' : 'var(--border)',
+              cursor: 'pointer'
+            }}
+            onClick={() => setPlatform(platform === 'atcoder' ? 'all' : 'atcoder')}
+          >
+            <div style={{ ...styles.statIconWrapper, background: 'rgba(74, 222, 128, 0.15)', color: '#4ADE80' }}>
+              <AtCoderIcon size={18} />
+            </div>
+            <div>
+              <div style={styles.statValue}>{loading ? '-' : stats.acCount || 0}</div>
+              <div style={styles.statLabel}>AtCoder</div>
+            </div>
+          </div>
+
           <div style={styles.statCard}>
             <div style={{ ...styles.statIconWrapper, background: 'rgba(216, 180, 254, 0.12)', color: '#D8B4FE' }}>
               <Clock size={18} />
@@ -223,6 +253,13 @@ export default function ContestsPage() {
             >
               <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#D48843', marginRight: '6px' }}></span>
               CodeChef
+            </button>
+            <button
+              style={{ ...styles.tab, ...(platform === 'atcoder' ? styles.tabActiveAC : {}) }}
+              onClick={() => setPlatform('atcoder')}
+            >
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', marginRight: '6px' }}></span>
+              AtCoder
             </button>
           </div>
 
@@ -443,6 +480,69 @@ export default function ContestsPage() {
           </div>
         )}
 
+        {!loading && (platform === 'all' || platform === 'atcoder') && (
+          <div style={{ marginBottom: '40px' }}>
+            <div style={styles.platformHeader}>
+              <AtCoderIcon size={18} color="#4ADE80" style={{ marginRight: '8px' }} />
+              <span style={{ color: '#4ADE80' }}>AtCoder Contests</span>
+            </div>
+
+            {acCategories.map(cat => {
+              const list = acGrouped[cat].filter(filterContest);
+              if (list.length === 0) return null;
+
+              return (
+                <section key={cat} style={styles.section}>
+                  <div style={styles.sectionTitle}>{cat}</div>
+                  <div style={styles.grid}>
+                    {list.map(c => (
+                      <a
+                        key={c.id}
+                        href={c.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ ...styles.card, borderColor: 'rgba(74, 222, 128, 0.25)' }}
+                        className="row-hover"
+                      >
+                        <div style={styles.cardTop}>
+                          <div style={styles.badgeRow}>
+                            <span style={{ ...styles.platformBadge, background: 'rgba(74, 222, 128, 0.2)', color: '#4ADE80' }}>
+                              AtCoder
+                            </span>
+                            <span style={{ ...styles.phaseBadge, ...phaseStyle(c.phase) }}>
+                              {phaseLabel(c.phase)}
+                            </span>
+                          </div>
+                          <ExternalLink size={13} color="var(--text-dim)" />
+                        </div>
+
+                        <div style={styles.cardName}>{c.name}</div>
+
+                        <div style={styles.cardMetaRow}>
+                          <div style={styles.cardMeta} className="mono">
+                            {c.startTimeSeconds
+                              ? new Date(c.startTimeSeconds * 1000).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })
+                              : 'TBA'}
+                          </div>
+                          <div style={styles.durationPill}>
+                            {formatDuration(c.durationSeconds)}
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        )}
+
         {!loading && stats.totalCount === 0 && !error && (
           <div style={styles.empty}>No contests found right now.</div>
         )}
@@ -625,6 +725,12 @@ const styles = {
   tabActiveCC: {
     background: 'rgba(212, 136, 67, 0.3)',
     color: '#D48843',
+    fontWeight: 600
+  },
+  tabActiveAC: {
+    background: 'rgba(74, 222, 128, 0.2)',
+    border: '1px solid rgba(74, 222, 128, 0.4)',
+    color: '#4ADE80',
     fontWeight: 600
   },
   searchAndFilters: {

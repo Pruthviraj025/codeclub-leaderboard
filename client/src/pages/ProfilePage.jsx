@@ -39,6 +39,10 @@ export default function ProfilePage() {
     const [ccVerifyInfo, setCcVerifyInfo] = useState(null);
     const [ccVerifyMsg, setCcVerifyMsg] = useState("");
 
+    const [atcoderHandle, setAtcoderHandle] = useState("");
+    const [acVerifyInfo, setAcVerifyInfo] = useState(null);
+    const [acVerifyMsg, setAcVerifyMsg] = useState("");
+
     useEffect(() => {
 
         if (!sessionUser) {
@@ -328,6 +332,54 @@ export default function ProfilePage() {
         }
     }
 
+    async function handleStartAcVerification(e) {
+        e.preventDefault();
+        setAcVerifyMsg("");
+
+        try {
+            const res = await api.startAtcoderVerification(atcoderHandle);
+            setAcVerifyInfo(res);
+        } catch (err) {
+            setAcVerifyMsg(err.message);
+        }
+    }
+
+    async function handleCheckAcVerification() {
+        try {
+            const res = await api.checkAtcoderVerification();
+            if (res.verified) {
+                setAcVerifyMsg("AtCoder account connected!");
+                setAcVerifyInfo(null);
+                await load();
+            } else {
+                setAcVerifyMsg(
+                    res.expired
+                        ? "Verification expired. Start again."
+                        : (res.message || "Not verified yet.")
+                );
+            }
+        } catch (err) {
+            setAcVerifyMsg(err.message);
+        }
+    }
+
+    async function handleDisconnectAtcoder() {
+        if (!window.confirm("Disconnect AtCoder?")) return;
+
+        try {
+            await api.disconnectAtcoder();
+            const sessionUser = getSessionUser();
+            if (sessionUser) {
+                sessionUser.atcoderConnected = false;
+                localStorage.setItem("user", JSON.stringify(sessionUser));
+            }
+            setAcVerifyMsg("Disconnected.");
+            await load();
+        } catch (err) {
+            setAcVerifyMsg(err.message);
+        }
+    }
+
     if (!sessionUser)
         return null;
 
@@ -534,6 +586,24 @@ export default function ProfilePage() {
                         background: rgba(216, 180, 254, 0.3);
                     }
 
+                    .profile-btn-ac {
+                        background: rgba(74, 222, 128, 0.12);
+                        color: #4ADE80;
+                        border: 1px solid rgba(74, 222, 128, 0.35);
+                        box-shadow: 0 4px 14px rgba(74, 222, 128, 0.12);
+                    }
+                    .profile-btn-ac:hover:not(:disabled) {
+                        background: rgba(74, 222, 128, 0.22);
+                        border-color: rgba(74, 222, 128, 0.65);
+                        color: #DCFCE7;
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 8px 24px rgba(74, 222, 128, 0.25);
+                    }
+                    .profile-btn-ac:active:not(:disabled) {
+                        transform: translateY(1px) scale(0.98);
+                        background: rgba(74, 222, 128, 0.3);
+                    }
+
                     .profile-btn-teal {
                         background: rgba(94, 234, 212, 0.12);
                         color: #5EEAD4;
@@ -592,6 +662,10 @@ export default function ProfilePage() {
                     .profile-connected-badge-cc {
                         background: rgba(216, 180, 254, 0.06);
                         border: 1px solid rgba(216, 180, 254, 0.22);
+                    }
+                    .profile-connected-badge-ac {
+                        background: rgba(74, 222, 128, 0.06);
+                        border: 1px solid rgba(74, 222, 128, 0.22);
                     }
 
                     .profile-edit-email-btn {
@@ -669,6 +743,9 @@ export default function ProfilePage() {
                     .profile-solve-row-cc:hover {
                         border-color: rgba(216, 180, 254, 0.3) !important;
                     }
+                    .profile-solve-row-ac:hover {
+                        border-color: rgba(74, 222, 128, 0.3) !important;
+                    }
                     .profile-solve-problem-link {
                         color: #FFFFFF;
                         text-decoration: none;
@@ -688,6 +765,9 @@ export default function ProfilePage() {
                     }
                     .profile-solve-row-cc:hover .profile-solve-problem-link {
                         color: #F3E8FF;
+                    }
+                    .profile-solve-row-ac:hover .profile-solve-problem-link {
+                        color: #DCFCE7;
                     }
                     .profile-solve-problem-link:active {
                         transform: scale(0.98);
@@ -871,6 +951,29 @@ export default function ProfilePage() {
                             }
                         />
 
+                        <Stat
+                            variant="ac"
+                            label="ATCODER"
+                            value={
+                                profile.atcoderHandle ? (
+                                    <a
+                                        href={`https://atcoder.jp/users/${profile.atcoderHandle}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="profile-platform-link profile-platform-link-ac"
+                                        style={{ color: "var(--ac-color, #4ADE80)", textDecoration: "none" }}
+                                        title="Open AtCoder profile"
+                                    >
+                                        {profile.atcoderHandle} ↗
+                                    </a>
+                                ) : (
+                                    <span style={{ color: "var(--text-subtle, rgba(255, 255, 255, 0.4))", fontSize: "15px", fontWeight: 500 }}>
+                                        Not Connected
+                                    </span>
+                                )
+                            }
+                        />
+
                     </div>
 
                     <div style={{ ...styles.statRow, marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.07)" }} className="profile-stats-grid">
@@ -897,6 +1000,12 @@ export default function ProfilePage() {
                             label="CC POINTS"
                             value={profile.codechefPoints || 0}
                             color="var(--cc-color, #D8B4FE)"
+                        />
+                        <Stat
+                            variant="ac"
+                            label="AC POINTS"
+                            value={profile.atcoderPoints || 0}
+                            color="var(--ac-color, #4ADE80)"
                         />
                     </div>
 
@@ -1389,6 +1498,108 @@ export default function ProfilePage() {
                         </div>
                     )}
 
+                    {isOwner && (
+                        <div style={styles.cfConnect}>
+                            <div style={{ ...styles.eyebrow, color: "#4ADE80" }}>
+                                {profile.atcoderConnected ? "ATCODER" : "CONNECT ATCODER"}
+                            </div>
+
+                            {!profile.atcoderConnected ? (
+                                <>
+                                    <div style={{ ...styles.privateLine, marginBottom: 12 }}>
+                                        Connect your AtCoder account to earn leaderboard points.
+                                    </div>
+
+                                    {!acVerifyInfo ? (
+                                        <form onSubmit={handleStartAcVerification} style={styles.cfForm} className="profile-cf-form">
+                                            <input
+                                                className="profile-input"
+                                                placeholder="AtCoder Handle"
+                                                value={atcoderHandle}
+                                                onChange={(e) => setAtcoderHandle(e.target.value)}
+                                                required
+                                            />
+                                            <button className="profile-btn profile-btn-ac">
+                                                Connect
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <div style={{ marginTop: 12 }}>
+                                            <p style={styles.instructions}>
+                                                Set your AtCoder <strong>Affiliation (所属)</strong> in your{" "}
+                                                <a
+                                                    href={acVerifyInfo.settingsUrl || "https://atcoder.jp/settings"}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    style={{ ...styles.link, color: "#4ADE80" }}
+                                                >
+                                                    Profile Settings
+                                                </a>{" "}
+                                                to:
+                                            </p>
+                                            <div
+                                                style={{
+                                                    margin: "10px 0 14px",
+                                                    padding: "12px 16px",
+                                                    border: "1px solid rgba(74, 222, 128, 0.3)",
+                                                    borderRadius: "10px",
+                                                    background: "rgba(74, 222, 128, 0.08)",
+                                                    fontFamily: "'Space Grotesk', sans-serif",
+                                                    color: "#4ADE80",
+                                                    fontSize: "15px",
+                                                    fontWeight: 700,
+                                                    display: "inline-block"
+                                                }}
+                                            >
+                                                {acVerifyInfo.verificationCode}
+                                            </div>
+                                            <p style={{ ...styles.instructions, fontSize: "12px", color: "var(--text-dim, rgba(255, 255, 255, 0.5))" }}>
+                                                Or submit broken code (Compile Error) to{" "}
+                                                <a
+                                                    href={acVerifyInfo.problemUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    style={{ ...styles.link, color: "#4ADE80" }}
+                                                >
+                                                    problem {acVerifyInfo.problemCode}
+                                                </a>{" "}
+                                                within {acVerifyInfo.windowMinutes} minutes.
+                                            </p>
+                                            <button
+                                                className="profile-btn profile-btn-ac"
+                                                onClick={handleCheckAcVerification}
+                                            >
+                                                Verify Account
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <div className="profile-connected-badge profile-connected-badge-ac">
+                                        <span>✅</span>
+                                        <span style={{ color: "var(--text-secondary, rgba(255, 255, 255, 0.75))" }}>Connected as</span>
+                                        <strong style={{ color: "var(--ac-color, #4ADE80)", fontWeight: 700 }}>{profile.atcoderHandle}</strong>
+                                    </div>
+                                    <div style={{ marginTop: 14 }}>
+                                        <button
+                                            className="profile-btn profile-btn-disconnect"
+                                            onClick={handleDisconnectAtcoder}
+                                        >
+                                            Disconnect
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
+                            {acVerifyMsg && (
+                                <div style={styles.verifyMsg}>
+                                    {acVerifyMsg}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                 </div>
 
                 <ProfileHeatmap activityMap={profile.activityMap} userCreatedAt={profile.createdAt} />
@@ -1408,10 +1619,11 @@ export default function ProfilePage() {
                             {profile.solvedSubmissions.slice(0, 5).map(sub => {
                                 const isCf = sub.platform === "codeforces";
                                 const isCc = sub.platform === "codechef";
+                                const isAc = sub.platform === "atcoder";
                                 return (
                                     <div
                                         key={sub._id}
-                                        className={`profile-solve-row profile-solve-row-${isCf ? "cf" : isCc ? "cc" : "lc"}`}
+                                        className={`profile-solve-row profile-solve-row-${isCf ? "cf" : isCc ? "cc" : isAc ? "ac" : "lc"}`}
                                         style={{
                                             display: "flex",
                                             alignItems: "center",
@@ -1432,12 +1644,12 @@ export default function ProfilePage() {
                                                     padding: "3px 8px",
                                                     borderRadius: "6px",
                                                     fontFamily: "'Space Grotesk', sans-serif",
-                                                    color: isCf ? "#7DD3FC" : isCc ? "#D8B4FE" : "#FB923C",
-                                                    background: isCf ? "rgba(99, 223, 255, 0.12)" : isCc ? "rgba(216, 180, 254, 0.12)" : "rgba(251, 146, 60, 0.12)",
-                                                    border: `1px solid ${isCf ? "rgba(99, 223, 255, 0.25)" : isCc ? "rgba(216, 180, 254, 0.25)" : "rgba(251, 146, 60, 0.25)"}`
+                                                    color: isCf ? "#7DD3FC" : isCc ? "#D8B4FE" : isAc ? "#4ADE80" : "#FB923C",
+                                                    background: isCf ? "rgba(99, 223, 255, 0.12)" : isCc ? "rgba(216, 180, 254, 0.12)" : isAc ? "rgba(74, 222, 128, 0.12)" : "rgba(251, 146, 60, 0.12)",
+                                                    border: `1px solid ${isCf ? "rgba(99, 223, 255, 0.25)" : isCc ? "rgba(216, 180, 254, 0.25)" : isAc ? "rgba(74, 222, 128, 0.25)" : "rgba(251, 146, 60, 0.25)"}`
                                                 }}
                                             >
-                                                {isCf ? "CF" : isCc ? "CC" : "LC"}
+                                                {isCf ? "CF" : isCc ? "CC" : isAc ? "AC" : "LC"}
                                             </span>
                                             {sub.problemUrl ? (
                                                 <a
@@ -1548,6 +1760,11 @@ function Stat({
             bg: "var(--cc-dim, rgba(216, 180, 254, 0.035))",
             border: "var(--cc-border, rgba(216, 180, 254, 0.16))",
             labelColor: "var(--cc-accent, #D8B4FE)"
+        },
+        ac: {
+            bg: "var(--ac-dim, rgba(74, 222, 128, 0.035))",
+            border: "var(--ac-border, rgba(74, 222, 128, 0.16))",
+            labelColor: "var(--ac-accent, #4ADE80)"
         },
         total: {
             bg: "var(--accent-green-dim, rgba(94, 234, 212, 0.035))",

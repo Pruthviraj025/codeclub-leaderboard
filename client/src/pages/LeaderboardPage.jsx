@@ -11,9 +11,11 @@ export default function LeaderboardPage() {
   const [refreshingCf, setRefreshingCf] = useState(false);
   const [refreshingLc, setRefreshingLc] = useState(false);
   const [refreshingCc, setRefreshingCc] = useState(false);
+  const [refreshingAc, setRefreshingAc] = useState(false);
   const [cfMsg, setCfMsg] = useState('');
   const [lcMsg, setLcMsg] = useState('');
   const [ccMsg, setCcMsg] = useState('');
+  const [acMsg, setAcMsg] = useState('');
   const [showInfo, setShowInfo] = useState(false);
   const user = getSessionUser();
   const navigate = useNavigate();
@@ -81,6 +83,21 @@ export default function LeaderboardPage() {
     }
   }
 
+  async function handleRefreshAc() {
+    setRefreshingAc(true);
+    setAcMsg('');
+    try {
+      const res = await api.refreshAtcoder();
+      const added = res.pointsAdded || 0;
+      setAcMsg(added > 0 ? `AC: +${added} points` : 'AC: No new solves found.');
+      await loadLeaderboard();
+    } catch (err) {
+      setAcMsg(`AC: ${err.message}`);
+    } finally {
+      setRefreshingAc(false);
+    }
+  }
+
   if (!user) return null;
 
   return (
@@ -111,21 +128,26 @@ export default function LeaderboardPage() {
           <button style={styles.refreshBtnCc} className="refresh-btn refresh-btn-cc" onClick={handleRefreshCc} disabled={refreshingCc}>
             {refreshingCc ? 'Checking…' : '↻ Refresh CC'}
           </button>
+          <button style={styles.refreshBtnAc} className="refresh-btn refresh-btn-ac" onClick={handleRefreshAc} disabled={refreshingAc}>
+            {refreshingAc ? 'Checking…' : '↻ Refresh AC'}
+          </button>
         </div>
       </div>
 
       {cfMsg && <div style={{ ...styles.refreshMsg, color: '#7DD3FC' }}>{cfMsg}</div>}
       {lcMsg && <div style={{ ...styles.refreshMsg, color: '#FCD34D' }}>{lcMsg}</div>}
       {ccMsg && <div style={{ ...styles.refreshMsg, color: '#D8B4FE' }}>{ccMsg}</div>}
+      {acMsg && <div style={{ ...styles.refreshMsg, color: 'var(--ac-color, #4ADE80)' }}>{acMsg}</div>}
       {error && <div style={styles.error}>{error}</div>}
 
       <div style={styles.queue} className="leaderboard-queue">
         <div style={styles.queueHeader} className="leaderboard-queue-header">
           <span style={{ ...styles.col, width: '48px' }} className="queue-col-rank">RANK</span>
           <span style={{ ...styles.col, flex: 1 }}>USER</span>
-          <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cf">CF</span>
-          <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-lc">LC</span>
-          <span style={{ ...styles.col, width: '80px', textAlign: 'right' }} className="queue-col-cc">CC</span>
+          <span style={{ ...styles.col, width: '70px', textAlign: 'right' }} className="queue-col-cf">CF</span>
+          <span style={{ ...styles.col, width: '70px', textAlign: 'right' }} className="queue-col-lc">LC</span>
+          <span style={{ ...styles.col, width: '70px', textAlign: 'right' }} className="queue-col-cc">CC</span>
+          <span style={{ ...styles.col, width: '70px', textAlign: 'right' }} className="queue-col-ac">AC</span>
           <span style={{ ...styles.col, width: '85px', textAlign: 'right', color: 'var(--text, #FFFFFF)' }} className="queue-col-points">TOTAL</span>
         </div>
 
@@ -187,25 +209,42 @@ export default function LeaderboardPage() {
                     <CodeChefIcon />
                   </a>
                 )}
+                {row.atcoderHandle && (
+
+                  <a href={`https://atcoder.jp/users/${row.atcoderHandle}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={styles.cfIconLink}
+                    className="platform-icon-link"
+                    title={`Open ${row.atcoderHandle} on AtCoder`}
+                  >
+                    <AtCoderIcon />
+                  </a>
+                )}
                 <span
                   style={styles.nameLink}
                   className="user-name-link"
                   onClick={(e) => { e.stopPropagation(); navigate(`/profile/${row.userId}`); }}
                 >
-                  {row.cfHandle || row.lcUsername || row.ccHandle || row.name}
+                  {row.cfHandle || row.lcUsername || row.ccHandle || row.atcoderHandle || row.name}
                 </span>
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--cf-color, #7DD3FC)', fontWeight: 600, fontSize: '15px' }} className="queue-col-cf">
+              <span style={{ ...styles.col, width: '70px', textAlign: 'right', color: 'var(--cf-color, #7DD3FC)', fontWeight: 600, fontSize: '15px' }} className="queue-col-cf">
                 {row.codeforcesPoints}
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--lc-color, #FB923C)', fontWeight: 600, fontSize: '15px' }} className="queue-col-lc">
+              <span style={{ ...styles.col, width: '70px', textAlign: 'right', color: 'var(--lc-color, #FB923C)', fontWeight: 600, fontSize: '15px' }} className="queue-col-lc">
                 {row.leetcodePoints}
               </span>
 
-              <span style={{ ...styles.col, width: '80px', textAlign: 'right', color: 'var(--cc-color, #D8B4FE)', fontWeight: 600, fontSize: '15px' }} className="queue-col-cc">
+              <span style={{ ...styles.col, width: '70px', textAlign: 'right', color: 'var(--cc-color, #D8B4FE)', fontWeight: 600, fontSize: '15px' }} className="queue-col-cc">
                 {row.codechefPoints || 0}
+              </span>
+
+              <span style={{ ...styles.col, width: '70px', textAlign: 'right', color: 'var(--ac-color, #4ADE80)', fontWeight: 600, fontSize: '15px' }} className="queue-col-ac">
+                {row.atcoderPoints || 0}
               </span>
 
               <span style={{ ...styles.col, width: '85px', textAlign: 'right', fontWeight: 700, color: 'var(--text, #FFFFFF)', fontSize: '16px' }} className="queue-col-points">
@@ -268,6 +307,16 @@ function CodeChefIcon() {
   );
 }
 
+function AtCoderIcon({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" fill="#202020" stroke="#4ADE80" strokeWidth="1.5" />
+      <path d="M12 6L6.5 18H9.5L10.8 15H13.2L14.5 18H17.5L12 6Z" fill="#4ADE80" />
+      <path d="M11.2 13H12.8" stroke="#202020" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const RATING_MAP = [
   [800, 200], [900, 300], [1000, 600], [1100, 700], [1200, 1000],
   [1300, 1100], [1400, 1400], [1500, 1500], [1600, 1800], [1700, 1900],
@@ -314,6 +363,25 @@ const CODECHEF_MAP = [
   ['3000+', 5500]
 ];
 
+const ATCODER_MAP = [
+  ['< 200 / Unrated', 100],
+  ['200–399', 200],
+  ['400–599', 300],
+  ['600–799', 450],
+  ['800–999', 700],
+  ['1000–1199', 1000],
+  ['1200–1399', 1300],
+  ['1400–1599', 1600],
+  ['1600–1799', 2000],
+  ['1800–1999', 2400],
+  ['2000–2199', 2800],
+  ['2200–2399', 3400],
+  ['2400–2599', 4000],
+  ['2600–2799', 4500],
+  ['2800–2999', 5000],
+  ['3000+', 5500]
+];
+
 function InfoModal({ onClose }) {
   return (
     <div style={styles.overlay} onClick={onClose}>
@@ -330,6 +398,7 @@ function InfoModal({ onClose }) {
               <li>Codeforces Accepted submissions are scored.</li>
               <li>LeetCode Accepted submissions are scored.</li>
               <li>CodeChef Accepted submissions are scored.</li>
+              <li>AtCoder Accepted submissions are scored.</li>
               <li>All platforms contribute toward your <strong>Total Points</strong>.</li>
             </ul>
           </section>
@@ -350,6 +419,16 @@ function InfoModal({ onClose }) {
             <ul style={styles.list}>
               <li>Connect your CodeChef handle on your Profile page by submitting non-compiling code to problem TEST.</li>
               <li>Only <strong>Accepted (100 pts)</strong> solutions count.</li>
+              <li>Each problem awards points once within the 7-day rolling window.</li>
+              <li>Points scale based on problem difficulty rating intervals (see table below).</li>
+            </ul>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>AtCoder scoring</div>
+            <ul style={styles.list}>
+              <li>Connect your AtCoder handle on your Profile page by setting your Affiliation or submitting broken code to problem practice_1.</li>
+              <li>Only <strong>Accepted (AC)</strong> solutions count.</li>
               <li>Each problem awards points once within the 7-day rolling window.</li>
               <li>Points scale based on problem difficulty rating intervals (see table below).</li>
             </ul>
@@ -397,6 +476,18 @@ function InfoModal({ onClose }) {
                 <div key={range} style={styles.ratingCell}>
                   <span className="mono" style={{ ...styles.ratingNum, fontSize: '9px' }}>{range}</span>
                   <span className="mono" style={{ ...styles.ratingPts, color: '#D8B4FE' }}>{points}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section style={styles.section}>
+            <div style={styles.sectionTitle}>AtCoder rating → points</div>
+            <div style={styles.ratingGrid}>
+              {ATCODER_MAP.map(([range, points]) => (
+                <div key={range} style={styles.ratingCell}>
+                  <span className="mono" style={{ ...styles.ratingNum, fontSize: '9px' }}>{range}</span>
+                  <span className="mono" style={{ ...styles.ratingPts, color: '#4ADE80' }}>{points}</span>
                 </div>
               ))}
             </div>
@@ -647,6 +738,24 @@ const styles = {
     background: 'var(--cc-dim, rgba(216, 180, 254, 0.04))',
     border: '1px solid var(--cc-border, rgba(216, 180, 254, 0.22))',
     color: 'var(--cc-color, #D8B4FE)',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 600,
+    letterSpacing: '0.4px',
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    cursor: 'pointer'
+  },
+  refreshBtnAc: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    background: 'var(--ac-dim, rgba(74, 222, 128, 0.04))',
+    border: '1px solid var(--ac-border, rgba(74, 222, 128, 0.22))',
+    color: 'var(--ac-color, #4ADE80)',
     borderRadius: '10px',
     padding: '10px 20px',
     fontSize: '14px',

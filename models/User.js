@@ -184,6 +184,48 @@ const UserSchema = new mongoose.Schema({
         default: null
     },
 
+    atcoderHandle: {
+        type: String,
+        default: null,
+        trim: true
+    },
+
+    atcoderConnected: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+
+    atcoderConnectedAt: {
+        type: Date,
+        default: null
+    },
+
+    atcoderVerification: {
+        method: {
+            type: String,
+            default: "affiliation"
+        },
+        verificationCode: {
+            type: String,
+            default: null
+        },
+        verifiedAt: {
+            type: Date,
+            default: null
+        }
+    },
+
+    atcoderVerificationRequestedAt: {
+        type: Date,
+        default: null
+    },
+
+    lastCheckedAtcoderSubmissionId: {
+        type: Number,
+        default: null
+    },
+
     lastRefreshAt: {
         type: Date,
         default: null
@@ -200,6 +242,11 @@ const UserSchema = new mongoose.Schema({
     },
 
     lastCcRefreshAt: {
+        type: Date,
+        default: null
+    },
+
+    lastAtcoderRefreshAt: {
         type: Date,
         default: null
     },
@@ -227,6 +274,11 @@ UserSchema.index({
 
 UserSchema.index({
     ccConnected: 1,
+    isActive: 1
+});
+
+UserSchema.index({
+    atcoderConnected: 1,
     isActive: 1
 });
 

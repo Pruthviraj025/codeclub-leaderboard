@@ -6,6 +6,7 @@ const ScoredSubmission = require("../models/ScoredSubmission");
 const { resolvePoints } = require("../utils/ratingMap");
 const { refreshLeetCodeScore } = require("./leetcodeService");
 const { refreshCodechefScore } = require("./codechefService");
+const { refreshAtcoderScore } = require("./atcoderService");
 
 const REFRESH_COOLDOWN_MS = 15 * 1000;
 const MAX_RETRIES = 3;
@@ -267,6 +268,13 @@ async function refreshUserScore(
         error: null
     };
 
+    let atcoder = {
+        newlyScored: [],
+        pointsAdded: 0,
+        success: false,
+        error: null
+    };
+
     try {
 
         const result =
@@ -333,6 +341,28 @@ async function refreshUserScore(
 
     }
 
+    try {
+
+        const result =
+            await refreshAtcoderScore(user);
+
+        atcoder = {
+            ...result,
+            success: true,
+            error: null
+        };
+
+    } catch (err) {
+
+        atcoder.error = err.message;
+
+        console.error(
+            "AtCoder refresh failed:",
+            err.message
+        );
+
+    }
+
     await User.updateOne(
         { _id: user._id },
         { $set: { lastRefreshAt: new Date() } }
@@ -346,10 +376,13 @@ async function refreshUserScore(
 
         codechef: cc,
 
+        atcoder: atcoder,
+
         totalPointsAdded:
             cf.pointsAdded +
             lc.pointsAdded +
-            cc.pointsAdded
+            cc.pointsAdded +
+            atcoder.pointsAdded
 
     };
 
@@ -481,6 +514,48 @@ async function refreshCcOnly(userId, options = {}) {
 
 }
 
+async function refreshAtcoderOnly(userId, options = {}) {
+
+    const user =
+        await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (
+        !options.ignoreCooldown &&
+        user.lastAtcoderRefreshAt &&
+        Date.now() -
+            user.lastAtcoderRefreshAt.getTime() <
+            REFRESH_COOLDOWN_MS
+    ) {
+
+        const wait =
+            REFRESH_COOLDOWN_MS -
+            (
+                Date.now() -
+                user.lastAtcoderRefreshAt.getTime()
+            );
+
+        throw new Error(
+            `Refresh on cooldown. Try again in ${Math.ceil(wait / 1000)}s`
+        );
+
+    }
+
+    const result =
+        await refreshAtcoderScore(user);
+
+    await User.updateOne(
+        { _id: user._id },
+        { $set: { lastAtcoderRefreshAt: new Date() } }
+    );
+
+    return result;
+
+}
+
 module.exports = {
 
     refreshUserScore,
@@ -491,9 +566,13 @@ module.exports = {
 
     refreshCcOnly,
 
+    refreshAtcoderOnly,
+
     refreshCodeforcesScore,
 
     refreshCodechefScore,
+
+    refreshAtcoderScore,
 
     fetchCFSubmissions,
 

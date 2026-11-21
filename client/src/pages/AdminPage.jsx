@@ -286,6 +286,7 @@ function ReviewTab() {
               const u = s.userId || {};
               const isCf = s.platform === 'codeforces' || (!s.platform && s.cfSubmissionId);
               const isCc = s.platform === 'codechef';
+              const isAc = s.platform === 'atcoder';
               
               let contestId = s.contestId;
               let problemIndex = s.problemIndex;
@@ -301,25 +302,37 @@ function ReviewTab() {
                 problemIndex = s.problemId;
               }
 
-              const subId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || s.ccSubmissionId;
+              const subId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || s.ccSubmissionId || s.atcoderSubmissionId;
               
               const problemUrl = s.problemUrl || (
                 isCf
                   ? (contestId && problemIndex ? `https://codeforces.com/contest/${contestId}/problem/${problemIndex}` : (s.problemId ? `https://codeforces.com/problemset/problem/${s.problemId}` : null))
-                  : (isCc ? (s.problemId ? `https://www.codechef.com/problems/${s.problemId}` : null) : (s.problemId ? `https://leetcode.com/problems/${s.problemId}/` : null))
+                  : (isCc
+                      ? (s.problemId ? `https://www.codechef.com/problems/${s.problemId}` : null)
+                      : (isAc
+                          ? (s.problemId ? `https://atcoder.jp/contests/${contestId || s.problemId.split('_')[0]}/tasks/${s.problemId}` : null)
+                          : (s.problemId ? `https://leetcode.com/problems/${s.problemId}/` : null)))
               );
 
               const submissionUrl = s.submissionUrl || (
                 isCf
                   ? (contestId && s.cfSubmissionId ? `https://codeforces.com/contest/${contestId}/submission/${s.cfSubmissionId}` : (s.cfSubmissionId ? `https://codeforces.com/submission/${s.cfSubmissionId}` : null))
-                  : (isCc ? (s.ccSubmissionId ? `https://www.codechef.com/viewsolution/${s.ccSubmissionId}` : null) : (s.lcSubmissionId ? `https://leetcode.com/submissions/detail/${s.lcSubmissionId}/` : null))
+                  : (isCc
+                      ? (s.ccSubmissionId ? `https://www.codechef.com/viewsolution/${s.ccSubmissionId}` : null)
+                      : (isAc
+                          ? (s.atcoderSubmissionId ? `https://atcoder.jp/contests/${contestId || (s.problemId ? s.problemId.split('_')[0] : '')}/submissions/${s.atcoderSubmissionId}` : null)
+                          : (s.lcSubmissionId ? `https://leetcode.com/submissions/detail/${s.lcSubmissionId}/` : null)))
               );
 
               const problemTitle = s.problemName || (isCf ? (contestId && problemIndex ? `Contest ${contestId} · Prob ${problemIndex}` : s.problemId) : s.problemId) || 'Problem';
 
               const userPlatformHandle = isCf
                 ? (u.cfHandle ? `CF: ${u.cfHandle}` : null)
-                : (isCc ? (u.ccHandle ? `CC: ${u.ccHandle}` : null) : (u.lcUsername ? `LC: ${u.lcUsername}` : null));
+                : (isCc
+                    ? (u.ccHandle ? `CC: ${u.ccHandle}` : null)
+                    : (isAc
+                        ? (u.atcoderHandle ? `AC: ${u.atcoderHandle}` : null)
+                        : (u.lcUsername ? `LC: ${u.lcUsername}` : null)));
 
               return (
                 <div key={s._id} style={styles.tableRow}>
@@ -333,8 +346,8 @@ function ReviewTab() {
 
                   <div style={{ flex: 3 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={isCf ? styles.pillCf : (isCc ? styles.pillCc : styles.pillLc)}>
-                        {isCf ? 'CF' : (isCc ? 'CC' : 'LC')}
+                      <span style={isCf ? styles.pillCf : (isCc ? styles.pillCc : (isAc ? styles.pillAc : styles.pillLc))}>
+                        {isCf ? 'CF' : (isCc ? 'CC' : (isAc ? 'AC' : 'LC'))}
                       </span>
                       {problemUrl ? (
                         <a
@@ -946,6 +959,16 @@ const styles = {
     color: 'var(--cc-accent, #D8B4FE)',
     background: 'var(--cc-dim, rgba(216, 180, 254, 0.12))',
     border: '1px solid var(--cc-border, rgba(216, 180, 254, 0.28))',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    fontSize: '13px',
+    fontWeight: 700,
+    fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  },
+  pillAc: {
+    color: 'var(--ac-accent, #4ADE80)',
+    background: 'var(--ac-dim, rgba(74, 222, 128, 0.12))',
+    border: '1px solid var(--ac-border, rgba(74, 222, 128, 0.28))',
     borderRadius: '6px',
     padding: '4px 10px',
     fontSize: '13px',

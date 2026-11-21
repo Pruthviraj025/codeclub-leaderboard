@@ -10,6 +10,7 @@ const CACHE_MS = 5 * 60 * 1000;
 const DIVISION_ORDER = ['Div. 1', 'Div. 2', 'Div. 3', 'Div. 4', 'Div. 1 + 2', 'Educational', 'Global', 'Other'];
 const LEETCODE_CATEGORIES = ['Upcoming & Live', 'Weekly Contest', 'Biweekly Contest', 'Past Contests'];
 const CODECHEF_CATEGORIES = ['Upcoming & Live', 'Starters', 'Cook-Off', 'Lunchtime', 'DSA Challenges', 'Other Contests'];
+const ATCODER_CATEGORIES = ['Upcoming & Live', 'ABC', 'ARC', 'AGC', 'AHC', 'Other Contests'];
 
 function detectCFDivision(name) {
   const n = name.toLowerCase();
@@ -38,6 +39,17 @@ function detectCCGroup(name, code, phase) {
   if (/cook/i.test(n) || c.startsWith('COOK')) return 'Cook-Off';
   if (/lunch/i.test(n) || c.startsWith('LTIME')) return 'Lunchtime';
   if (/dsa|munch|prep|placement/i.test(n) || c.startsWith('DSAMONDAY') || c.startsWith('PLACEPREP')) return 'DSA Challenges';
+  return 'Other Contests';
+}
+
+function detectACGroup(name, id, phase) {
+  if (phase === 'BEFORE' || phase === 'CODING') return 'Upcoming & Live';
+  const i = (id || '').toLowerCase();
+  const n = (name || '').toLowerCase();
+  if (i.startsWith('abc') || n.includes('beginner')) return 'ABC';
+  if (i.startsWith('arc') || n.includes('regular')) return 'ARC';
+  if (i.startsWith('agc') || n.includes('grand')) return 'AGC';
+  if (i.startsWith('ahc') || n.includes('heuristic')) return 'AHC';
   return 'Other Contests';
 }
 
@@ -226,29 +238,95 @@ async function fetchCodeChefContests() {
   }
 }
 
+async function fetchAtCoderContests() {
+  try {
+    const response = await axios.get('https://kenkoooo.com/atcoder/resources/contests.json', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      timeout: 10000
+    });
+
+    if (!Array.isArray(response.data)) {
+      return { contests: [], grouped: {} };
+    }
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    const sorted = response.data
+      .filter(c => c && c.id && c.start_epoch_second)
+      .sort((a, b) => b.start_epoch_second - a.start_epoch_second);
+
+    const relevant = sorted.filter(c => {
+      const end = c.start_epoch_second + (c.duration_second || 0);
+      return end >= nowSec - 30 * 24 * 3600;
+    }).slice(0, 60);
+
+    const contests = relevant.map(c => {
+      const start = c.start_epoch_second;
+      const durationSeconds = c.duration_second || 0;
+      const end = start + durationSeconds;
+      let phase = 'FINISHED';
+      if (nowSec < start) {
+        phase = 'BEFORE';
+      } else if (nowSec >= start && nowSec <= end) {
+        phase = 'CODING';
+      }
+
+      const division = detectACGroup(c.title, c.id, phase);
+
+      return {
+        id: `ac-${c.id}`,
+        rawId: c.id,
+        code: c.id,
+        name: c.title || c.id,
+        platform: 'atcoder',
+        phase,
+        startTimeSeconds: start,
+        durationSeconds,
+        division,
+        url: `https://atcoder.jp/contests/${c.id}`
+      };
+    });
+
+    const grouped = {};
+    for (const c of contests) {
+      if (!grouped[c.division]) grouped[c.division] = [];
+      grouped[c.division].push(c);
+    }
+
+    return { contests, grouped };
+  } catch (err) {
+    console.error('Error fetching AtCoder contests:', err.message);
+    return { contests: [], grouped: {} };
+  }
+}
+
 router.get('/', requireAuth, async (req, res) => {
   try {
     if (cache.data && Date.now() - cache.fetchedAt < CACHE_MS) {
       return res.json(cache.data);
     }
 
-    const [cfRes, lcRes, ccRes] = await Promise.allSettled([
+    const [cfRes, lcRes, ccRes, acRes] = await Promise.allSettled([
       fetchCodeforcesContests(),
       fetchLeetCodeContests(),
-      fetchCodeChefContests()
+      fetchCodeChefContests(),
+      fetchAtCoderContests()
     ]);
 
     const cfData = cfRes.status === 'fulfilled' ? cfRes.value : { contests: [], grouped: {} };
     const lcData = lcRes.status === 'fulfilled' ? lcRes.value : { contests: [], grouped: {} };
     const ccData = ccRes.status === 'fulfilled' ? ccRes.value : { contests: [], grouped: {} };
+    const acData = acRes.status === 'fulfilled' ? acRes.value : { contests: [], grouped: {} };
 
-    const allContests = [...cfData.contests, ...lcData.contests, ...ccData.contests];
+    const allContests = [...cfData.contests, ...lcData.contests, ...ccData.contests, ...acData.contests];
 
     const stats = {
       totalCount: allContests.length,
       cfCount: cfData.contests.length,
       lcCount: lcData.contests.length,
       ccCount: ccData.contests.length,
+      acCount: acData.contests.length,
       upcomingCount: allContests.filter(c => c.phase === 'BEFORE').length,
       liveCount: allContests.filter(c => c.phase === 'CODING').length
     };
@@ -257,6 +335,7 @@ router.get('/', requireAuth, async (req, res) => {
       codeforces: cfData,
       leetcode: lcData,
       codechef: ccData,
+      atcoder: acData,
       allContests,
       stats
     };

@@ -12,7 +12,7 @@ router.use(requireAuth, requireAdmin);
 
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected lcUsername lcConnected ccHandle ccConnected createdAt')
+    const users = await User.find({}, 'name usn email role isActive cfHandle cfConnected lcUsername lcConnected ccHandle ccConnected atcoderHandle atcoderConnected createdAt')
       .sort({ createdAt: -1 });
     res.json(users);
   } catch (err) {
@@ -24,7 +24,7 @@ router.get('/submissions', async (req, res) => {
   try {
     const status = req.query.status || 'unreviewed';
     const submissions = await ScoredSubmission.find({ reviewStatus: status })
-      .populate('userId', 'name usn cfHandle lcUsername ccHandle')
+      .populate('userId', 'name usn cfHandle lcUsername ccHandle atcoderHandle')
       .sort({ createdAt: -1 })
       .limit(100)
       .lean();
@@ -32,9 +32,10 @@ router.get('/submissions', async (req, res) => {
     const enriched = submissions.map(s => {
       let contestId = s.contestId || null;
       let problemIndex = s.problemIndex || null;
-      const submissionId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || s.ccSubmissionId || null;
+      const submissionId = s.submissionId || s.cfSubmissionId || s.lcSubmissionId || s.ccSubmissionId || s.atcoderSubmissionId || null;
       const isCf = s.platform === 'codeforces' || !s.platform;
       const isCc = s.platform === 'codechef';
+      const isAc = s.platform === 'atcoder';
 
       if (isCf && s.problemId) {
         const m = String(s.problemId).match(/^(\d+)([a-zA-Z0-9]+)$/);
@@ -68,6 +69,14 @@ router.get('/submissions', async (req, res) => {
         }
         if (s.ccSubmissionId) {
           submissionUrl = `https://www.codechef.com/viewsolution/${s.ccSubmissionId}`;
+        }
+      } else if (isAc) {
+        const contest = contestId || (s.problemId ? s.problemId.split('_')[0] : null);
+        if (contest && s.problemId) {
+          problemUrl = `https://atcoder.jp/contests/${contest}/tasks/${s.problemId}`;
+        }
+        if (contest && s.atcoderSubmissionId) {
+          submissionUrl = `https://atcoder.jp/contests/${contest}/submissions/${s.atcoderSubmissionId}`;
         }
       } else {
         if (s.problemId) {
