@@ -239,11 +239,16 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 acTotal += dayData.atcoder || 0;
             }
 
-            const currentMonth = cursor.getMonth();
-            if (currentMonth !== lastMonth && cursor.getDate() <= 7) {
-                const monthName = cursor.toLocaleDateString("en-US", { month: "short" });
-                monthPositions.push({ colIndex, label: monthName });
-                lastMonth = currentMonth;
+            if (cursor.getDay() === 0) {
+                const currentMonth = cursor.getMonth();
+                if (currentMonth !== lastMonth) {
+                    // Skip a partial leading month if fewer than ~2 weeks remain before the next month
+                    if (colIndex > 0 || cursor.getDate() <= 14) {
+                        const monthName = cursor.toLocaleDateString("en-US", { month: "short" });
+                        monthPositions.push({ colIndex, label: monthName });
+                    }
+                    lastMonth = currentMonth;
+                }
             }
 
             currentWeek.push({
@@ -840,22 +845,20 @@ export default function ProfileHeatmap({ activityMap = {}, userCreatedAt = null 
                 <div style={styles.gridContainer}>
                     {/* Month labels along the top */}
                     <div style={styles.monthRow}>
-                        <div style={{ width: "24px" }} /> {/* spacer for weekday labels */}
+                        <div style={{ width: "22px", flexShrink: 0 }} /> {/* spacer for weekday labels */}
                         <div style={styles.monthLabelsTrack}>
-                            {monthLabels.map((m, idx) => (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        position: "absolute",
-                                        left: `${m.colIndex * 13}px`,
-                                        fontSize: "12px",
-                                        color: "var(--text-dim, rgba(255, 255, 255, 0.6))",
-                                        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-                                    }}
-                                >
-                                    {m.label}
-                                </div>
-                            ))}
+                            {weeks.map((_, wIdx) => {
+                                const m = monthLabels.find((item) => item.colIndex === wIdx);
+                                return (
+                                    <div key={wIdx} style={styles.monthLabelSlot}>
+                                        {m && (
+                                            <span style={styles.monthLabelText}>
+                                                {m.label}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -1175,13 +1178,29 @@ const styles = {
     monthRow: {
         display: "flex",
         alignItems: "center",
+        gap: "6px",
         height: "18px",
         position: "relative"
     },
     monthLabelsTrack: {
-        position: "relative",
-        flex: 1,
+        display: "flex",
+        gap: "2.5px",
         height: "18px"
+    },
+    monthLabelSlot: {
+        width: "11px",
+        flexShrink: 0,
+        position: "relative",
+        height: "18px"
+    },
+    monthLabelText: {
+        position: "absolute",
+        left: 0,
+        top: 0,
+        whiteSpace: "nowrap",
+        fontSize: "12px",
+        color: "var(--text-dim, rgba(255, 255, 255, 0.6))",
+        fontFamily: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     },
     bodyRow: {
         display: "flex",

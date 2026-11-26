@@ -160,6 +160,15 @@ export default function AnalyticsPage() {
                       fontFamily: "'Space Grotesk', sans-serif",
                       boxShadow: isDark ? '0 12px 30px rgba(0, 0, 0, 0.7)' : '0 8px 24px rgba(15, 23, 42, 0.08)'
                     }}
+                    labelStyle={{
+                      color: isDark ? '#FFFFFF' : '#0F172A',
+                      fontWeight: 600,
+                      marginBottom: 4
+                    }}
+                    itemStyle={{
+                      color: isDark ? '#5EEAD4' : '#0F766E',
+                      fontWeight: 500
+                    }}
                     formatter={(value) => [value, yLabel]}
                   />
                   <Bar dataKey="value" radius={[6, 6, 0, 0]}>
